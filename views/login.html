@@ -1,0 +1,497 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta name="keywords" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta name="author" content="كاتدرائية السمائيين" />
+    <meta name="theme-color" content="#402958" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta property="og:title" content="تسجيل الدخول | كاتدرائية السمائيين" />
+    <meta property="og:description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <title>تسجيل الدخول | كاتدرائية السمائيين</title>
+    <link rel="icon" href="/UI/icon.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/UI/icon.png" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        font-family: "Cairo", system-ui, sans-serif;
+        color-scheme: dark;
+        --bg: radial-gradient(circle at top right, #402958, #2a1b3c 60%);
+        --card-bg: rgba(64, 41, 88, 0.85);
+        --accent: #ffcc00;
+        --accent-soft: rgba(255, 204, 0, 0.12);
+        --text: #f2f4ff;
+        --muted: #d1c4e9;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        direction: rtl;
+        scrollbar-width: thin;
+        scrollbar-color: #ffcc00 rgba(255, 204, 0, 0.15);
+      }
+
+      body::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      body::-webkit-scrollbar-track {
+        background: rgba(255, 204, 0, 0.1);
+      }
+
+      body::-webkit-scrollbar-thumb {
+        background: #ffcc00;
+        border-radius: 12px;
+      }
+
+      body::-webkit-scrollbar-thumb:hover {
+        background: #ffd84d;
+      }
+
+      .auth-shell {
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 160px 20px 20px 20px;
+      }
+
+      .nav-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10000;
+        background: var(--nav-bg);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(255, 204, 0, 0.15);
+      }
+
+      .nav-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2rem;
+        height: 80px;
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+        flex: 1;
+      }
+
+      .nav-logo-container {
+        position: relative;
+      }
+
+      .nav-logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid var(--accent);
+        box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+        object-fit: cover;
+        margin-top: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-logo:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 30px rgba(255, 204, 0, 0.5);
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+        justify-content: flex-end;
+      }
+
+      .user-nav-login {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffcc00;
+        color: #000;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .user-nav-login:hover {
+        background: #e6b800;
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 1024px) {
+        .nav-bar {
+          padding: 0 1.5rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .nav-bar {
+          height: 70px;
+          padding: 0 1rem;
+        }
+
+        .user-nav-login {
+          padding: 8px 16px;
+          font-size: 0.85rem;
+        }
+      }
+
+      .login-panel {
+        border-radius: 12px;
+        padding: 30px;
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 25px rgba(42, 27, 60, 0.5);
+        width: 100%;
+        max-width: 460px;
+        backdrop-filter: blur(10px);
+      }
+
+      .login-panel h2 {
+        margin: 0 0 10px;
+        font-size: 1.6rem;
+        color: #ffcc00;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      .login-panel p {
+        margin: 0 0 20px;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      #login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      #login-form label {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #ffcc00;
+      }
+
+      #login-form input {
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        font-size: 1rem;
+        font-family: "Cairo", sans-serif;
+        transition: all 0.2s ease;
+        width: 100%;
+      }
+
+      #login-form input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      #login-form button {
+        margin-top: 10px;
+        border: none;
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffcc00, #ffaa00);
+        color: #402958;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+        transition: all 0.2s ease;
+        font-family: "Cairo", sans-serif;
+      }
+
+      #login-form button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 204, 0, 0.4);
+        background: linear-gradient(135deg, #ffd700, #ffbb00);
+      }
+
+      #login-form button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      #verification-code-section {
+        display: none;
+        margin-top: 20px;
+        padding: 20px;
+        background: rgba(255, 204, 0, 0.1);
+        border-radius: 10px;
+        border: 2px solid rgba(255, 204, 0, 0.3);
+      }
+
+      #verification-code-section label {
+        color: #ffcc00;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: block;
+        font-size: 1rem;
+      }
+
+      #verification-code {
+        text-align: center;
+        font-size: 24px;
+        letter-spacing: 10px;
+        font-weight: bold;
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ffcc00;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffcc00;
+        font-family: monospace;
+      }
+
+      #verification-code-section small {
+        color: #ffcc00;
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+
+      #error-message {
+        min-height: 20px;
+        color: #ff7a8a;
+        font-size: 0.9rem;
+        text-align: center;
+        margin: 8px 0;
+      }
+
+      small {
+        color: var(--muted);
+        font-size: 0.9rem;
+        text-align: center;
+        display: block;
+        margin-top: 15px;
+      }
+
+      small a {
+        color: #ffcc00;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      small a:hover {
+        text-decoration: underline;
+      }
+
+      footer {
+        color: #ffffff;
+        text-align: center;
+        padding: 15px 0;
+        width: 100%;
+        background-color: transparent;
+        font-size: 0.9rem;
+        margin-top: 15px;
+      }
+
+      @media (max-width: 768px) {
+        .auth-shell {
+          padding: 140px 15px 15px 15px;
+        }
+
+        .login-panel {
+          padding: 25px;
+        }
+
+        .nav-logo {
+          width: 54px;
+          height: 54px;
+        }
+
+        .user-nav-login {
+          padding: 8px 16px;
+          font-size: 0.9rem;
+        }
+
+        .login-panel h2 {
+          font-size: 1.4rem;
+        }
+
+        #verification-code {
+          font-size: 22px;
+          letter-spacing: 8px;
+          padding: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .auth-shell {
+          padding: 125px 10px 10px 10px;
+        }
+
+        .login-panel {
+          padding: 20px;
+        }
+
+        .nav-logo {
+          width: 48px;
+          height: 48px;
+        }
+
+        .user-nav-login {
+          padding: 7px 12px;
+          font-size: 0.85rem;
+        }
+
+        .login-panel h2 {
+          font-size: 1.3rem;
+        }
+
+        .login-panel p {
+          font-size: 0.95rem;
+        }
+
+        #login-form input {
+          padding: 11px 13px;
+          font-size: 0.95rem;
+        }
+
+        #login-form button {
+          padding: 12px;
+          font-size: 0.95rem;
+        }
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f0f0f0;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #f4c400;
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #e0b200;
+      }
+
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #f4c400 #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav-container">
+      <div class="nav-bar">
+        <div class="nav-left">
+          <div class="nav-logo-container">
+            <img src="/UI/logo.png" alt="كاتدرائية السمائيين" class="nav-logo" />
+          </div>
+        </div>
+        <div class="nav-right">
+          <a href="/" class="user-nav-login" aria-label="العودة إلى الصفحة الرئيسية">
+            <i class="fas fa-home" aria-hidden="true"></i>
+            <span>العودة للرئيسية</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="auth-shell">
+      <section class="login-panel">
+        <h2>تسجيل الدخول</h2>
+        <p>استخدم بيانات الحسابك.</p>
+        <form id="login-form">
+          <label for="username">اسم المستخدم</label>
+          <input
+            type="text"
+            id="username"
+            autocomplete="username"
+            required
+            placeholder="مثال: carl"
+          />
+
+          <label for="password">كلمة المرور</label>
+          <input
+            type="password"
+            id="password"
+            autocomplete="current-password"
+            required
+            placeholder=""
+          />
+
+          <div id="verification-code-section">
+            <label for="verification-code">🔑 كود التحقق (6 أرقام)</label>
+            <input
+              type="text"
+              id="verification-code"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              placeholder="123456"
+            />
+            <small>أدخل كود التحقق الذي استلمته من المسؤول</small>
+          </div>
+
+          <button type="submit">تسجيل الدخول</button>
+          <p id="error-message" aria-live="polite"></p>
+        </form>
+        <small>ليس لديك حساب؟ <a href="/register">إنشاء حساب جديد</a></small>
+      </section>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 كاتدرائية السمائيين. جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="/login.js" type="module"></script>
+  </body>
+</html>
