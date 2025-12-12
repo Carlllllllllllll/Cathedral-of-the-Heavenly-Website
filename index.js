@@ -19,34 +19,6 @@ const fs = require("fs");
 
 console.log(`[SERVER] Starting Church Website Application...`);
 
-const submissionLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Too many submissions. Please wait 15 minutes before trying again.",
-  },
-  keyGenerator: (req) => {
-    return req.session.username || req.ip;
-  }
-});
-
-const globalRateLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Too many requests. Please slow down.",
-  },
-  skip: (req) => {
-    return req.session.role === 'admin' || req.session.role === 'leadadmin';
-  }
-});
-
 const GRADE_SLUGS = [
   "prep1",
   "prep2",
@@ -202,9 +174,6 @@ app.use(
   })
 );
 
-app.use(globalRateLimiter);
-app.use(mongoSanitize());
-app.use(cors(corsOptions));
 app.use(mongoSanitize());
 app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: "10mb" }));
@@ -382,78 +351,6 @@ const WEBHOOK_RETRY_DELAYS = [0, 750, 2000];
 const webhookHealth = new Map();
 
 const sleep = (ms) => (ms && ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve());
-
-const os = require('os');
-
-function checkMemoryUsage() {
-  const used = process.memoryUsage();
-  const totalMem = os.totalmem();
-  const freeMem = os.freemem();
-  const usedMem = totalMem - freeMem;
-  const memoryUsagePercent = (usedMem / totalMem) * 100;
-  
-  return {
-    heapUsed: Math.round(used.heapUsed / 1024 / 1024),
-    heapTotal: Math.round(used.heapTotal / 1024 / 1024),
-    rss: Math.round(used.rss / 1024 / 1024),
-    systemTotal: Math.round(totalMem / 1024 / 1024),
-    systemUsed: Math.round(usedMem / 1024 / 1024),
-    systemFree: Math.round(freeMem / 1024 / 1024),
-    memoryUsagePercent: Math.round(memoryUsagePercent * 100) / 100
-  };
-}
-
-function isMemoryCritical() {
-  const memory = checkMemoryUsage();
-  return memory.memoryUsagePercent > 85 || memory.heapUsed > 450;
-}
-
-setInterval(async () => {
-  const memory = checkMemoryUsage();
-  
-  if (memory.memoryUsagePercent > 80) {
-    await sendWebhook('SYSTEM', {
-      embeds: [{
-        title: '⚠️ High Memory Usage Warning',
-        color: 0xf59e0b,
-        fields: [
-          { name: 'Heap Used', value: `${memory.heapUsed} MB`, inline: true },
-          { name: 'Heap Total', value: `${memory.heapTotal} MB`, inline: true },
-          { name: 'RSS', value: `${memory.rss} MB`, inline: true },
-          { name: 'System Usage', value: `${memory.memoryUsagePercent}%`, inline: true },
-          { name: 'Status', value: '⚠️ High', inline: true }
-        ],
-        timestamp: new Date().toISOString()
-      }]
-    });
-  }
-  
-  if (isMemoryCritical()) {
-    await sendWebhook('ERROR', {
-      embeds: [{
-        title: '🚨 Critical Memory Usage',
-        color: 0xe74c3c,
-        fields: [
-          { name: 'Heap Used', value: `${memory.heapUsed} MB`, inline: true },
-          { name: 'Memory Usage', value: `${memory.memoryUsagePercent}%`, inline: true },
-          { name: 'Status', value: '🚨 CRITICAL', inline: true },
-          { name: 'Action', value: 'Initiated cleanup', inline: true }
-        ],
-        timestamp: new Date().toISOString()
-      }]
-    });
-    
-    if (global.gc) {
-      global.gc();
-    }
-    
-    try {
-      await cleanupOldFiles();
-    } catch (error) {
-      console.error('[MEMORY CLEANUP ERROR]', error.message);
-    }
-  }
-}, 60000);
 
 function prefixContent(content, prefix) {
   if (!content || typeof content !== "string") {
@@ -6423,7 +6320,7 @@ app.get(
   }
 );
 
-app.post("/api/suggestions", requireAuth, submissionLimiter, async (req, res) => {
+app.post("/api/suggestions", requireAuth, async (req, res) => {
   try {
     const user = getSessionUser(req);
     if (!user) {
@@ -9145,7 +9042,7 @@ app.get("/form/:link", requireAuth, async (req, res) => {
   }
 });
 
-app.post("/form/:link", requireAuth, submissionLimiter, async (req, res) => {
+app.post("/form/:link", requireAuth, async (req, res) => {
   const formLink = req.params.link;
   const { deviceId, ...answers } = req.body;
   const userIp = req.ip || "unknown";
@@ -10054,7 +9951,7 @@ app.get("/api/gift-shop/my-points", requireAuth, async (req, res) => {
   }
 });
 
-app.post("/api/gift-shop/purchase", requireAuth, submissionLimiter, async (req, res) => {
+app.post("/api/gift-shop/purchase", requireAuth, async (req, res) => {
   try {
     const { itemId } = req.body;
 
@@ -12598,104 +12495,6 @@ async function checkAndBanUnverifiedUsers() {
 
 setInterval(checkAndBanUnverifiedUsers, 60 * 60 * 1000);
 setTimeout(checkAndBanUnverifiedUsers, 5000);
-
-
-app.use((req, res, next) => {
-  if (isMemoryCritical()) {
-    return res.status(503).json({
-      success: false,
-      message: "Server is under heavy load. Please try again in a few moments.",
-      retryAfter: 30
-    });
-  }
-  next();
-});
-
-process.on('uncaughtException', async (error) => {
-  await sendWebhook('ERROR', {
-    embeds: [{
-      title: '🚨 Uncaught Exception',
-      color: 0xe74c3c,
-      fields: [
-        { name: 'Error', value: error.message },
-        { name: 'Stack', value: error.stack?.substring(0, 500) || 'No stack' },
-        { name: 'Time', value: new Date().toISOString() }
-      ],
-      timestamp: new Date().toISOString()
-    }]
-  });
-  
-  if (error.code === 'EMFILE' || error.message.includes('EMFILE')) {
-    console.error('[CRITICAL] Too many open files. Consider increasing ulimit.');
-  }
-  
-  if (!error.message.includes('ECONNRESET')) {
-    process.exit(1);
-  }
-});
-
-process.on('unhandledRejection', async (reason, promise) => {
-  await sendWebhook('ERROR', {
-    embeds: [{
-      title: '⚠️ Unhandled Promise Rejection',
-      color: 0xf59e0b,
-      fields: [
-        { name: 'Reason', value: reason?.message || String(reason) },
-        { name: 'Time', value: new Date().toISOString() }
-      ],
-      timestamp: new Date().toISOString()
-    }]
-  });
-});
-
-
-app.use((req, res, next) => {
-  if (isMemoryCritical()) {
-    return res.status(503).json({
-      success: false,
-      message: "Server is under heavy load. Please try again in a few moments.",
-      retryAfter: 30
-    });
-  }
-  next();
-});
-
-process.on('uncaughtException', async (error) => {
-  await sendWebhook('ERROR', {
-    embeds: [{
-      title: '🚨 Uncaught Exception',
-      color: 0xe74c3c,
-      fields: [
-        { name: 'Error', value: error.message },
-        { name: 'Stack', value: error.stack?.substring(0, 500) || 'No stack' },
-        { name: 'Time', value: new Date().toISOString() }
-      ],
-      timestamp: new Date().toISOString()
-    }]
-  });
-  
-  if (error.code === 'EMFILE' || error.message.includes('EMFILE')) {
-    console.error('[CRITICAL] Too many open files. Consider increasing ulimit.');
-  }
-  
-  if (!error.message.includes('ECONNRESET')) {
-    process.exit(1);
-  }
-});
-
-process.on('unhandledRejection', async (reason, promise) => {
-  await sendWebhook('ERROR', {
-    embeds: [{
-      title: '⚠️ Unhandled Promise Rejection',
-      color: 0xf59e0b,
-      fields: [
-        { name: 'Reason', value: reason?.message || String(reason) },
-        { name: 'Time', value: new Date().toISOString() }
-      ],
-      timestamp: new Date().toISOString()
-    }]
-  });
-});
 
 app.use(async (err, req, res, next) => {
   await sendWebhook("ERROR", {
