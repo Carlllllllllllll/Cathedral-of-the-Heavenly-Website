@@ -127,8 +127,8 @@ app.set("trust proxy", 1);
 const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
-      "https://kenisa-elsamma2yeen.ooguy.com",
-      "https://kenisa-elsamma2yeen.ooguy.com",
+      "https://kenisa-el-sama2eyeen.ooguy.com",
+      "https://kenisa-el-sama2eyeen.ooguy.com",
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
