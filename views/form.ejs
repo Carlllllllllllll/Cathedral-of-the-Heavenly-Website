@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
@@ -1035,6 +1035,63 @@
       const desktopArrow = document.getElementById('desktopArrow');
       const mobileArrow = document.getElementById('mobileArrow');
 
+      const formLink = '<%= form.link %>';
+      const storageKey = `form_${formLink}_answers`;
+      const totalQuestions = <%= form.questions.length %>;
+
+      function saveAnswersToLocalStorage() {
+          const answers = {};
+          for (let index = 0; index < totalQuestions; index++) {
+              const radio = document.querySelector(`input[name="q${index}"]:checked`);
+              if (radio) {
+                  answers[`q${index}`] = radio.value;
+              }
+          }
+          localStorage.setItem(storageKey, JSON.stringify(answers));
+      }
+
+      function loadAnswersFromLocalStorage() {
+          const saved = localStorage.getItem(storageKey);
+          if (saved) {
+              try {
+                  const answers = JSON.parse(saved);
+                  for (const [questionName, value] of Object.entries(answers)) {
+                      const radio = document.querySelector(`input[name="${questionName}"][value="${value}"]`);
+                      if (radio) {
+                          radio.checked = true;
+                      }
+                  }
+              } catch (error) {
+                  console.error('Error loading saved answers:', error);
+              }
+          }
+      }
+
+      function clearLocalStorageAnswers() {
+          localStorage.removeItem(storageKey);
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+          loadAnswersFromLocalStorage();
+
+          const radioInputs = document.querySelectorAll('input[type="radio"]');
+          radioInputs.forEach(input => {
+              input.addEventListener('change', saveAnswersToLocalStorage);
+          });
+
+          const textInputs = document.querySelectorAll('input[type="text"], textarea');
+          textInputs.forEach(input => {
+              input.addEventListener('input', saveAnswersToLocalStorage);
+          });
+
+          window.addEventListener('beforeunload', function(event) {
+              const hasUnsavedChanges = localStorage.getItem(storageKey);
+              if (hasUnsavedChanges) {
+                  saveAnswersToLocalStorage();
+              }
+          });
+      });
+
       mobileMenuBtn.addEventListener('click', function(e) {
           e.stopPropagation();
           const isOpen = mobileDropdown.classList.toggle('active');
@@ -1222,9 +1279,6 @@
       const solveForm = document.getElementById('solve-form');
       const submitBtn = document.querySelector('#solve-form .submit-btn');
       if (solveForm) {
-          const formLink = '<%= form.link %>';
-          const totalQuestions = <%= form.questions.length %>;
-
           const generateDeviceId = () => {
               if (crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
               return `device-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -1282,6 +1336,7 @@
                   const result = await response.json();
 
                   if (response.ok && result.success) {
+                      clearLocalStorageAnswers();
                       await Swal.fire({
                           text: result.message || 'تم إرسال إجاباتك بنجاح.',
                           icon: 'success',
