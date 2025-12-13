@@ -29,8 +29,8 @@ const submissionLimiter = rateLimit({
     message: "Too many submissions. Please wait 15 minutes before trying again.",
   },
   keyGenerator: (req) => {
-    return req.session.username || req.ip;
-  }
+    return req.session?.username || req.ip;
+  },
 });
 
 const globalRateLimiter = rateLimit({
@@ -43,8 +43,9 @@ const globalRateLimiter = rateLimit({
     message: "Too many requests. Please slow down.",
   },
   skip: (req) => {
-    return req.session.role === 'admin' || req.session.role === 'leadadmin';
-  }
+    const role = req.session?.role;
+    return role === "admin" || role === "leadadmin";
+  },
 });
 
 const GRADE_SLUGS = [
@@ -202,6 +203,23 @@ app.use(
   })
 );
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      ttl: 14 * 24 * 60 * 60,
+    }),
+    cookie: {
+      maxAge: 14 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    },
+  })
+);
+
 app.use(globalRateLimiter);
 app.use(mongoSanitize());
 app.use(cors(corsOptions));
@@ -231,23 +249,6 @@ const loginLimiter = rateLimit({
     message: "Too many login attempts. Try again later.",
   },
 });
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
-      ttl: 14 * 24 * 60 * 60,
-    }),
-    cookie: {
-      maxAge: 14 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    },
-  })
-);
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
