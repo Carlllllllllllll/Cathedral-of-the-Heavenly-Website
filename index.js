@@ -19,6 +19,34 @@ const fs = require("fs");
 
 console.log(`[SERVER] Starting Church Website Application...`);
 
+const submissionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many submissions. Please wait 15 minutes before trying again.",
+  },
+  keyGenerator: (req) => {
+    return req.session.username || req.ip;
+  }
+});
+
+const globalRateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests. Please slow down.",
+  },
+  skip: (req) => {
+    return req.session.role === 'admin' || req.session.role === 'leadadmin';
+  }
+});
+
 const GRADE_SLUGS = [
   "prep1",
   "prep2",
@@ -174,6 +202,9 @@ app.use(
   })
 );
 
+app.use(globalRateLimiter);
+app.use(mongoSanitize());
+app.use(cors(corsOptions));
 app.use(mongoSanitize());
 app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: "10mb" }));
@@ -352,6 +383,78 @@ const webhookHealth = new Map();
 
 const sleep = (ms) => (ms && ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve());
 
+const os = require('os');
+
+function checkMemoryUsage() {
+  const used = process.memoryUsage();
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const usedMem = totalMem - freeMem;
+  const memoryUsagePercent = (usedMem / totalMem) * 100;
+  
+  return {
+    heapUsed: Math.round(used.heapUsed / 1024 / 1024),
+    heapTotal: Math.round(used.heapTotal / 1024 / 1024),
+    rss: Math.round(used.rss / 1024 / 1024),
+    systemTotal: Math.round(totalMem / 1024 / 1024),
+    systemUsed: Math.round(usedMem / 1024 / 1024),
+    systemFree: Math.round(freeMem / 1024 / 1024),
+    memoryUsagePercent: Math.round(memoryUsagePercent * 100) / 100
+  };
+}
+
+function isMemoryCritical() {
+  const memory = checkMemoryUsage();
+  return memory.memoryUsagePercent > 85 || memory.heapUsed > 450;
+}
+
+setInterval(async () => {
+  const memory = checkMemoryUsage();
+  
+  if (memory.memoryUsagePercent > 80) {
+    await sendWebhook('SYSTEM', {
+      embeds: [{
+        title: '⚠️ High Memory Usage Warning',
+        color: 0xf59e0b,
+        fields: [
+          { name: 'Heap Used', value: `${memory.heapUsed} MB`, inline: true },
+          { name: 'Heap Total', value: `${memory.heapTotal} MB`, inline: true },
+          { name: 'RSS', value: `${memory.rss} MB`, inline: true },
+          { name: 'System Usage', value: `${memory.memoryUsagePercent}%`, inline: true },
+          { name: 'Status', value: '⚠️ High', inline: true }
+        ],
+        timestamp: new Date().toISOString()
+      }]
+    });
+  }
+  
+  if (isMemoryCritical()) {
+    await sendWebhook('ERROR', {
+      embeds: [{
+        title: '🚨 Critical Memory Usage',
+        color: 0xe74c3c,
+        fields: [
+          { name: 'Heap Used', value: `${memory.heapUsed} MB`, inline: true },
+          { name: 'Memory Usage', value: `${memory.memoryUsagePercent}%`, inline: true },
+          { name: 'Status', value: '🚨 CRITICAL', inline: true },
+          { name: 'Action', value: 'Initiated cleanup', inline: true }
+        ],
+        timestamp: new Date().toISOString()
+      }]
+    });
+    
+    if (global.gc) {
+      global.gc();
+    }
+    
+    try {
+      await cleanupOldFiles();
+    } catch (error) {
+      console.error('[MEMORY CLEANUP ERROR]', error.message);
+    }
+  }
+}, 60000);
+
 function prefixContent(content, prefix) {
   if (!content || typeof content !== "string") {
     return `${prefix} update`;
@@ -455,7 +558,7 @@ function updateWebhookStats(envKey, success) {
   webhookHealth.set(envKey, current);
 }
 
-async function sendWebhook(webhookType, data = {}) {
+async function dispatchWebhook(webhookType, data = {}) {
   const registryEntry = WEBHOOK_REGISTRY[webhookType];
   const eventId = uuidv4();
   if (!registryEntry) {
@@ -501,6 +604,20 @@ async function sendWebhook(webhookType, data = {}) {
       .join(", ")}`
   );
   return false;
+}
+
+function sendWebhook(webhookType, data = {}, options = {}) {
+  const awaitResponse = options.awaitResponse === true;
+  const deliveryPromise = dispatchWebhook(webhookType, data);
+  if (awaitResponse) {
+    return deliveryPromise;
+  }
+  deliveryPromise.catch((error) => {
+    console.error(
+      `[WEBHOOK][${webhookType}] async dispatch failed: ${error.message}`
+    );
+  });
+  return Promise.resolve(true);
 }
 
 async function sendFileDeleteWebhook(
@@ -806,6 +923,10 @@ const ActiveSessionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  lastSeenAt: {
+    type: Date,
+    default: Date.now,
+  },
   expiresAt: {
     type: Date,
     required: true,
@@ -814,6 +935,20 @@ const ActiveSessionSchema = new mongoose.Schema({
 });
 
 const ActiveSession = mongoose.model("ActiveSession", ActiveSessionSchema);
+
+async function destroyStoredSession(sessionStore, sessionId) {
+  if (!sessionStore || typeof sessionStore.destroy !== "function" || !sessionId) {
+    return;
+  }
+  await new Promise((resolve) => {
+    sessionStore.destroy(sessionId, (err) => {
+      if (err) {
+        console.error(`[SESSION DESTROY ERROR] ${sessionId}:`, err.message);
+      }
+      resolve();
+    });
+  });
+}
 
 async function connectToDatabase() {
   try {
@@ -1114,6 +1249,101 @@ async function hasLeaderboardAccess(username) {
   return !!accessRecord;
 }
 
+function isApiRequest(req) {
+  return req.path.startsWith("/api/");
+}
+
+async function respondWithSessionReset(req, res, message) {
+  const finalizeResponse = () => {
+    if (isApiRequest(req)) {
+      res.status(401).json({
+        success: false,
+        message: message || "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+      });
+    } else {
+      res.redirect("/login");
+    }
+  };
+
+  if (req.session) {
+    await new Promise((resolve) => {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("[SESSION DESTROY ERROR]", err.message);
+        }
+        resolve();
+      });
+    });
+  }
+
+  finalizeResponse();
+}
+
+async function handleInvalidActiveSession(req, res, reason, activeRecord) {
+  await sendWebhook("SECURITY", {
+    embeds: [
+      {
+        title: "🚫 Session Validation Failed",
+        color: 0xe74c3c,
+        fields: [
+          { name: "Username", value: req.session.username || "Unknown", inline: true },
+          { name: "Path", value: req.path, inline: true },
+          { name: "IP", value: req.ip || "unknown", inline: true },
+          { name: "Reason", value: reason, inline: false },
+          {
+            name: "Request Session ID",
+            value: req.sessionID ? req.sessionID.substring(0, 20) + "..." : "Unknown",
+            inline: true,
+          },
+          {
+            name: "Active Session ID",
+            value: activeRecord?.sessionId
+              ? activeRecord.sessionId.substring(0, 20) + "..."
+              : "None",
+            inline: true,
+          },
+        ],
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  });
+
+  await respondWithSessionReset(
+    req,
+    res,
+    "تم تسجيل الدخول من جهاز آخر. الرجاء تسجيل الدخول مجدداً."
+  );
+}
+
+async function validateActiveSessionOwnership(req, res) {
+  if (!req.session?.username) {
+    return true;
+  }
+
+  const normalizedUsername = req.session.username.toLowerCase();
+  const activeRecord = await ActiveSession.findOne({
+    username: normalizedUsername,
+    expiresAt: { $gt: new Date() },
+  });
+
+  if (!activeRecord) {
+    await handleInvalidActiveSession(req, res, "Active session record missing", null);
+    return false;
+  }
+
+  if (activeRecord.sessionId !== req.sessionID) {
+    await handleInvalidActiveSession(req, res, "Session mismatch detected", activeRecord);
+    return false;
+  }
+
+  await ActiveSession.updateOne(
+    { _id: activeRecord._id },
+    { $set: { lastSeenAt: new Date() } }
+  );
+
+  return true;
+}
+
 async function requireAuth(req, res, next) {
   if (!req.session.isAuthenticated) {
     await sendWebhook("SECURITY", {
@@ -1132,6 +1362,11 @@ async function requireAuth(req, res, next) {
       ],
     });
     return res.redirect("/login");
+  }
+
+  const sessionValid = await validateActiveSessionOwnership(req, res);
+  if (!sessionValid) {
+    return;
   }
 
   const user = getSessionUser(req);
@@ -1608,81 +1843,6 @@ app.post("/login", loginLimiter, async (req, res) => {
     ],
   });
 
-  const existingSession = await ActiveSession.findOne({
-    username: normalizedUsername,
-    expiresAt: { $gt: new Date() },
-  });
-
-  if (existingSession) {
-    const parser = new UAParser();
-    const deviceInfo = parser.setUA(userAgent).getResult();
-    const device = `${deviceInfo.os.name || "Unknown OS"} (${
-      deviceInfo.browser.name || "Unknown Browser"
-    })`;
-
-    await sendWebhook("SECURITY", {
-      content: `⚠️ **Multiple Login Detected - Logging Out Old Session**`,
-      embeds: [
-        {
-          title: "User Logged In On Another Device - Force Logout",
-          color: 0xf59e0b,
-          fields: [
-            { name: "Username", value: username, inline: true },
-            { name: "New Device", value: device, inline: true },
-            {
-              name: "Old Session IP",
-              value: existingSession.ip || "unknown",
-              inline: true,
-            },
-            {
-              name: "Old Session Device",
-              value: existingSession.userAgent?.substring(0, 100) || "Unknown",
-              inline: false,
-            },
-            {
-              name: "Old Session Login Time",
-              value: existingSession.loginTime.toLocaleString(),
-              inline: true,
-            },
-            {
-              name: "Old Session ID",
-              value: existingSession.sessionId?.substring(0, 20) + "...",
-              inline: true,
-            },
-            {
-              name: "Status",
-              value: "Force logout old session, allowing new login",
-              inline: true,
-            },
-            { name: "IP", value: req.ip || "unknown", inline: true },
-          ],
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    });
-
-    try {
-      const sessionStore = req.sessionStore;
-      if (sessionStore && sessionStore.destroy && existingSession.sessionId) {
-        await new Promise((resolve, reject) => {
-          sessionStore.destroy(existingSession.sessionId, (err) => {
-            if (err) {
-              console.error("[SESSION DESTROY ERROR]", err.message);
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        });
-      }
-    } catch (sessionError) {
-      console.error("[SESSION DESTROY ERROR]", sessionError.message);
-    }
-
-    await ActiveSession.deleteMany({
-      username: normalizedUsername,
-    });
-  }
 
   const isEmail = username.includes("@");
   const isPhone = /^01\d{9}$/.test(username.replace(/\D/g, ""));
@@ -2228,19 +2388,99 @@ app.post("/login", loginLimiter, async (req, res) => {
   const sessionId = req.sessionID;
   const sessionExpiry = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
-  const activeSession = new ActiveSession({
-    username: normalizedUsername,
-    sessionId: sessionId,
-    userAgent: userAgent,
-    ip: req.ip || "unknown",
-    loginTime: new Date(),
-    expiresAt: sessionExpiry,
-  });
+  let replacedSession = null;
 
   try {
-    await activeSession.save();
+    const previousSession = await ActiveSession.findOneAndUpdate(
+      { username: normalizedUsername },
+      {
+        username: normalizedUsername,
+        sessionId,
+        userAgent: userAgent,
+        ip: req.ip || "unknown",
+        loginTime: new Date(),
+        lastSeenAt: new Date(),
+        expiresAt: sessionExpiry,
+      },
+      {
+        upsert: true,
+        new: false,
+        setDefaultsOnInsert: true,
+      }
+    );
+
+    if (
+      previousSession &&
+      previousSession.sessionId &&
+      previousSession.sessionId !== sessionId
+    ) {
+      replacedSession = previousSession;
+    }
+
+    await ActiveSession.deleteMany({
+      username: normalizedUsername,
+      sessionId: { $ne: sessionId },
+    });
   } catch (sessionError) {
     console.error("[SESSION ERROR]", sessionError.message);
+  }
+
+  if (replacedSession) {
+    await sendWebhook("SECURITY", {
+      content: `⚠️ **Multiple Login Detected - Logging Out Old Session**`,
+      embeds: [
+        {
+          title: "User Logged In On Another Device - Force Logout",
+          color: 0xf59e0b,
+          fields: [
+            {
+              name: "Username",
+              value: user.originalUsername || username,
+              inline: true,
+            },
+            { name: "New Device", value: device, inline: true },
+            {
+              name: "Old Session IP",
+              value: replacedSession.ip || "unknown",
+              inline: true,
+            },
+            {
+              name: "Old Session Device",
+              value: replacedSession.userAgent?.substring(0, 100) || "Unknown",
+              inline: false,
+            },
+            {
+              name: "Old Session Login Time",
+              value: replacedSession.loginTime
+                ? replacedSession.loginTime.toLocaleString()
+                : "Unknown",
+              inline: true,
+            },
+            {
+              name: "Old Session ID",
+              value: replacedSession.sessionId
+                ? replacedSession.sessionId.substring(0, 20) + "..."
+                : "Unknown",
+              inline: true,
+            },
+            {
+              name: "Status",
+              value: "Force logout old session, allowing new login",
+              inline: true,
+            },
+            { name: "IP", value: req.ip || "unknown", inline: true },
+          ],
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    });
+
+    if (
+      replacedSession.sessionId &&
+      replacedSession.sessionId !== sessionId
+    ) {
+      await destroyStoredSession(req.sessionStore, replacedSession.sessionId);
+    }
   }
 
   await sendWebhook("USER", {
@@ -3278,7 +3518,8 @@ app.post(
 
       const approvalWebhookDelivered = await sendWebhook(
         "REGISTRATION_APPROVAL",
-        approvalWebhookPayload
+        approvalWebhookPayload,
+        { awaitResponse: true }
       );
       if (!approvalWebhookDelivered) {
         console.warn(
@@ -6320,7 +6561,7 @@ app.get(
   }
 );
 
-app.post("/api/suggestions", requireAuth, async (req, res) => {
+app.post("/api/suggestions", requireAuth, submissionLimiter, async (req, res) => {
   try {
     const user = getSessionUser(req);
     if (!user) {
@@ -6433,34 +6674,46 @@ app.post("/api/suggestions", requireAuth, async (req, res) => {
     });
 
     if (recent) {
-      await sendWebhook("USER", {
+      const duplicateEmbed = {
+        title: "⏰ Suggestion Submission - Rate Limited",
+        color: 0xf59e0b,
+        fields: [
+          { name: "Username", value: req.session.username, inline: true },
+          { name: "Category", value: normalizedCategory, inline: true },
+          {
+            name: "Last Submission",
+            value: recent.createdAt.toLocaleString(),
+            inline: true,
+          },
+          {
+            name: "Time Since Last",
+            value: `${Math.floor(
+              (new Date() - recent.createdAt) / (1000 * 60 * 60 * 24)
+            )} days`,
+            inline: true,
+          },
+          {
+            name: "Limit",
+            value: "1 suggestion per week per category",
+            inline: false,
+          },
+          { name: "Error", value: "Rate limited", inline: true },
+          {
+            name: "Attempted Text",
+            value: suggestionText.substring(0, 1024) || "No text",
+            inline: false,
+          },
+        ],
+        timestamp: new Date().toISOString(),
+      };
+
+      await sendWebhook("USER", { embeds: [duplicateEmbed] });
+      await sendWebhook("SUGGESTION", {
+        content: "♻️ Duplicate suggestion attempt blocked",
         embeds: [
           {
-            title: "⏰ Suggestion Submission - Rate Limited",
-            color: 0xf59e0b,
-            fields: [
-              { name: "Username", value: req.session.username, inline: true },
-              { name: "Category", value: normalizedCategory, inline: true },
-              {
-                name: "Last Submission",
-                value: recent.createdAt.toLocaleString(),
-                inline: true,
-              },
-              {
-                name: "Time Since Last",
-                value: `${Math.floor(
-                  (new Date() - recent.createdAt) / (1000 * 60 * 60 * 24)
-                )} days`,
-                inline: true,
-              },
-              {
-                name: "Limit",
-                value: "1 suggestion per week per category",
-                inline: false,
-              },
-              { name: "Error", value: "Rate limited", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
+            ...duplicateEmbed,
+            title: "♻️ Duplicate Suggestion Attempt",
           },
         ],
       });
@@ -6495,7 +6748,7 @@ app.post("/api/suggestions", requireAuth, async (req, res) => {
       text: suggestionText,
     });
 
-    await sendWebhook("SUGGESTION", {
+    const suggestionPayload = {
       content: `💡 **New Suggestion Submitted**`,
       embeds: [
         {
@@ -6536,7 +6789,14 @@ app.post("/api/suggestions", requireAuth, async (req, res) => {
           timestamp: new Date().toISOString(),
         },
       ],
+    };
+
+    const suggestionLogged = await sendWebhook("SUGGESTION", suggestionPayload, {
+      awaitResponse: true,
     });
+    if (!suggestionLogged) {
+      await sendWebhook("USER", suggestionPayload);
+    }
 
     return res.json({ success: true, suggestion: saved });
   } catch (error) {
@@ -6763,7 +7023,7 @@ app.post("/api/nady", async (req, res) => {
   };
 
   try {
-    const delivered = await sendWebhook("NADY", embed);
+    const delivered = await sendWebhook("NADY", embed, { awaitResponse: true });
     if (delivered) {
       await sendWebhook("USER", {
         embeds: [
@@ -6944,7 +7204,7 @@ app.post("/api/trip", async (req, res) => {
   };
 
   try {
-    const delivered = await sendWebhook("TRIP", embed);
+    const delivered = await sendWebhook("TRIP", embed, { awaitResponse: true });
     if (delivered) {
       await sendWebhook("USER", {
         embeds: [
@@ -7125,7 +7385,7 @@ app.post("/api/ektmaa", async (req, res) => {
   };
 
   try {
-    const delivered = await sendWebhook("EKTMAA", embed);
+    const delivered = await sendWebhook("EKTMAA", embed, { awaitResponse: true });
     if (delivered) {
       await sendWebhook("USER", {
         embeds: [
@@ -9042,7 +9302,7 @@ app.get("/form/:link", requireAuth, async (req, res) => {
   }
 });
 
-app.post("/form/:link", requireAuth, async (req, res) => {
+app.post("/form/:link", requireAuth, submissionLimiter, async (req, res) => {
   const formLink = req.params.link;
   const { deviceId, ...answers } = req.body;
   const userIp = req.ip || "unknown";
@@ -9951,7 +10211,7 @@ app.get("/api/gift-shop/my-points", requireAuth, async (req, res) => {
   }
 });
 
-app.post("/api/gift-shop/purchase", requireAuth, async (req, res) => {
+app.post("/api/gift-shop/purchase", requireAuth, submissionLimiter, async (req, res) => {
   try {
     const { itemId } = req.body;
 
@@ -12495,6 +12755,104 @@ async function checkAndBanUnverifiedUsers() {
 
 setInterval(checkAndBanUnverifiedUsers, 60 * 60 * 1000);
 setTimeout(checkAndBanUnverifiedUsers, 5000);
+
+
+app.use((req, res, next) => {
+  if (isMemoryCritical()) {
+    return res.status(503).json({
+      success: false,
+      message: "Server is under heavy load. Please try again in a few moments.",
+      retryAfter: 30
+    });
+  }
+  next();
+});
+
+process.on('uncaughtException', async (error) => {
+  await sendWebhook('ERROR', {
+    embeds: [{
+      title: '🚨 Uncaught Exception',
+      color: 0xe74c3c,
+      fields: [
+        { name: 'Error', value: error.message },
+        { name: 'Stack', value: error.stack?.substring(0, 500) || 'No stack' },
+        { name: 'Time', value: new Date().toISOString() }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  });
+  
+  if (error.code === 'EMFILE' || error.message.includes('EMFILE')) {
+    console.error('[CRITICAL] Too many open files. Consider increasing ulimit.');
+  }
+  
+  if (!error.message.includes('ECONNRESET')) {
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', async (reason, promise) => {
+  await sendWebhook('ERROR', {
+    embeds: [{
+      title: '⚠️ Unhandled Promise Rejection',
+      color: 0xf59e0b,
+      fields: [
+        { name: 'Reason', value: reason?.message || String(reason) },
+        { name: 'Time', value: new Date().toISOString() }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  });
+});
+
+
+app.use((req, res, next) => {
+  if (isMemoryCritical()) {
+    return res.status(503).json({
+      success: false,
+      message: "Server is under heavy load. Please try again in a few moments.",
+      retryAfter: 30
+    });
+  }
+  next();
+});
+
+process.on('uncaughtException', async (error) => {
+  await sendWebhook('ERROR', {
+    embeds: [{
+      title: '🚨 Uncaught Exception',
+      color: 0xe74c3c,
+      fields: [
+        { name: 'Error', value: error.message },
+        { name: 'Stack', value: error.stack?.substring(0, 500) || 'No stack' },
+        { name: 'Time', value: new Date().toISOString() }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  });
+  
+  if (error.code === 'EMFILE' || error.message.includes('EMFILE')) {
+    console.error('[CRITICAL] Too many open files. Consider increasing ulimit.');
+  }
+  
+  if (!error.message.includes('ECONNRESET')) {
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', async (reason, promise) => {
+  await sendWebhook('ERROR', {
+    embeds: [{
+      title: '⚠️ Unhandled Promise Rejection',
+      color: 0xf59e0b,
+      fields: [
+        { name: 'Reason', value: reason?.message || String(reason) },
+        { name: 'Time', value: new Date().toISOString() }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  });
+});
 
 app.use(async (err, req, res, next) => {
   await sendWebhook("ERROR", {
