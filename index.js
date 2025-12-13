@@ -170,6 +170,12 @@ const corsOptions = {
   credentials: true,
 };
 
+const staticAssetOptions = {
+  cacheControl: true,
+  immutable: process.env.NODE_ENV === "production",
+  maxAge: process.env.NODE_ENV === "production" ? "7d" : 0,
+};
+
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -223,17 +229,15 @@ app.use(
 app.use(globalRateLimiter);
 app.use(mongoSanitize());
 app.use(cors(corsOptions));
-app.use(mongoSanitize());
-app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static(path.join(__dirname, "views")));
-app.use(express.static(path.join(__dirname, "design")));
-app.use(express.static(path.join(__dirname, "scripts")));
-app.use(express.static(path.join(__dirname, "UI")));
-app.use("/design", express.static(path.join(__dirname, "design")));
-app.use("/scripts", express.static(path.join(__dirname, "scripts")));
-app.use("/UI", express.static(path.join(__dirname, "UI")));
+app.use(express.static(path.join(__dirname, "design"), staticAssetOptions));
+app.use(express.static(path.join(__dirname, "scripts"), staticAssetOptions));
+app.use(express.static(path.join(__dirname, "UI"), staticAssetOptions));
+app.use("/design", express.static(path.join(__dirname, "design"), staticAssetOptions));
+app.use("/scripts", express.static(path.join(__dirname, "scripts"), staticAssetOptions));
+app.use("/UI", express.static(path.join(__dirname, "UI"), staticAssetOptions));
 
 app.get("/design2.css", (req, res) => {
   res.sendFile(path.join(__dirname, "design", "design2.css"));

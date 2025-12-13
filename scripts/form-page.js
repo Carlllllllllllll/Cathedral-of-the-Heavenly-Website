@@ -1,5 +1,5 @@
-const submitButton = document.querySelector(".submit-btn");
-const formElement = document.getElementById("solve-form");
+let submitButton;
+let formElement;
 
 async function generateDeviceId() {
   if (!window.FingerprintJS) {
@@ -95,6 +95,29 @@ async function submitForm(event) {
   }
 }
 
-if (formElement) {
-  formElement.addEventListener("submit", submitForm);
-}
+const whenReady = (callback) => {
+  if (typeof callback !== "function") return;
+  let fired = false;
+  const run = () => {
+    if (fired) return;
+    fired = true;
+    callback();
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run, { once: true });
+    window.addEventListener("load", run, { once: true });
+    window.addEventListener("pageshow", run, { once: true });
+  } else {
+    (typeof queueMicrotask === "function"
+      ? queueMicrotask
+      : (fn) => Promise.resolve().then(fn))(run);
+  }
+};
+
+whenReady(() => {
+  submitButton = document.querySelector(".submit-btn");
+  formElement = document.getElementById("solve-form");
+  if (formElement) {
+    formElement.addEventListener("submit", submitForm);
+  }
+});

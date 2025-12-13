@@ -21,6 +21,10 @@
     <title>الصفحة الرئيسية | كاتدرائية السمائيين</title>
     <link rel="icon" href="/UI/icon.png" type="image/png" sizes="16x16" />
     <link rel="apple-touch-icon" href="/UI/icon.png" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link rel="stylesheet" href="/design6.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@400;700&display=swap"
@@ -30,7 +34,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <script src="/console.js"></script>
+    <script src="/console.js" defer></script>
   </head>
   <body>
     <nav class="nav-container">
@@ -53,7 +57,10 @@
       </div>
     </nav>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"
+      defer
+    ></script>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
@@ -84,7 +91,12 @@
         </div>
         <div class="separator"></div>
         <div class="image-container">
-          <img src="/UI/church.png" alt="كاتدرائية السمائيين" />
+          <img
+            src="/UI/church.png"
+            alt="كاتدرائية السمائيين"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </section>
 

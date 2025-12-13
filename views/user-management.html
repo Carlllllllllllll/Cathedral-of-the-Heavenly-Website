@@ -3,8 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
-    <meta name="keywords" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta
+      name="description"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
+    <meta
+      name="keywords"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
     <meta name="author" content="كاتدرائية السمائيين" />
     <meta name="theme-color" content="#402958" />
     <meta name="robots" content="noindex, nofollow" />
@@ -1640,10 +1646,7 @@
 
       <nav class="nav-menu">
         <div class="nav-item">
-          <a
-            href="https://kenisa-el-sama2eyeen.ooguy.com"
-            class="nav-link"
-          >
+          <a href="https://kenisa-el-sama2eyeen.ooguy.com" class="nav-link">
             <i class="fas fa-home"></i>
             الصفحة الرئيسية
           </a>
@@ -1734,11 +1737,23 @@
             طلبات المراجعة
           </a>
         </div>
-        <div class="nav-item">
-          <a href="/admin/suggestion/ektma3at" class="nav-link">
+        <div class="nav-item suggestions-nav-item">
+          <div class="nav-link suggestions-toggle" id="suggestionsToggle">
             <i class="fas fa-lightbulb"></i>
-            اقتراحات الاجتماعات
-          </a>
+            الاقتراحات
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="suggestions-submenu-container">
+            <div class="suggestions-submenu" id="suggestionsSubmenu">
+              <a
+                href="/admin/suggestion/ektma3at"
+                class="nav-link submenu-link"
+              >
+                <i class="fas fa-users"></i>
+                اقتراحات الاجتماعات
+              </a>
+            </div>
+          </div>
         </div>
       </nav>
 
@@ -2013,7 +2028,10 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"
+      defer
+    ></script>
     <script>
       const mobileToggle = document.getElementById("mobileToggle");
       const sidebar = document.getElementById("sidebar");
@@ -2455,7 +2473,7 @@
             secondName,
             email,
             phone,
-            grade
+            grade,
           };
           if (password) updateData.password = password;
 
@@ -3185,6 +3203,46 @@
           }
         }
       }
+      const suggestionsToggle = document.getElementById("suggestionsToggle");
+      const suggestionsSubmenu = document.getElementById("suggestionsSubmenu");
+
+      if (suggestionsToggle) {
+        suggestionsToggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          this.classList.toggle("active");
+          const icon = this.querySelector(".toggle-icon");
+          if (this.classList.contains("active")) {
+            icon.classList.remove("fa-chevron-down");
+            icon.classList.add("fa-chevron-up");
+            suggestionsSubmenu.style.maxHeight =
+              suggestionsSubmenu.scrollHeight + "px";
+          } else {
+            icon.classList.remove("fa-chevron-up");
+            icon.classList.add("fa-chevron-down");
+            suggestionsSubmenu.style.maxHeight = "0";
+          }
+        });
+      }
+
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".suggestions-nav-item")) {
+          const suggestionsToggle =
+            document.getElementById("suggestionsToggle");
+          const suggestionsSubmenu =
+            document.getElementById("suggestionsSubmenu");
+
+          if (
+            suggestionsToggle &&
+            suggestionsToggle.classList.contains("active")
+          ) {
+            suggestionsToggle.classList.remove("active");
+            const icon = suggestionsToggle.querySelector(".toggle-icon");
+            icon.classList.remove("fa-chevron-up");
+            icon.classList.add("fa-chevron-down");
+            suggestionsSubmenu.style.maxHeight = "0";
+          }
+        }
+      });
     </script>
   </body>
 </html>

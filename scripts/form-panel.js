@@ -1,4 +1,23 @@
-document.addEventListener("DOMContentLoaded", () => {
+const whenReady = (callback) => {
+  if (typeof callback !== "function") return;
+  let fired = false;
+  const run = () => {
+    if (fired) return;
+    fired = true;
+    callback();
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run, { once: true });
+    window.addEventListener("load", run, { once: true });
+    window.addEventListener("pageshow", run, { once: true });
+  } else {
+    (typeof queueMicrotask === "function"
+      ? queueMicrotask
+      : (fn) => Promise.resolve().then(fn))(run);
+  }
+};
+
+whenReady(() => {
   const createFormButton = document.getElementById("create-form");
   const formModal = document.getElementById("form-modal");
   const closeButton = formModal

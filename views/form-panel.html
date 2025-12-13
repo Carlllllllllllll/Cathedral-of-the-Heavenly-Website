@@ -3,8 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
-    <meta name="keywords" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta
+      name="description"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
+    <meta
+      name="keywords"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
     <meta name="author" content="كاتدرائية السمائيين" />
     <meta name="theme-color" content="#402958" />
     <meta name="robots" content="noindex, nofollow" />
@@ -12,6 +18,8 @@
     <link rel="icon" href="/UI/icon.png" type="image/png" sizes="16x16" />
     <link rel="apple-touch-icon" href="/UI/icon.png" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -22,12 +30,19 @@
     <link rel="stylesheet" href="/design8.css" />
     <link
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
     />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
-    <script src="form-panel.js"></script>
-    <script src="sidebar.js"></script>
-    <script src="console.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"
+      defer
+    ></script>
+    <script src="/form-panel.js" defer></script>
+    <script src="/sidebar.js" defer></script>
+    <script src="/console.js" defer></script>
   </head>
   <body>
     <div class="mobile-toggle" id="mobileToggle">
@@ -49,10 +64,7 @@
 
       <nav class="nav-menu">
         <div class="nav-item">
-          <a
-            href="https://kenisa-el-sama2eyeen.ooguy.com"
-            class="nav-link"
-          >
+          <a href="https://kenisa-el-sama2eyeen.ooguy.com" class="nav-link">
             <i class="fas fa-home"></i>
             الصفحة الرئيسية
           </a>
@@ -267,16 +279,6 @@
         </div>
       </div>
     </div>
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
     <script>
       const mobileToggle = document.getElementById("mobileToggle");
@@ -3336,6 +3338,174 @@
           padding: 10px 12px;
           font-size: 13px;
         }
+      }
+
+      .sidebar {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        margin: 5px 0;
+      }
+
+      .sidebar::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, var(--accent), #ffd700);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .sidebar::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom, #ffd700, var(--accent));
+        box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+      }
+
+      .nav-menu {
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 5px;
+      }
+
+      .grades-submenu {
+        max-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        transition: max-height 0.4s ease;
+        margin-right: 20px;
+        border-right: 2px solid var(--accent);
+        margin-top: 5px;
+        padding-right: 8px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.03);
+      }
+
+      .grades-submenu::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .grades-submenu::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+      }
+
+      .grades-submenu::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .grades-submenu::-webkit-scrollbar-thumb:hover {
+        background: #ffd700;
+      }
+
+      .section-submenu {
+        max-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        transition: max-height 0.3s ease;
+        margin-right: 20px;
+        margin-top: 5px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 204, 0, 0.7) rgba(255, 255, 255, 0.02);
+      }
+
+      .section-submenu::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .section-submenu::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+      }
+
+      .section-submenu::-webkit-scrollbar-thumb {
+        background: rgba(255, 204, 0, 0.7);
+        border-radius: 10px;
+      }
+
+      .section-submenu::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+      }
+
+      .suggestions-submenu {
+        max-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        transition: max-height 0.4s ease;
+        margin-right: 20px;
+        border-right: 2px solid var(--accent);
+        margin-top: 5px;
+        padding-right: 8px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.03);
+      }
+
+      .suggestions-submenu::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .suggestions-submenu::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+      }
+
+      .suggestions-submenu::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, var(--accent), #ffd700);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .suggestions-submenu::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom, #ffd700, var(--accent));
+        box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+      }
+
+      .grades-submenu-container::before,
+      .grades-submenu-container::after,
+      .suggestions-submenu-container::before,
+      .suggestions-submenu-container::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 12px;
+        height: 20px;
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .grades-submenu-container::before,
+      .suggestions-submenu-container::before {
+        top: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(42, 27, 60, 0.95),
+          transparent
+        );
+      }
+
+      .grades-submenu-container::after,
+      .suggestions-submenu-container::after {
+        bottom: 0;
+        background: linear-gradient(
+          to top,
+          rgba(42, 27, 60, 0.95),
+          transparent
+        );
+      }
+
+      .grades-toggle.active + .grades-submenu-container::before,
+      .grades-toggle.active + .grades-submenu-container::after,
+      .suggestions-toggle.active + .suggestions-submenu-container::before,
+      .suggestions-toggle.active + .suggestions-submenu-container::after {
+        opacity: 1;
       }
     </style>
 
