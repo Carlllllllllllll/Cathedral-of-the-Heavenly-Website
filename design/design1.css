@@ -1528,12 +1528,6 @@ select:focus {
     color: var(--accent);
   }
 
-  .nav-link.active {
-    background: linear-gradient(90deg, var(--accent), #ffd700);
-    color: var(--dark);
-    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
-  }
-
   .sidebar-footer {
     flex-shrink: 0;
     padding-top: 15px;
