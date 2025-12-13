@@ -15,6 +15,25 @@ function calculateEmbedSize(embed) {
   return size;
 }
 
+function truncateText(text, maxLength) {
+  if (!text) {
+    return "";
+  }
+  return text.length > maxLength
+    ? `${text.slice(0, Math.max(0, maxLength - 3))}...`
+    : text;
+}
+
+function normalizeAnswer(value, fallback) {
+  if (Array.isArray(value)) {
+    return value.length ? value.join(", ") : fallback;
+  }
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
+  return value.toString();
+}
+
 async function sendWebhook(webhookURL, content, embeds) {
   if (!webhookURL) return;
 
@@ -128,26 +147,46 @@ async function sendFormSubmissionWebhook(form, submission, pointsEarned, req) {
       .format("YYYY-MM-DD HH:mm:ss");
 
     const answerDetails = form.questions.map((question, index) => {
-      const userAnswer = submission[`q${index}`] || "لم يتم الإجابة";
-      let correctAnswer = "";
+      const rawAnswer = submission[`q${index}`];
+      const comparisonAnswer = Array.isArray(rawAnswer)
+        ? rawAnswer.join(", ")
+        : rawAnswer?.toString() || "";
+      const userAnswer = normalizeAnswer(rawAnswer, "لم يتم الإجابة");
+      let correctAnswerRaw = "";
 
       if (question.questionType === "true-false") {
-        correctAnswer = question.correctAnswer;
+        correctAnswerRaw = question.correctAnswer || "";
       } else {
         const answerIndex =
           typeof question.correctAnswerIndex === "number"
             ? question.correctAnswerIndex
-            : question.correctAnswer;
-        correctAnswer = question.options[answerIndex] || "";
+            : typeof question.correctAnswer === "number"
+            ? question.correctAnswer
+            : null;
+
+        if (
+          typeof answerIndex === "number" &&
+          Array.isArray(question.options)
+        ) {
+          correctAnswerRaw = question.options[answerIndex] || "";
+        } else if (typeof question.correctAnswer === "string") {
+          correctAnswerRaw = question.correctAnswer;
+        }
       }
 
+      const comparisonCorrectAnswer = Array.isArray(correctAnswerRaw)
+        ? correctAnswerRaw.join(", ")
+        : correctAnswerRaw?.toString() || "";
+      const correctAnswer = normalizeAnswer(correctAnswerRaw, "غير محدد");
+      const questionPoints =
+        typeof question.points === "number" ? question.points : 10;
       const isCorrect =
-        userAnswer.toString().trim() === correctAnswer.toString().trim();
-      const points = isCorrect ? question.points || 10 : 0;
+        comparisonAnswer.trim() === comparisonCorrectAnswer.trim();
+      const points = isCorrect ? questionPoints : 0;
 
       return {
         questionNumber: index + 1,
-        questionText: question.questionText,
+        questionText: question.questionText || "",
         userAnswer,
         correctAnswer,
         isCorrect,
@@ -181,6 +220,43 @@ async function sendFormSubmissionWebhook(form, submission, pointsEarned, req) {
       },
       timestamp: new Date().toISOString(),
     };
+
+    const maxQuestionFields = Math.max(0, 25 - embed.fields.length);
+    if (maxQuestionFields > 0 && answerDetails.length) {
+      const fieldsToInclude = Math.min(maxQuestionFields, answerDetails.length);
+      const detailFields = [];
+
+      for (let i = 0; i < fieldsToInclude; i++) {
+        const detail = answerDetails[i];
+        const questionLabel = truncateText(
+          detail.questionText || "سؤال بدون عنوان",
+          200
+        );
+        const statusLabel = detail.isCorrect ? "✅ صحيح" : "❌ خطأ";
+        const pointsInfo =
+          typeof detail.points === "number"
+            ? `\nالنقاط المكتسبة: ${detail.points}`
+            : "";
+
+        detailFields.push({
+          name: `س${detail.questionNumber}: ${questionLabel}`,
+          value: `اختيار الطالب: ${
+            detail.userAnswer || "لم يتم الإجابة"
+          }\nالإجابة الصحيحة: ${
+            detail.correctAnswer || "غير محدد"
+          }\n${statusLabel}${pointsInfo}`,
+          inline: false,
+        });
+      }
+
+      if (answerDetails.length > fieldsToInclude && detailFields.length) {
+        detailFields[detailFields.length - 1].value += `\n\n... وتم اختصار ${
+          answerDetails.length - fieldsToInclude
+        } سؤالًا إضافيًا بسبب حدود ديسكورد.`;
+      }
+
+      embed.fields.push(...detailFields);
+    }
 
     await sendWebhook(
       webhookURL,

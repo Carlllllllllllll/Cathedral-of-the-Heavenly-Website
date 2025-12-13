@@ -683,6 +683,25 @@ function formatBytes(bytes, decimals = 2) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
+function truncateValue(text, maxLength) {
+  if (!text) {
+    return "";
+  }
+  return text.length > maxLength
+    ? `${text.slice(0, Math.max(0, maxLength - 3))}...`
+    : text;
+}
+
+function formatAnswerValue(value, fallback) {
+  if (Array.isArray(value)) {
+    return value.length ? value.join(", ") : fallback;
+  }
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
+  return value.toString();
+}
+
 async function cleanupOldFiles() {
   const directories = [
     path.join(__dirname, "uploads"),
@@ -9624,53 +9643,60 @@ app.post("/form/:link", requireAuth, submissionLimiter, async (req, res) => {
       }
     }
 
-    const score = form.questions.reduce((total, question, index) => {
-      const userAnswerKey = answers[`q${index}`];
-      let correctAnswerValue = "";
+    const answerDetails = form.questions.map((question, index) => {
+      const rawAnswer = answers[`q${index}`];
+      const normalizedUserAnswer = formatAnswerValue(rawAnswer, "").trim();
+      const userAnswer = normalizedUserAnswer || "لم يتم الإجابة";
+      let correctAnswerRaw = "";
+
       if (question.questionType === "true-false") {
-        correctAnswerValue = question.correctAnswer;
+        correctAnswerRaw = question.correctAnswer || "";
       } else {
         const answerIndex =
           typeof question.correctAnswerIndex === "number"
             ? question.correctAnswerIndex
-            : question.correctAnswer;
-        correctAnswerValue = question.options[answerIndex] || "";
+            : typeof question.correctAnswer === "number"
+            ? question.correctAnswer
+            : null;
+
+        if (
+          typeof answerIndex === "number" &&
+          Array.isArray(question.options)
+        ) {
+          correctAnswerRaw = question.options[answerIndex] || "";
+        } else if (typeof question.correctAnswer === "string") {
+          correctAnswerRaw = question.correctAnswer;
+        }
       }
 
-      if (
-        userAnswerKey &&
-        correctAnswerValue &&
-        userAnswerKey.toString().trim() === correctAnswerValue.toString().trim()
-      ) {
-        total += 1;
-      }
-      return total;
-    }, 0);
+      const normalizedCorrectAnswer = formatAnswerValue(
+        correctAnswerRaw,
+        ""
+      ).trim();
+      const correctAnswer = normalizedCorrectAnswer || "غير محدد";
+      const questionPoints =
+        typeof question.points === "number" ? question.points : 10;
+      const isCorrect =
+        normalizedUserAnswer &&
+        normalizedCorrectAnswer &&
+        normalizedUserAnswer === normalizedCorrectAnswer;
+      const pointsAwarded = isCorrect ? questionPoints : 0;
 
-    const pointsEarned = form.questions.reduce((total, question, index) => {
-      const userAnswerKey = answers[`q${index}`];
-      let correctAnswerValue = "";
-      if (question.questionType === "true-false") {
-        correctAnswerValue = question.correctAnswer;
-      } else {
-        const answerIndex =
-          typeof question.correctAnswerIndex === "number"
-            ? question.correctAnswerIndex
-            : question.correctAnswer;
-        correctAnswerValue = question.options[answerIndex] || "";
-      }
+      return {
+        questionNumber: index + 1,
+        questionText: question.questionText || "",
+        userAnswer,
+        correctAnswer,
+        isCorrect: Boolean(isCorrect),
+        pointsAwarded,
+      };
+    });
 
-      if (
-        userAnswerKey &&
-        correctAnswerValue &&
-        userAnswerKey.toString().trim() === correctAnswerValue.toString().trim()
-      ) {
-        const questionPoints =
-          typeof question.points === "number" ? question.points : 10;
-        return total + questionPoints;
-      }
-      return total;
-    }, 0);
+    const score = answerDetails.filter((detail) => detail.isCorrect).length;
+    const pointsEarned = answerDetails.reduce(
+      (total, detail) => total + detail.pointsAwarded,
+      0
+    );
 
     const submissionUsername =
       req.session.username ||
@@ -9800,58 +9826,89 @@ app.post("/form/:link", requireAuth, submissionLimiter, async (req, res) => {
       : "غير محدد";
     const userRole = req.session.role || "student";
 
-    await sendWebhook("FORM", {
-      content: `📝 **New Form Submission**`,
-      embeds: [
+    const formEmbed = {
+      title: "Form Submission Report",
+      color: pointsEarned > 0 ? 0x10b981 : 0x6366f1,
+      fields: [
         {
-          title: "Form Submission Report",
-          color: pointsEarned > 0 ? 0x10b981 : 0x6366f1,
-          fields: [
-            {
-              name: "👤 User Information",
-              value: `**Username:** ${
-                req.session.username
-              }\n**Grade:** ${gradeLabel}\n**Role:** ${userRole.toUpperCase()}`,
-              inline: true,
-            },
-            {
-              name: "📋 Form Information",
-              value: `**Topic:** ${form.topic}\n**Target Grade:** ${
-                GRADE_LABELS[form.targetGrade]?.long || form.targetGrade
-              }\n**Questions:** ${totalQuestions}`,
-              inline: true,
-            },
-            {
-              name: "📊 Results",
-              value: `**Score:** ${score}/${totalQuestions}\n**Percentage:** ${percentage}%\n**Points:** 🎁 ${pointsEarned}`,
-              inline: false,
-            },
-            {
-              name: "🕐 Submission Details",
-              value: `**Time:** ${submissionTime}\n**Device:** ${device}\n**IP:** ${userIp}\n**Device ID:** ${deviceId.substring(
-                0,
-                20
-              )}...`,
-              inline: false,
-            },
-            {
-              name: "📈 Additional Info",
-              value: `**Form Link:** ${formLink}\n**Form ID:** ${form._id.toString()}\n**Submission ID:** ${form.submissions[
-                form.submissions.length - 1
-              ]._id
-                .toString()
-                .substring(0, 10)}...\n**Allow Retake:** ${
-                form.allowRetake ? "✅ Yes" : "❌ No"
-              }\n**Total Submissions:** ${form.submissions.length}`,
-              inline: false,
-            },
-          ],
-          footer: {
-            text: `Form: ${formLink}`,
-          },
-          timestamp: new Date().toISOString(),
+          name: "👤 User Information",
+          value: `**Username:** ${
+            req.session.username
+          }\n**Grade:** ${gradeLabel}\n**Role:** ${userRole.toUpperCase()}`,
+          inline: true,
+        },
+        {
+          name: "📋 Form Information",
+          value: `**Topic:** ${form.topic}\n**Target Grade:** ${
+            GRADE_LABELS[form.targetGrade]?.long || form.targetGrade
+          }\n**Questions:** ${totalQuestions}`,
+          inline: true,
+        },
+        {
+          name: "📊 Results",
+          value: `**Score:** ${score}/${totalQuestions}\n**Percentage:** ${percentage}%\n**Points:** 🎁 ${pointsEarned}`,
+          inline: false,
+        },
+        {
+          name: "🕐 Submission Details",
+          value: `**Time:** ${submissionTime}\n**Device:** ${device}\n**IP:** ${userIp}\n**Device ID:** ${deviceId.substring(
+            0,
+            20
+          )}...`,
+          inline: false,
+        },
+        {
+          name: "📈 Additional Info",
+          value: `**Form Link:** ${formLink}\n**Form ID:** ${form._id.toString()}\n**Submission ID:** ${form.submissions[
+            form.submissions.length - 1
+          ]._id
+            .toString()
+            .substring(0, 10)}...\n**Allow Retake:** ${
+            form.allowRetake ? "✅ Yes" : "❌ No"
+          }\n**Total Submissions:** ${form.submissions.length}`,
+          inline: false,
         },
       ],
+      footer: {
+        text: `Form: ${formLink}`,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    const remainingFieldSlots = Math.max(0, 25 - formEmbed.fields.length);
+    if (remainingFieldSlots > 0 && answerDetails.length) {
+      const detailsToInclude = Math.min(remainingFieldSlots, answerDetails.length);
+      const detailFields = [];
+
+      for (let i = 0; i < detailsToInclude; i++) {
+        const detail = answerDetails[i];
+        detailFields.push({
+          name: `س${detail.questionNumber}: ${truncateValue(
+            detail.questionText || "سؤال بدون عنوان",
+            100
+          )}`,
+          value: `اختيار الطالب: ${detail.userAnswer}\nالإجابة الصحيحة: ${
+            detail.correctAnswer
+          }\nالحالة: ${detail.isCorrect ? "✅ صحيح" : "❌ خطأ"}\nالنقاط المكتسبة: ${
+            detail.pointsAwarded
+          }`,
+          inline: false,
+        });
+      }
+
+      if (answerDetails.length > detailsToInclude && detailFields.length) {
+        const lastField = detailFields[detailFields.length - 1];
+        lastField.value += `\n\n... يوجد ${
+          answerDetails.length - detailsToInclude
+        } سؤال إضافي لم يتم عرضها بسبب قيود ديسكورد.`;
+      }
+
+      formEmbed.fields.push(...detailFields);
+    }
+
+    await sendWebhook("FORM", {
+      content: `📝 **New Form Submission**`,
+      embeds: [formEmbed],
     });
 
     const pointsMessage =
