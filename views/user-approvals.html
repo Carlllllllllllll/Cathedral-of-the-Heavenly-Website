@@ -243,7 +243,9 @@
         }
       }
 
-      mobileToggle.addEventListener("click", toggleSidebar);
+      if (mobileToggle) {
+        mobileToggle.addEventListener("click", toggleSidebar);
+      }
 
       if (gradesToggle) {
         gradesToggle.addEventListener("click", function (e) {
@@ -679,12 +681,13 @@
         }
       }
 
-      logoutBtn.addEventListener("click", performLogout);
-      logoutBtnMobile.addEventListener("click", performLogout);
+      if (logoutBtn) logoutBtn.addEventListener("click", performLogout);
+      if (logoutBtnMobile)
+        logoutBtnMobile.addEventListener("click", performLogout);
 
-      filterGrade.addEventListener("change", loadRegistrations);
-      filterDate.addEventListener("change", loadRegistrations);
-      refreshBtn.addEventListener("click", loadRegistrations);
+      if (filterGrade) filterGrade.addEventListener("change", loadRegistrations);
+      if (filterDate) filterDate.addEventListener("change", loadRegistrations);
+      if (refreshBtn) refreshBtn.addEventListener("click", loadRegistrations);
 
       document.addEventListener("click", function (event) {
         if (window.innerWidth <= 992) {
