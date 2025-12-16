@@ -848,6 +848,8 @@ const UserRegistrationSchema = new mongoose.Schema({
   verificationCode: { type: String, default: null },
   verificationCodeVerified: { type: Boolean, default: false },
   verificationDate: { type: Date, default: null },
+  // Track actual login time so admin panels can show real online/offline + last login.
+  lastLoginAt: { type: Date, default: null, index: true },
   createdAt: { type: Date, default: Date.now },
   reviewedBy: String,
   reviewedAt: Date,
@@ -2161,6 +2163,10 @@ app.post("/login", loginLimiter, async (req, res) => {
               allowedPages = ["form-editor", "user-approver", "gift-approver"];
             }
           }
+
+          // Persist last login timestamp (used for admin user-management status)
+          registeredUser.lastLoginAt = new Date();
+          await registeredUser.save();
 
           user = {
             originalUsername: registeredUser.username,
@@ -4217,6 +4223,13 @@ app.get(
           const leaderboardAccess = await LeaderboardAccess.findOne({
             username: reg.username.toLowerCase(),
           });
+          
+          // Fetch the most recent session activity for the user
+          const activeSession = await ActiveSession.findOne({ username: reg.username.toLowerCase() }).sort({ lastSeenAt: -1 });
+
+          // Determine the most accurate last activity time
+          const lastActivity = activeSession ? activeSession.lastSeenAt : reg.lastLoginAt;
+
           return {
             _id: reg._id,
             username: reg.username,
@@ -4227,15 +4240,17 @@ app.get(
             grade: reg.grade,
             role: reg.role || "student",
             verificationCode: reg.verificationCode,
+            verificationCodeVerified: Boolean(reg.verificationCodeVerified),
+            verificationDate: reg.verificationDate,
             points: points ? points.points : 0,
             hasLeaderboardAccess: leaderboardAccess
               ? leaderboardAccess.hasLeaderboardAccess
               : false,
             createdAt: reg.createdAt,
-            lastActivity:
-              points && points.transactions.length > 0
-                ? points.transactions[points.transactions.length - 1].timestamp
-                : reg.createdAt,
+            // Use the more accurate lastActivity timestamp
+            lastActivity: lastActivity || null,
+            // lastLoginAt can remain for historical data if needed
+            lastLoginAt: reg.lastLoginAt || null,
           };
         })
       );
