@@ -1,0 +1,431 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: rgba(42, 27, 60, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
+  transition: var(--transition-speed);
+  z-index: 1000;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-header {
+  margin-bottom: 30px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-container img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+.logo-text h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+
+.logo-text p {
+  font-size: 12px;
+  color: #bdc3c7;
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 5px;
+}
+
+.nav-item {
+  margin-bottom: 5px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  color: var(--light);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all var(--transition-speed);
+  font-weight: 600;
+}
+
+.nav-link i {
+  width: 20px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.nav-link:hover {
+  background: rgba(52, 73, 94, 0.5);
+  transform: translateX(-5px);
+  color: var(--accent);
+}
+
+.nav-link.active {
+    background: linear-gradient(90deg, var(--accent), #ffd700);
+    color: var(--dark);
+    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+}
+
+.sidebar-footer {
+  flex-shrink: 0;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all var(--transition-speed);
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+}
+.grades-nav-item {
+  position: relative;
+}
+
+.grades-submenu-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.grades-submenu {
+  max-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 20px;
+  border-right: 2px solid var(--accent);
+  margin-top: 5px;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+}
+
+.grades-toggle.active + .grades-submenu-container .grades-submenu {
+  max-height: 250px;
+  animation: fadeInDown 0.3s ease-out;
+}
+
+.grades-submenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.grades-submenu::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  margin: 5px 0;
+}
+
+.grades-submenu::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--accent), #ffd700);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.grades-submenu::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #ffd700, var(--accent));
+  box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+}
+
+.grades-submenu-container::before,
+.grades-submenu-container::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 12px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.grades-submenu-container::before {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(42, 27, 60, 0.95),
+    transparent
+  );
+}
+
+.grades-submenu-container::after {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    rgba(42, 27, 60, 0.95),
+    transparent
+  );
+}
+
+.grades-toggle.active + .grades-submenu-container::before,
+.grades-toggle.active + .grades-submenu-container::after {
+  opacity: 1;
+}
+
+.submenu-header {
+  margin-bottom: 5px;
+  position: relative;
+}
+
+.section-submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  margin-right: 20px;
+  margin-top: 5px;
+}
+
+.section-toggle.active + .section-submenu {
+  max-height: 150px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.submenu-link {
+  padding: 12px 15px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  margin-bottom: 3px;
+  display: block;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+.submenu-link:hover {
+  background: rgba(255, 204, 0, 0.15);
+  transform: translateX(-5px);
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2);
+}
+
+.submenu-link::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.submenu-link:hover::before {
+  left: 100%;
+}
+
+.submenu-link i {
+  font-size: 12px;
+  color: var(--accent);
+  transition: transform 0.3s ease;
+}
+
+.submenu-link:hover i {
+  transform: translateX(-3px);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.suggestions-nav-item {
+  position: relative;
+}
+
+.suggestions-submenu-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.suggestions-submenu {
+  max-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 20px;
+  border-right: 2px solid var(--accent);
+  margin-top: 5px;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+}
+
+.suggestions-toggle.active
+  + .suggestions-submenu-container
+  .suggestions-submenu {
+  max-height: 200px;
+  animation: fadeInDown 0.3s ease-out;
+}
+
+.suggestions-submenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions-submenu::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  margin: 5px 0;
+}
+
+.suggestions-submenu::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--accent), #ffd700);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.suggestions-submenu::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #ffd700, var(--accent));
+  box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+}
+
+.suggestions-submenu-container::before,
+.suggestions-submenu-container::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 12px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.suggestions-submenu-container::before {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(42, 27, 60, 0.95),
+    transparent
+  );
+}
+
+.suggestions-submenu-container::after {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    rgba(42, 27, 60, 0.95),
+    transparent
+  );
+}
+
+.suggestions-toggle.active + .suggestions-submenu-container::before,
+.suggestions-toggle.active + .suggestions-submenu-container::after {
+  opacity: 1;
+}
+
+.suggestions-submenu .submenu-link {
+  padding: 12px 15px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  margin-bottom: 3px;
+  display: block;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+.suggestions-submenu .submenu-link:hover {
+  background: rgba(255, 204, 0, 0.15);
+  transform: translateX(-5px);
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2);
+}
+
+.suggestions-submenu .submenu-link::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.suggestions-submenu .submenu-link:hover::before {
+  left: 100%;
+}
+
+.suggestions-submenu .submenu-link i {
+  font-size: 12px;
+  color: var(--accent);
+  transition: transform 0.3s ease;
+}
+
+.suggestions-submenu .submenu-link:hover i {
+  transform: translateX(-3px);
+}

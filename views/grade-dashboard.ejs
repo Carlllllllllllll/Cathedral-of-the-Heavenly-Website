@@ -1047,14 +1047,30 @@
                 suggestionDropdown.classList.toggle('active');
                 desktopArrow.classList.toggle('rotated');
             });
+
+            // close when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.suggestion-container')) {
+                    suggestionDropdown.classList.remove('active');
+                    desktopArrow.classList.remove('rotated');
+                }
+            });
         }
 
         if (mobileSuggestionBtn) {
-            mobileSuggestionBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                mobileSuggestionMenu.classList.toggle('active');
-                mobileArrow.classList.toggle('rotated');
-            });
+        mobileSuggestionBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileSuggestionMenu.classList.toggle('active');
+            mobileArrow.classList.toggle('rotated');
+        });
+
+        // close mobile suggestion menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#mobileSuggestionBtn') && !e.target.closest('#mobileSuggestionMenu')) {
+                mobileSuggestionMenu.classList.remove('active');
+                mobileArrow.classList.remove('rotated');
+            }
+        });
         }
 
         function hideCurrentPageFromNav() {

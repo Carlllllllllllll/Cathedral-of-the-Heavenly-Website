@@ -5049,6 +5049,14 @@ app.delete(
       if (leaderboardDoc) {
         await LeaderboardAccess.deleteOne({ _id: leaderboardDoc._id });
       }
+
+      const activeSession = await ActiveSession.findOne({
+        username: registration.username.toLowerCase(),
+      });
+      if (activeSession) {
+        await destroyStoredSession(req.sessionStore, activeSession.sessionId);
+        await ActiveSession.deleteOne({ _id: activeSession._id });
+      }
       await sendWebhook("ADMIN", {
         content: `🗑️ **User Deleted**`,
         embeds: [
