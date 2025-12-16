@@ -2423,7 +2423,22 @@
       }
 
       function displayUsers(users) {
-    usersList.innerHTML = users
+    // Sort users: online first, then idle, then signed-in, then signed-out
+    const statusRank = { online: 0, idle: 1, "signed-in": 2, "signed-out": 3, banned: 4 };
+    const sorted = [...users].sort((a, b) => {
+      const aStatus = getUserStatus(a);
+      const bStatus = getUserStatus(b);
+      const aRank = statusRank[aStatus] ?? 99;
+      const bRank = statusRank[bStatus] ?? 99;
+      if (aRank !== bRank) return aRank - bRank;
+      // within same status sort by lastActivity desc then username
+      const aTime = a.lastActivity ? new Date(a.lastActivity).getTime() : 0;
+      const bTime = b.lastActivity ? new Date(b.lastActivity).getTime() : 0;
+      if (bTime !== aTime) return bTime - aTime;
+      return (a.username || "").localeCompare(b.username || "");
+    });
+
+    usersList.innerHTML = sorted
         .map((user) => {
             const gradeText = {
                 prep1: "إعدادي أولى",
@@ -2450,7 +2465,7 @@
             // حالة التحقق
             const verificationStatus = user.verificationCodeVerified ? 
                 '<span class="status-badge verified-badge">✅ تم التحقق</span>' : 
-                '<span class="status-badge not-verified-badge">❌ غير مفعل</span>';
+                '<span class="status-badge not-verified-badge">❌ غير متحقق</span>';
             
             // آخر دخول
             const lastLoginText = user.lastActivity ? 
@@ -3312,6 +3327,13 @@ function toggleView() {
       document.addEventListener("DOMContentLoaded", function () {
         loadUserInfo();
         loadUsers();
+        // live refresh of statuses / verified / last login
+        setInterval(() => {
+          loadUsers();
+          if (bannedSection.style.display !== "none") {
+            loadBannedUsers();
+          }
+        }, 15000);
       });
 
       if (sidebarGradesToggle) {
@@ -3537,10 +3559,11 @@ function toggleView() {
         const now = Date.now();
         const diffMinutes = Math.floor((now - lastActivity.getTime()) / 60000);
 
-        // thresholds tuned so it won't always look online
+        // Simple, clear UX:
+        // - online: last seen within 2 minutes
+        // - offline: otherwise
+        // (we keep idle/signed-in internal ranks for sorting if you want later)
         if (diffMinutes <= 2) return "online";
-        if (diffMinutes <= 15) return "idle";
-        if (diffMinutes <= 24 * 60) return "signed-in";
         return "signed-out";
       }
 
@@ -3553,10 +3576,8 @@ function isUserBanned(user) {
 // دالة لإنشاء شارة الحالة
 function getStatusBadge(status) {
     const badges = {
-        'online': '<span class="status-badge online-badge">🟢 متصل الآن</span>',
-        'idle': '<span class="status-badge idle-badge">🟡 خامل</span>',
-        'signed-in': '<span class="status-badge signed-in-badge">🔵 مسجل الدخول</span>',
-        'signed-out': '<span class="status-badge signed-out-badge">⚫ غير متصل</span>',
+        'online': '<span class="status-badge online-badge">🟢 Online</span>',
+        'signed-out': '<span class="status-badge signed-out-badge">⚫ Offline</span>',
         'banned': '<span class="status-badge banned-badge">🔴 محظور</span>'
     };
     
@@ -3566,14 +3587,12 @@ function getStatusBadge(status) {
 // دالة للحصول على وصف الحالة
 function getStatusDescription(status) {
     const descriptions = {
-        'online': 'المستخدم متصل الآن',
-        'idle': 'المستخدم خامل (لم ينشط خلال 30 دقيقة)',
-        'signed-in': 'المستخدم سجل دخوله مؤخراً',
-        'signed-out': 'المستخدم غير متصل',
+        'online': 'Online',
+        'signed-out': 'Offline',
         'banned': 'المستخدم محظور'
     };
     
-    return descriptions[status] || 'حالة غير معروفة';
+    return descriptions[status] || 'Offline';
 }
 
 // دالة لتنسيق الوقت المنقضي
