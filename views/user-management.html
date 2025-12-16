@@ -238,7 +238,6 @@
         overflow-x: hidden;
       }
 
-      /* Match the "User Approvals" feel: keep top area stable and avoid weird zoom/scale issues */
       .top-nav {
         position: sticky;
         top: 16px;
@@ -481,7 +480,6 @@
         gap: 10px;
       }
 
-      /* Primary action buttons (Refresh / Toggle view) */
       .toggle-btn {
         padding: 12px 22px;
         background: linear-gradient(90deg, var(--secondary), var(--primary));
@@ -1710,96 +1708,158 @@
         }
       }
 
-      /* شارات الحالة الجديدة */
-.status-badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-.online-badge {
-    background: rgba(46, 204, 113, 0.2);
-    color: #2ecc71;
-    border: 1px solid rgba(46, 204, 113, 0.3);
-}
+      .online-badge {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
 
-.idle-badge {
-    background: rgba(241, 196, 15, 0.2);
-    color: #f1c40f;
-    border: 1px solid rgba(241, 196, 15, 0.3);
-}
+      .idle-badge {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.3);
+      }
 
-.signed-in-badge {
-    background: rgba(52, 152, 219, 0.2);
-    color: #3498db;
-    border: 1px solid rgba(52, 152, 219, 0.3);
-}
+      .signed-in-badge {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+      }
 
-.signed-out-badge {
-    background: rgba(149, 165, 166, 0.2);
-    color: #95a5a6;
-    border: 1px solid rgba(149, 165, 166, 0.3);
-}
+      .offline-badge {
+        background: rgba(149, 165, 166, 0.4);
+        color: #bdc3c7;
+        border: 1px solid rgba(149, 165, 166, 0.5);
+      }
 
-.banned-badge {
-    background: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
-    border: 1px solid rgba(231, 76, 60, 0.3);
-}
+      .banned-badge {
+        background: rgba(231, 76, 60, 0.4);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.6);
+      }
 
-.verified-badge {
-    background: rgba(46, 204, 113, 0.2);
-    color: #2ecc71;
-    border: 1px solid rgba(46, 204, 113, 0.3);
-}
+      .verified-badge {
+        background: rgba(46, 204, 113, 0.3);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.4);
+      }
 
-.not-verified-badge {
-    background: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
-    border: 1px solid rgba(231, 76, 60, 0.3);
-}
+      .not-verified-badge {
+        background: rgba(231, 76, 60, 0.3);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.4);
+      }
 
-/* معلومات الحالة الإضافية */
-.user-status-info {
-    margin-top: 8px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
+      .user-status-info {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
 
-.last-login-text {
-    font-size: 12px;
-    color: #95a5a6;
-    font-style: italic;
-}
+      .last-login-text {
+        font-size: 12px;
+        color: #95a5a6;
+        font-style: italic;
+      }
 
-/* تحسين عرض الشارات */
-.user-badges {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-}
+      .user-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
 
-.user-badges .status-badge {
-    margin: 2px 0;
-}
+      .user-badges .status-badge {
+        margin: 2px 0;
+      }
 
-/* استجابة للشاشات الصغيرة */
-@media (max-width: 480px) {
-    .user-badges {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .status-badge {
-        font-size: 10px;
-        padding: 3px 8px;
-    }
-}
+      @media (max-width: 480px) {
+        .user-badges {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .status-badge {
+          font-size: 10px;
+          padding: 3px 8px;
+        }
+      }
+
+      .suggestions-nav-item {
+        position: relative;
+      }
+
+      .suggestions-submenu-container {
+        overflow: hidden;
+        position: relative;
+      }
+
+      .suggestions-submenu {
+        max-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-right: 20px;
+        border-right: 2px solid var(--accent);
+        margin-top: 5px;
+        padding-right: 8px;
+      }
+
+      .suggestions-toggle.active + .suggestions-submenu-container .suggestions-submenu {
+        max-height: 250px;
+        animation: fadeInDown 0.3s ease-out;
+      }
+
+      .suggestions-submenu-container::before,
+      .suggestions-submenu-container::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 12px;
+        height: 20px;
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .suggestions-submenu-container::before {
+        top: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(42, 27, 60, 0.95),
+          transparent
+        );
+      }
+
+      .suggestions-submenu-container::after {
+        bottom: 0;
+        background: linear-gradient(
+          to top,
+          rgba(42, 27, 60, 0.95),
+          transparent
+        );
+      }
+
+      .suggestions-toggle.active + .suggestions-submenu-container::before,
+      .suggestions-toggle.active + .suggestions-submenu-container::after {
+        opacity: 1;
+      }
+
+      .suggestions-toggle {
+        cursor: pointer;
+        user-select: none;
+      }
     </style>
   </head>
   <body>
@@ -2227,14 +2287,14 @@
       const banForm = document.getElementById("banForm");
       const editUserModal = document.getElementById("editUserModal");
       const editUserForm = document.getElementById("editUserForm");
-      const categoryNav = document.getElementById("categoryNav");
-      const categoryTabs = document.querySelectorAll(".category-tab");
       const sidebarGradesToggle = document.getElementById(
         "sidebarGradesToggle"
       );
       const sidebarGradesSubmenu = document.getElementById(
         "sidebarGradesSubmenu"
       );
+      const suggestionsToggle = document.getElementById("suggestionsToggle");
+      const suggestionsSubmenu = document.getElementById("suggestionsSubmenu");
       const closeEditModal = document.getElementById("closeEditModal");
       const cancelEditModal = document.getElementById("cancelEditModal");
       const closeTakePointsModalBtn = document.getElementById(
@@ -2313,7 +2373,6 @@
           const response = await fetch("/api/admin/users");
           const allUsersFromAPI = await response.json();
 
-          // Always hydrate banned users list first so status logic can be correct
           const bannedResponse = await fetch("/api/banned-users");
           const bannedUsers = await bannedResponse.json();
           allBannedUsers = Array.isArray(bannedUsers) ? bannedUsers : [];
@@ -2381,6 +2440,7 @@
       `;
         }
       }
+      
       function updateCategoryCounts() {
         userCounts = {
           all: allUsers.length,
@@ -2423,183 +2483,179 @@
       }
 
       function displayUsers(users) {
-    // Sort users: online first, then idle, then signed-in, then signed-out
-    const statusRank = { online: 0, idle: 1, "signed-in": 2, "signed-out": 3, banned: 4 };
-    const sorted = [...users].sort((a, b) => {
-      const aStatus = getUserStatus(a);
-      const bStatus = getUserStatus(b);
-      const aRank = statusRank[aStatus] ?? 99;
-      const bRank = statusRank[bStatus] ?? 99;
-      if (aRank !== bRank) return aRank - bRank;
-      // within same status sort by lastActivity desc then username
-      const aTime = a.lastActivity ? new Date(a.lastActivity).getTime() : 0;
-      const bTime = b.lastActivity ? new Date(b.lastActivity).getTime() : 0;
-      if (bTime !== aTime) return bTime - aTime;
-      return (a.username || "").localeCompare(b.username || "");
-    });
+        const sorted = [...users].sort((a, b) => {
+          const aStatus = getUserStatus(a);
+          const bStatus = getUserStatus(b);
+          const statusOrder = { online: 0, idle: 1, "signed-in": 2, offline: 3, banned: 4 };
+          const aRank = statusOrder[aStatus] ?? 99;
+          const bRank = statusOrder[bStatus] ?? 99;
+          if (aRank !== bRank) return aRank - bRank;
+          const aTime = a.lastActivity ? new Date(a.lastActivity).getTime() : 0;
+          const bTime = b.lastActivity ? new Date(b.lastActivity).getTime() : 0;
+          if (bTime !== aTime) return bTime - aTime;
+          return (a.username || "").localeCompare(b.username || "");
+        });
 
-    usersList.innerHTML = sorted
-        .map((user) => {
+        usersList.innerHTML = sorted
+          .map((user) => {
             const gradeText = {
-                prep1: "إعدادي أولى",
-                prep2: "إعدادي ثانية",
-                prep3: "إعدادي ثالثة",
-                sec1: "ثانوي أولى",
-                sec2: "ثانوي ثانية",
-                sec3: "ثانوي ثالثة",
-                teachers: "خادم",
-                admins: "مشرف",
+              prep1: "إعدادي أولى",
+              prep2: "إعدادي ثانية",
+              prep3: "إعدادي ثالثة",
+              sec1: "ثانوي أولى",
+              sec2: "ثانوي ثانية",
+              sec3: "ثانوي ثالثة",
+              teachers: "خادم",
+              admins: "مشرف",
             }[user.grade] || user.grade;
 
             const roleText = {
-                leadadmin: "قائد عام",
-                admin: "مشرف",
-                teacher: "خادم",
-                student: "طالب",
+              leadadmin: "قائد عام",
+              admin: "مشرف",
+              teacher: "خادم",
+              student: "طالب",
             }[user.role] || user.role;
 
-            // الحالة الجديدة - معرفة حالة المستخدم
             const userStatus = getUserStatus(user);
             const statusBadge = getStatusBadge(userStatus);
             
-            // حالة التحقق
-            const verificationStatus = user.verificationCodeVerified ? 
-                '<span class="status-badge verified-badge">✅ تم التحقق</span>' : 
-                '<span class="status-badge not-verified-badge">❌ غير متحقق</span>';
+            const verificationStatus = user.verified === true || user.verificationCodeVerified === true ? 
+              '<span class="status-badge verified-badge">✅ تم التحقق</span>' : 
+              '<span class="status-badge not-verified-badge">❌ غير متحقق</span>';
             
-            // آخر دخول
             const lastLoginText = user.lastActivity ? 
-                `آخر دخول: ${formatTimeAgo(new Date(user.lastActivity))}` : 
-                'لم يسجل دخول بعد';
+              `آخر دخول: ${formatTimeAgo(new Date(user.lastActivity))}` : 
+              'لم يسجل دخول بعد';
 
             const logoutAllDevicesBtn =
-                user.role !== "leadadmin"
-                    ? `
-                    <button class="action-btn logout-all-btn" onclick="logoutAllDevices('${user._id}', '${user.username}')">
-                        <i class="fas fa-sign-out-alt"></i>
-                        تسجيل الخروج من جميع الأجهزة
-                    </button>
-                    `
-                    : "";
+              user.role !== "leadadmin"
+                ? `
+                <button class="action-btn logout-all-btn" onclick="logoutAllDevices('${user._id}', '${user.username}')">
+                    <i class="fas fa-sign-out-alt"></i>
+                    تسجيل الخروج من جميع الأجهزة
+                </button>
+                `
+                : "";
 
             return `
-                <div class="user-card">
-                    <div class="user-card-header">
-                        <div class="user-avatar-large ${userStatus === 'banned' ? 'banned-avatar' : ''}">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <div class="user-main-info">
-                            <h3>${user.firstName} ${user.secondName}</h3>
-                            <div class="user-badges">
-                                <span class="username-badge">@${user.username}</span>
-                                <span class="role-badge ${user.role}">${roleText}</span>
-                                <span class="grade-badge">${gradeText}</span>
-                                ${statusBadge}
-                                ${verificationStatus}
-                            </div>
-                            <div class="user-status-info">
-                                <small class="last-login-text">${lastLoginText}</small>
-                            </div>
-                        </div>
-                        <div class="user-points">
-                            <i class="fas fa-star"></i>
-                            <span>${user.points || 0}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="user-card-details">
-                        <div class="detail-row">
-                            <span class="detail-label">البريد الإلكتروني:</span>
-                            <span class="detail-value-wrap">
-                              <span class="detail-value">${user.email}</span>
-                              <button class="copy-btn" type="button" title="نسخ البريد" onclick="copyText('${user.email.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">رقم الهاتف:</span>
-                            <span class="detail-value-wrap">
-                              <span class="detail-value">${user.phone}</span>
-                              <button class="copy-btn" type="button" title="نسخ رقم الهاتف" onclick="copyText('${user.phone.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">تاريخ التسجيل:</span>
-                            <span class="detail-value-wrap">
-                              <span class="detail-value">${new Date(user.createdAt).toLocaleDateString("ar-EG")}</span>
-                              <button class="copy-btn" type="button" title="نسخ تاريخ التسجيل" onclick="copyText('${new Date(user.createdAt).toLocaleDateString("ar-EG")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">آخر نشاط:</span>
-                            <span class="detail-value-wrap">
-                              <span class="detail-value">${
-                                user.lastActivity
-                                    ? new Date(user.lastActivity).toLocaleDateString("ar-EG")
-                                    : "لم يسجل دخول بعد"
+              <div class="user-card">
+                  <div class="user-card-header">
+                      <div class="user-avatar-large ${userStatus === 'banned' ? 'banned-avatar' : ''}">
+                          <i class="fas fa-user-circle"></i>
+                      </div>
+                      <div class="user-main-info">
+                          <h3>${user.firstName} ${user.secondName}</h3>
+                          <div class="user-badges">
+                              <span class="username-badge">@${user.username}</span>
+                              <span class="role-badge ${user.role}">${roleText}</span>
+                              <span class="grade-badge">${gradeText}</span>
+                              ${statusBadge}
+                              ${verificationStatus}
+                          </div>
+                          <div class="user-status-info">
+                              <small class="last-login-text">${lastLoginText}</small>
+                          </div>
+                      </div>
+                      <div class="user-points">
+                          <i class="fas fa-star"></i>
+                          <span>${user.points || 0}</span>
+                      </div>
+                  </div>
+                  
+                  <div class="user-card-details">
+                      <div class="detail-row">
+                          <span class="detail-label">البريد الإلكتروني:</span>
+                          <span class="detail-value-wrap">
+                            <span class="detail-value">${user.email}</span>
+                            <button class="copy-btn" type="button" title="نسخ البريد" onclick="copyText('${user.email.replace(/'/g, "\\'")}')">
+                              <i class="fas fa-copy"></i>
+                            </button>
+                          </span>
+                      </div>
+                      <div class="detail-row">
+                          <span class="detail-label">رقم الهاتف:</span>
+                          <span class="detail-value-wrap">
+                            <span class="detail-value">${user.phone}</span>
+                            <button class="copy-btn" type="button" title="نسخ رقم الهاتف" onclick="copyText('${user.phone.replace(/'/g, "\\'")}')">
+                              <i class="fas fa-copy"></i>
+                            </button>
+                          </span>
+                      </div>
+                      <div class="detail-row">
+                          <span class="detail-label">تاريخ التسجيل:</span>
+                          <span class="detail-value-wrap">
+                            <span class="detail-value">${new Date(user.createdAt).toLocaleDateString("ar-EG")}</span>
+                            <button class="copy-btn" type="button" title="نسخ تاريخ التسجيل" onclick="copyText('${new Date(user.createdAt).toLocaleDateString("ar-EG")}')">
+                              <i class="fas fa-copy"></i>
+                            </button>
+                          </span>
+                      </div>
+                      <div class="detail-row">
+                          <span class="detail-label">آخر نشاط:</span>
+                          <span class="detail-value-wrap">
+                            <span class="detail-value">${
+                              user.lastActivity
+                                ? new Date(user.lastActivity).toLocaleDateString("ar-EG")
+                                : "لم يسجل دخول بعد"
                             }</span>
-                              <button class="copy-btn" type="button" title="نسخ آخر نشاط" onclick="copyText('${(user.lastActivity ? new Date(user.lastActivity).toLocaleDateString("ar-EG") : "لم يسجل دخول بعد").replace(/'/g, "\\'")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">حالة الحساب:</span>
-                            <span class="detail-value-wrap">
-                              <span class="detail-value">${getStatusDescription(userStatus)}</span>
-                              <button class="copy-btn" type="button" title="نسخ حالة الحساب" onclick="copyText('${getStatusDescription(userStatus).replace(/'/g, "\\'")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
-                            </span>
-                        </div>
-                        ${user.verificationCode
-                            ? `
-                        <div class="detail-row" style="background: rgba(255, 204, 0, 0.1); border: 1px solid rgba(255, 204, 0, 0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
-                            <span class="detail-label" style="color: #ffcc00; font-weight: 700;">🔑 كود التحقق:</span>
-                            <span class="detail-value-wrap">
-                              <span class="detail-value" style="color: #ffcc00; font-weight: 700; font-size: 16px; font-family: monospace;">${user.verificationCode}</span>
-                              <button class="copy-btn" type="button" title="نسخ كود التحقق" onclick="copyText('${user.verificationCode.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
-                            </span>
-                        </div>
-                        `
-                            : ""}
-                    </div>
-                    
-                    <div class="user-card-actions">
-                        <button class="action-btn points-btn" onclick="givePoints('${user._id}', '${user.username}')">
-                            <i class="fas fa-plus-circle"></i>
-                            إضافة نقاط
-                        </button>
-                        <button class="action-btn remove-points-btn" onclick="openTakePointsModal('${user._id}', '${user.username}')">
-                            <i class="fas fa-minus-circle"></i>
-                            خصم نقاط
-                        </button>
-                        <button class="action-btn edit-btn" onclick="openEditUserModal('${user._id}')">
-                            <i class="fas fa-edit"></i>
-                            تعديل
-                        </button>
-                        <button class="action-btn ban-btn" onclick="openBanModal('${user._id}', '${user.username}')">
-                            <i class="fas fa-ban"></i>
-                            حظر
-                        </button>
-                        <button class="action-btn delete-btn" onclick="deleteUser('${user._id}', '${user.username}')">
-                            <i class="fas fa-trash"></i>
-                            حذف
-                        </button>
-                        ${logoutAllDevicesBtn}
-                    </div>
-                </div>
-            `;
-        })
-        .join("");
-}
+                            <button class="copy-btn" type="button" title="نسخ آخر نشاط" onclick="copyText('${(user.lastActivity ? new Date(user.lastActivity).toLocaleDateString("ar-EG") : "لم يسجل دخول بعد").replace(/'/g, "\\'")}')">
+                              <i class="fas fa-copy"></i>
+                            </button>
+                          </span>
+                      </div>
+                      <div class="detail-row">
+                          <span class="detail-label">حالة الحساب:</span>
+                          <span class="detail-value-wrap">
+                            <span class="detail-value">${getStatusDescription(userStatus)}</span>
+                            <button class="copy-btn" type="button" title="نسخ حالة الحساب" onclick="copyText('${getStatusDescription(userStatus).replace(/'/g, "\\'")}')">
+                              <i class="fas fa-copy"></i>
+                            </button>
+                          </span>
+                      </div>
+                      ${user.verificationCode
+                        ? `
+                      <div class="detail-row" style="background: rgba(255, 204, 0, 0.1); border: 1px solid rgba(255, 204, 0, 0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
+                          <span class="detail-label" style="color: #ffcc00; font-weight: 700;">🔑 كود التحقق:</span>
+                          <span class="detail-value-wrap">
+                            <span class="detail-value" style="color: #ffcc00; font-weight: 700; font-size: 16px; font-family: monospace;">${user.verificationCode}</span>
+                            <button class="copy-btn" type="button" title="نسخ كود التحقق" onclick="copyText('${user.verificationCode.replace(/'/g, "\\'")}')">
+                              <i class="fas fa-copy"></i>
+                            </button>
+                          </span>
+                      </div>
+                      `
+                        : ""}
+                  </div>
+                  
+                  <div class="user-card-actions">
+                      <button class="action-btn points-btn" onclick="givePoints('${user._id}', '${user.username}')">
+                          <i class="fas fa-plus-circle"></i>
+                          إضافة نقاط
+                      </button>
+                      <button class="action-btn remove-points-btn" onclick="openTakePointsModal('${user._id}', '${user.username}')">
+                          <i class="fas fa-minus-circle"></i>
+                          خصم نقاط
+                      </button>
+                      <button class="action-btn edit-btn" onclick="openEditUserModal('${user._id}')">
+                          <i class="fas fa-edit"></i>
+                          تعديل
+                      </button>
+                      <button class="action-btn ban-btn" onclick="openBanModal('${user._id}', '${user.username}')">
+                          <i class="fas fa-ban"></i>
+                          حظر
+                      </button>
+                      <button class="action-btn delete-btn" onclick="deleteUser('${user._id}', '${user.username}')">
+                          <i class="fas fa-trash"></i>
+                          حذف
+                      </button>
+                      ${logoutAllDevicesBtn}
+                  </div>
+              </div>
+          `;
+          })
+          .join("");
+      }
+
       async function logoutAllDevices(userId, username) {
         const result = await Swal.fire({
           title: "تسجيل الخروج من جميع الأجهزة",
@@ -2897,131 +2953,69 @@
       closeBanModalBtn.addEventListener("click", closeBanModal);
       cancelBanModal.addEventListener("click", closeBanModal);
 
-      async function loadBannedUsers() {
-        try {
-          const response = await fetch("/api/banned-users");
-          const bannedUsers = await response.json();
-          allBannedUsers = bannedUsers;
-
-          if (!bannedUsers || bannedUsers.length === 0) {
-            bannedUsersList.innerHTML = `
-              <div class="empty-state">
-                  <i class="fas fa-user-check"></i>
-                  <h3>لا يوجد مستخدمون محظورون</h3>
-                  <p>لا يوجد مستخدمون محظورون حالياً</p>
-              </div>
-          `;
-            return;
-          }
-
-          displayBannedUsers(bannedUsers);
-        } catch (error) {
-          console.error("Error loading banned users:", error);
-          bannedUsersList.innerHTML = `
-          <div class="empty-state">
-              <i class="fas fa-exclamation-circle"></i>
-              <h3>حدث خطأ</h3>
-              <p>تعذر تحميل بيانات المستخدمين المحظورين. يرجى المحاولة مرة أخرى.</p>
-          </div>
-      `;
-        }
-      }
-
-// دالة لتحميل المستخدمين المحظورين مع تحديث الشارات
-async function loadBannedUsers() {
-    try {
-        const response = await fetch("/api/banned-users");
-        const bannedUsers = await response.json();
-        allBannedUsers = bannedUsers;
-
-        if (!bannedUsers || bannedUsers.length === 0) {
-            bannedUsersList.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-user-check"></i>
-                    <h3>لا يوجد مستخدمون محظورون</h3>
-                    <p>لا يوجد مستخدمون محظورون حالياً</p>
-                </div>
-            `;
-            return;
-        }
-
-        displayBannedUsers(bannedUsers);
-    } catch (error) {
-        console.error("Error loading banned users:", error);
-        bannedUsersList.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-circle"></i>
-                <h3>حدث خطأ</h3>
-                <p>تعذر تحميل بيانات المستخدمين المحظورين. يرجى المحاولة مرة أخرى.</p>
-            </div>
-        `;
-    }
-}
-
-// دالة لعرض المستخدمين المحظورين مع الشارات المحسنة
-function displayBannedUsers(bannedUsers) {
-    bannedUsersList.innerHTML = bannedUsers
-        .map((ban) => {
+      function displayBannedUsers(bannedUsers) {
+        bannedUsersList.innerHTML = bannedUsers
+          .map((ban) => {
             const banTypeText = {
-                all: "حظر كامل",
-                forms: "حظر النماذج فقط",
-                login: "حظر تسجيل الدخول فقط"
+              all: "حظر كامل",
+              forms: "حظر النماذج فقط",
+              login: "حظر تسجيل الدخول فقط"
             }[ban.banType] || ban.banType;
 
-            // البحث عن بيانات المستخدم الكاملة
             const userData = allUsers.find(user => user.username === ban.username) || {};
             
             return `
-                <div class="user-card banned">
-                    <div class="user-card-header">
-                        <div class="user-avatar-large banned-avatar">
-                            <i class="fas fa-user-slash"></i>
-                        </div>
-                        <div class="user-main-info">
-                            <h3>${ban.username}</h3>
-                            <div class="user-badges">
-                                <span class="ban-type-badge">${banTypeText}</span>
-                                <span class="ban-date">${new Date(ban.createdAt).toLocaleDateString("ar-EG")}</span>
-                                <span class="status-badge banned-badge">🔴 محظور</span>
-                            </div>
-                            ${userData.verificationCodeVerified ? 
-                                '<span class="status-badge verified-badge">✅ تم التحقق</span>' : 
-                                '<span class="status-badge not-verified-badge">❌ غير مفعل</span>'}
-                        </div>
-                    </div>
-                    
-                    <div class="user-card-details">
-                        <div class="detail-row">
-                            <span class="detail-label">سبب الحظر:</span>
-                            <span class="detail-value">${ban.reason || "لا يوجد سبب محدد"}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">حظر بواسطة:</span>
-                            <span class="detail-value">${ban.createdBy || "غير معروف"}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">تاريخ الحظر:</span>
-                            <span class="detail-value">${new Date(ban.createdAt).toLocaleString("ar-EG")}</span>
-                        </div>
-                        ${userData.lastActivity ? `
-                        <div class="detail-row">
-                            <span class="detail-label">آخر نشاط:</span>
-                            <span class="detail-value">${new Date(userData.lastActivity).toLocaleString("ar-EG")}</span>
-                        </div>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="user-card-actions">
-                        <button class="action-btn unban-btn" onclick="unbanUser('${ban.username}')">
-                            <i class="fas fa-unlock"></i>
-                            إلغاء الحظر
-                        </button>
-                    </div>
-                </div>
+              <div class="user-card banned">
+                  <div class="user-card-header">
+                      <div class="user-avatar-large banned-avatar">
+                          <i class="fas fa-user-slash"></i>
+                      </div>
+                      <div class="user-main-info">
+                          <h3>${ban.username}</h3>
+                          <div class="user-badges">
+                              <span class="ban-type-badge">${banTypeText}</span>
+                              <span class="ban-date">${new Date(ban.createdAt).toLocaleDateString("ar-EG")}</span>
+                              <span class="status-badge offline-badge">⚫ Offline</span>
+                          </div>
+                          ${userData.verified === true || userData.verificationCodeVerified === true ? 
+                            '<span class="status-badge verified-badge">✅ تم التحقق</span>' : 
+                            '<span class="status-badge not-verified-badge">❌ غير متحقق</span>'}
+                      </div>
+                  </div>
+                  
+                  <div class="user-card-details">
+                      <div class="detail-row">
+                          <span class="detail-label">سبب الحظر:</span>
+                          <span class="detail-value">${ban.reason || "لا يوجد سبب محدد"}</span>
+                      </div>
+                      <div class="detail-row">
+                          <span class="detail-label">حظر بواسطة:</span>
+                          <span class="detail-value">${ban.createdBy || "غير معروف"}</span>
+                      </div>
+                      <div class="detail-row">
+                          <span class="detail-label">تاريخ الحظر:</span>
+                          <span class="detail-value">${new Date(ban.createdAt).toLocaleString("ar-EG")}</span>
+                      </div>
+                      ${userData.lastActivity ? `
+                      <div class="detail-row">
+                          <span class="detail-label">آخر نشاط:</span>
+                          <span class="detail-value">${new Date(userData.lastActivity).toLocaleString("ar-EG")}</span>
+                      </div>
+                      ` : ''}
+                  </div>
+                  
+                  <div class="user-card-actions">
+                      <button class="action-btn unban-btn" onclick="unbanUser('${ban.username}')">
+                          <i class="fas fa-unlock"></i>
+                          إلغاء الحظر
+                      </button>
+                  </div>
+              </div>
             `;
-        })
-        .join("");
-}
+          })
+          .join("");
+      }
+
       function searchUsers() {
         const searchTerm = searchInput.value.toLowerCase().trim();
 
@@ -3224,23 +3218,20 @@ function displayBannedUsers(bannedUsers) {
         }
       }
 
-function toggleView() {
-    if (bannedSection.style.display === "none") {
-        usersSection.style.display = "none";
-        bannedSection.style.display = "block";
-        toggleViewBtn.innerHTML = '<i class="fas fa-users"></i> عرض النشطين';
-        
-        // تحديث البطاقات لتعرض الحالة الجديدة
-        loadBannedUsers();
-    } else {
-        usersSection.style.display = "block";
-        bannedSection.style.display = "none";
-        toggleViewBtn.innerHTML = '<i class="fas fa-ban"></i> عرض المحظورين';
-        
-        // تحديث البطاقات لتعرض الحالة الجديدة
-        displayUsersByCategory(currentCategory);
-    }
-}
+      function toggleView() {
+        if (bannedSection.style.display === "none") {
+          usersSection.style.display = "none";
+          bannedSection.style.display = "block";
+          toggleViewBtn.innerHTML = '<i class="fas fa-users"></i> عرض النشطين';
+          loadBannedUsers();
+        } else {
+          usersSection.style.display = "block";
+          bannedSection.style.display = "none";
+          toggleViewBtn.innerHTML = '<i class="fas fa-ban"></i> عرض المحظورين';
+          displayUsersByCategory(currentCategory);
+        }
+      }
+
       async function performLogout() {
         const result = await Swal.fire({
           title: "تسجيل الخروج",
@@ -3300,15 +3291,6 @@ function toggleView() {
         displayUsersByCategory(currentCategory);
       });
 
-      categoryTabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          categoryTabs.forEach((t) => t.classList.remove("active"));
-          tab.classList.add("active");
-          currentCategory = tab.dataset.category;
-          displayUsersByCategory(currentCategory);
-        });
-      });
-
       document.addEventListener("click", function (event) {
         if (window.innerWidth <= 992) {
           if (
@@ -3327,7 +3309,6 @@ function toggleView() {
       document.addEventListener("DOMContentLoaded", function () {
         loadUserInfo();
         loadUsers();
-        // live refresh of statuses / verified / last login
         setInterval(() => {
           loadUsers();
           if (bannedSection.style.display !== "none") {
@@ -3386,6 +3367,36 @@ function toggleView() {
             sectionSub.style.maxHeight = "0";
           }
         });
+      });
+
+      if (suggestionsToggle) {
+        suggestionsToggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          this.classList.toggle("active");
+          const icon = this.querySelector(".toggle-icon");
+          if (this.classList.contains("active")) {
+            icon.classList.remove("fa-chevron-down");
+            icon.classList.add("fa-chevron-up");
+            suggestionsSubmenu.style.maxHeight =
+              suggestionsSubmenu.scrollHeight + "px";
+          } else {
+            icon.classList.remove("fa-chevron-up");
+            icon.classList.add("fa-chevron-down");
+            suggestionsSubmenu.style.maxHeight = "0";
+          }
+        });
+      }
+
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".suggestions-nav-item")) {
+          if (suggestionsToggle && suggestionsToggle.classList.contains("active")) {
+            suggestionsToggle.classList.remove("active");
+            const icon = suggestionsToggle.querySelector(".toggle-icon");
+            icon.classList.remove("fa-chevron-up");
+            icon.classList.add("fa-chevron-down");
+            suggestionsSubmenu.style.maxHeight = "0";
+          }
+        }
       });
 
       document.addEventListener("keydown", function (event) {
@@ -3450,69 +3461,7 @@ function toggleView() {
         }
       });
 
-      function updateCategoryCounts() {
-        userCounts = {
-          all: allUsers.length,
-          sec1: allUsers.filter((user) => user.grade === "sec1").length,
-          sec2: allUsers.filter((user) => user.grade === "sec2").length,
-          sec3: allUsers.filter((user) => user.grade === "sec3").length,
-          prep1: allUsers.filter((user) => user.grade === "prep1").length,
-          prep2: allUsers.filter((user) => user.grade === "prep2").length,
-          prep3: allUsers.filter((user) => user.grade === "prep3").length,
-          teachers: allUsers.filter((user) => user.grade === "teachers").length,
-          admins: allUsers.filter((user) => user.grade === "admins").length,
-        };
-
-        for (const category in userCounts) {
-          const countElement = document.getElementById(`count-${category}`);
-          if (countElement) {
-            countElement.textContent = userCounts[category];
-          }
-        }
-      }
-      const suggestionsToggle = document.getElementById("suggestionsToggle");
-      const suggestionsSubmenu = document.getElementById("suggestionsSubmenu");
-
-      if (suggestionsToggle) {
-        suggestionsToggle.addEventListener("click", function (e) {
-          e.stopPropagation();
-          this.classList.toggle("active");
-          const icon = this.querySelector(".toggle-icon");
-          if (this.classList.contains("active")) {
-            icon.classList.remove("fa-chevron-down");
-            icon.classList.add("fa-chevron-up");
-            suggestionsSubmenu.style.maxHeight =
-              suggestionsSubmenu.scrollHeight + "px";
-          } else {
-            icon.classList.remove("fa-chevron-up");
-            icon.classList.add("fa-chevron-down");
-            suggestionsSubmenu.style.maxHeight = "0";
-          }
-        });
-      }
-
-      document.addEventListener("click", function (e) {
-        if (!e.target.closest(".suggestions-nav-item")) {
-          const suggestionsToggle =
-            document.getElementById("suggestionsToggle");
-          const suggestionsSubmenu =
-            document.getElementById("suggestionsSubmenu");
-
-          if (
-            suggestionsToggle &&
-            suggestionsToggle.classList.contains("active")
-          ) {
-            suggestionsToggle.classList.remove("active");
-            const icon = suggestionsToggle.querySelector(".toggle-icon");
-            icon.classList.remove("fa-chevron-up");
-            icon.classList.add("fa-chevron-down");
-            suggestionsSubmenu.style.maxHeight = "0";
-          }
-        }
-      });
-
       async function copyText(text) {
-        // Modal-style feedback (match the rest of the admin UX)
         try {
           if (navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(text);
@@ -3545,80 +3494,68 @@ function toggleView() {
         }
       }
 
-      // دالة لتحديد حالة المستخدم
       function getUserStatus(user) {
-        // Banned overrides everything
-        if (isUserBanned(user)) return "banned";
+        const bannedUsers = allBannedUsers || [];
+        const isBanned = bannedUsers.some(banned => banned.username === user.username);
+        if (isBanned) return "banned";
 
-        // If we don't have lastActivity (or it's invalid) => signed-out
-        if (!user?.lastActivity) return "signed-out";
+        if (!user?.lastActivity) return "offline";
 
         const lastActivity = new Date(user.lastActivity);
-        if (Number.isNaN(lastActivity.getTime())) return "signed-out";
+        if (Number.isNaN(lastActivity.getTime())) return "offline";
 
         const now = Date.now();
         const diffMinutes = Math.floor((now - lastActivity.getTime()) / 60000);
 
-        // Simple, clear UX:
-        // - online: last seen within 2 minutes
-        // - offline: otherwise
-        // (we keep idle/signed-in internal ranks for sorting if you want later)
         if (diffMinutes <= 2) return "online";
-        return "signed-out";
+        if (diffMinutes <= 10) return "idle";
+        if (diffMinutes <= 30) return "signed-in";
+        return "offline";
       }
 
-// دالة للتحقق إذا كان المستخدم محظوراً
-function isUserBanned(user) {
-    // يمكنك تحسين هذه الدالة للتحقق من قاعدة البيانات
-    return allBannedUsers.some(banned => banned.username === user.username);
-}
+      function getStatusBadge(status) {
+        const badges = {
+          'online': '<span class="status-badge online-badge">🟢 Online</span>',
+          'idle': '<span class="status-badge idle-badge">🟡 Idle</span>',
+          'signed-in': '<span class="status-badge signed-in-badge">🔵 Signed In</span>',
+          'offline': '<span class="status-badge offline-badge">⚫ Offline</span>',
+          'banned': '<span class="status-badge banned-badge">🔴 محظور</span>'
+        };
+        
+        return badges[status] || badges['offline'];
+      }
 
-// دالة لإنشاء شارة الحالة
-function getStatusBadge(status) {
-    const badges = {
-        'online': '<span class="status-badge online-badge">🟢 Online</span>',
-        'signed-out': '<span class="status-badge signed-out-badge">⚫ Offline</span>',
-        'banned': '<span class="status-badge banned-badge">🔴 محظور</span>'
-    };
-    
-    return badges[status] || badges['signed-out'];
-}
+      function getStatusDescription(status) {
+        const descriptions = {
+          'online': 'متصل الآن',
+          'idle': 'خامل',
+          'signed-in': 'متصل',
+          'offline': 'غير متصل',
+          'banned': 'المستخدم محظور'
+        };
+        
+        return descriptions[status] || 'غير متصل';
+      }
 
-// دالة للحصول على وصف الحالة
-function getStatusDescription(status) {
-    const descriptions = {
-        'online': 'Online',
-        'signed-out': 'Offline',
-        'banned': 'المستخدم محظور'
-    };
-    
-    return descriptions[status] || 'Offline';
-}
-
-// دالة لتنسيق الوقت المنقضي
-function formatTimeAgo(date) {
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMinutes = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMinutes / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffMinutes < 1) {
-        return 'الآن';
-    } else if (diffMinutes < 60) {
-        return `منذ ${diffMinutes} دقيقة`;
-    } else if (diffHours < 24) {
-        return `منذ ${diffHours} ساعة`;
-    } else if (diffDays < 7) {
-        return `منذ ${diffDays} يوم`;
-    } else {
-        return date.toLocaleDateString('ar-EG');
-    }
-}
-
-// NOTE: loadBannedUsers() & displayBannedUsers() are already defined earlier.
-// The duplicate implementation + stray rendering code below caused bugs; removed.
-
+      function formatTimeAgo(date) {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMinutes = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMinutes / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        
+        if (diffMinutes < 1) {
+          return 'الآن';
+        } else if (diffMinutes < 60) {
+          return `منذ ${diffMinutes} دقيقة`;
+        } else if (diffHours < 24) {
+          return `منذ ${diffHours} ساعة`;
+        } else if (diffDays < 7) {
+          return `منذ ${diffDays} يوم`;
+        } else {
+          return date.toLocaleDateString('ar-EG');
+        }
+      }
     </script>
   </body>
 </html>
