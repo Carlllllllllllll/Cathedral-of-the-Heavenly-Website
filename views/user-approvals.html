@@ -238,7 +238,7 @@
               <option value="oldest">الأقدم أولاً</option>
             </select>
           </div>
-          <button id="refreshBtn" class="toggle-btn">
+          <button id="refreshBtn" class="toggle-btn refresh-btn">
             <i class="fas fa-sync-alt"></i>
             تحديث
           </button>
@@ -543,29 +543,38 @@
         }
       }
 
-      function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'success',
-                title: 'تم النسخ بنجاح!',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true,
-            });
-        }, () => {
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'error',
-                title: 'فشل النسخ',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true,
-            });
-        });
-    }
+      async function copyToClipboard(text) {
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+          }
+
+          await Swal.fire({
+            title: "تم النسخ",
+            text: "تم نسخ كود التحقق بنجاح",
+            icon: "success",
+            confirmButtonText: "حسناً",
+            confirmButtonColor: "#ffcc00",
+            timer: 1600,
+            timerProgressBar: true,
+          });
+        } catch (e) {
+          await Swal.fire({
+            title: "فشل النسخ",
+            text: "تعذر نسخ كود التحقق. حاول مرة أخرى.",
+            icon: "error",
+            confirmButtonText: "حسناً",
+            confirmButtonColor: "#e74c3c",
+          });
+        }
+      }
 
       async function declineRegistration(id) {
         const { value: reason } = await Swal.fire({
@@ -789,38 +798,45 @@
         box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.2);
       }
 
-      .refresh-btn {
-        padding: 10px 20px;
+      .refresh-btn,
+      .toggle-btn {
+        padding: 12px 22px;
         background: linear-gradient(90deg, var(--secondary), var(--primary));
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 800;
         cursor: pointer;
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        gap: 10px;
         transition: all var(--transition-speed);
         white-space: nowrap;
         will-change: transform;
+        min-height: 44px;
         margin-top: 30px;
       }
 
-      .refresh-btn:hover {
+      .refresh-btn:hover,
+      .toggle-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+        border-color: rgba(255, 204, 0, 0.22);
       }
 
       .refresh-btn:active {
         transform: translateY(0);
       }
 
-      .refresh-btn i {
-        transition: transform 0.3s ease;
+      .refresh-btn i,
+      .toggle-btn i {
+        transition: transform 0.35s ease;
       }
 
-      .refresh-btn:hover i {
+      .refresh-btn:hover i,
+      .toggle-btn:hover i {
         transform: rotate(180deg);
       }
 

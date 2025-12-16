@@ -84,4 +84,3 @@ function validateInput(input, type = "text") {
       return sanitized;
   }
 }
-

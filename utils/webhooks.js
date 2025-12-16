@@ -330,4 +330,3 @@ module.exports = {
   sendPurchaseWebhook,
   sendBanWebhook,
 };
-

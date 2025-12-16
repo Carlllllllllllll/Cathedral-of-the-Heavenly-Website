@@ -249,4 +249,3 @@ module.exports = {
   maskSensitiveData,
   buildDataSnapshot,
 };
-
