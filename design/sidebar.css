@@ -88,9 +88,9 @@
 }
 
 .nav-link.active {
-    background: linear-gradient(90deg, var(--accent), #ffd700);
-    color: var(--dark);
-    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+  background: linear-gradient(90deg, var(--accent), #ffd700);
+  color: var(--dark);
+  box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
 }
 
 .sidebar-footer {
@@ -183,20 +183,12 @@
 
 .grades-submenu-container::before {
   top: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(42, 27, 60, 0.95),
-    transparent
-  );
+  background: linear-gradient(to bottom, rgba(42, 27, 60, 0.95), transparent);
 }
 
 .grades-submenu-container::after {
   bottom: 0;
-  background: linear-gradient(
-    to top,
-    rgba(42, 27, 60, 0.95),
-    transparent
-  );
+  background: linear-gradient(to top, rgba(42, 27, 60, 0.95), transparent);
 }
 
 .grades-toggle.active + .grades-submenu-container::before,
@@ -359,20 +351,12 @@
 
 .suggestions-submenu-container::before {
   top: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(42, 27, 60, 0.95),
-    transparent
-  );
+  background: linear-gradient(to bottom, rgba(42, 27, 60, 0.95), transparent);
 }
 
 .suggestions-submenu-container::after {
   bottom: 0;
-  background: linear-gradient(
-    to top,
-    rgba(42, 27, 60, 0.95),
-    transparent
-  );
+  background: linear-gradient(to top, rgba(42, 27, 60, 0.95), transparent);
 }
 
 .suggestions-toggle.active + .suggestions-submenu-container::before,

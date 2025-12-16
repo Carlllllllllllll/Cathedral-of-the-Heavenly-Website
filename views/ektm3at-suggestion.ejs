@@ -3,8 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
-    <meta name="keywords" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta
+      name="description"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
+    <meta
+      name="keywords"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
     <meta name="author" content="كاتدرائية السمائيين" />
     <meta name="theme-color" content="#402958" />
     <meta name="robots" content="noindex, nofollow" />
@@ -12,7 +18,10 @@
       property="og:title"
       content="اقتراحات الاجتماع | <%= gradeLabel.short || 'الصف' %>"
     />
-    <meta property="og:description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta
+      property="og:description"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
     <meta property="og:image" content="/UI/icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ar_AR" />
@@ -86,13 +95,17 @@
         overflow: hidden;
       }
       .notification::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         right: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.08),
+          rgba(255, 255, 255, 0.02)
+        );
         z-index: -1;
       }
       .notification.hiding {
@@ -122,7 +135,7 @@
         font-size: 22px;
         flex-shrink: 0;
         margin-top: 2px;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
       }
       .notification-content {
         flex: 1;
@@ -133,7 +146,7 @@
         margin-bottom: 6px;
         font-size: 1rem;
         letter-spacing: 0.3px;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       }
       .notification-message {
         font-size: 0.9rem;
@@ -196,8 +209,12 @@
         }
       }
       @keyframes progressShrink {
-        from { width: 100%; }
-        to { width: 0%; }
+        from {
+          width: 100%;
+        }
+        to {
+          width: 0%;
+        }
       }
       .shell {
         max-width: 1100px;
@@ -340,7 +357,11 @@
         height: 100%;
       }
       .points-badge {
-        background: linear-gradient(135deg, rgba(255, 204, 0, 0.15), rgba(255, 204, 0, 0.08));
+        background: linear-gradient(
+          135deg,
+          rgba(255, 204, 0, 0.15),
+          rgba(255, 204, 0, 0.08)
+        );
         border: 1px solid rgba(255, 204, 0, 0.3);
         border-radius: 16px;
         padding: 6px 12px;
@@ -447,7 +468,11 @@
         color: var(--accent);
       }
       .logout-btn {
-        background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(231, 76, 60, 0.08));
+        background: linear-gradient(
+          135deg,
+          rgba(231, 76, 60, 0.15),
+          rgba(231, 76, 60, 0.08)
+        );
         color: #e74c3c;
         border: 1px solid rgba(231, 76, 60, 0.3);
         padding: 6px 12px;
@@ -463,7 +488,11 @@
         white-space: nowrap;
       }
       .logout-btn:hover {
-        background: linear-gradient(135deg, rgba(231, 76, 60, 0.25), rgba(231, 76, 60, 0.15));
+        background: linear-gradient(
+          135deg,
+          rgba(231, 76, 60, 0.25),
+          rgba(231, 76, 60, 0.15)
+        );
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
       }
@@ -734,7 +763,11 @@
 
       <div class="mobile-dropdown" id="mobileDropdown">
         <div class="mobile-buttons">
-          <a href="/grades/<%= gradeSlug %>" class="nav-button" data-page="dashboard">
+          <a
+            href="/grades/<%= gradeSlug %>"
+            class="nav-button"
+            data-page="dashboard"
+          >
             <i class="fas fa-home"></i>
             صفحة الصف
           </a>
@@ -791,17 +824,17 @@
     ></script>
     <script>
       function showNotification(type, title, message, duration = 5000) {
-        const container = document.getElementById('notificationContainer');
-        const notification = document.createElement('div');
+        const container = document.getElementById("notificationContainer");
+        const notification = document.createElement("div");
         notification.className = `notification ${type}`;
-        
+
         const icons = {
-          success: 'fas fa-check-circle',
-          warning: 'fas fa-exclamation-triangle',
-          error: 'fas fa-times-circle',
-          info: 'fas fa-info-circle'
+          success: "fas fa-check-circle",
+          warning: "fas fa-exclamation-triangle",
+          error: "fas fa-times-circle",
+          info: "fas fa-info-circle",
         };
-        
+
         notification.innerHTML = `
           <i class="notification-icon ${icons[type] || icons.info}"></i>
           <div class="notification-content">
@@ -813,40 +846,42 @@
           </button>
           <div class="notification-progress" style="animation-duration: ${duration}ms"></div>
         `;
-        
+
         container.appendChild(notification);
-        
-        const closeBtn = notification.querySelector('.notification-close');
+
+        const closeBtn = notification.querySelector(".notification-close");
         closeBtn.onclick = () => {
-          notification.classList.add('hiding');
+          notification.classList.add("hiding");
           setTimeout(() => notification.remove(), 400);
         };
-        
-        const progressBar = notification.querySelector('.notification-progress');
-        
+
+        const progressBar = notification.querySelector(
+          ".notification-progress"
+        );
+
         let timeoutId;
         if (duration > 0) {
           timeoutId = setTimeout(() => {
-            notification.classList.add('hiding');
+            notification.classList.add("hiding");
             setTimeout(() => notification.remove(), 400);
           }, duration);
         }
-        
-        notification.addEventListener('mouseenter', () => {
-          if (progressBar) progressBar.style.animationPlayState = 'paused';
+
+        notification.addEventListener("mouseenter", () => {
+          if (progressBar) progressBar.style.animationPlayState = "paused";
           if (timeoutId) clearTimeout(timeoutId);
         });
-        
-        notification.addEventListener('mouseleave', () => {
-          if (progressBar) progressBar.style.animationPlayState = 'running';
+
+        notification.addEventListener("mouseleave", () => {
+          if (progressBar) progressBar.style.animationPlayState = "running";
           if (duration > 0) {
             timeoutId = setTimeout(() => {
-              notification.classList.add('hiding');
+              notification.classList.add("hiding");
               setTimeout(() => notification.remove(), 400);
-            }, duration - (progressBar ? (parseFloat(getComputedStyle(progressBar).animationDuration) * 1000 - progressBar.getAnimations()[0]?.currentTime * 1000) : duration));
+            }, duration - (progressBar ? parseFloat(getComputedStyle(progressBar).animationDuration) * 1000 - progressBar.getAnimations()[0]?.currentTime * 1000 : duration));
           }
         });
-        
+
         return notification;
       }
 
@@ -854,7 +889,9 @@
       const mobileDropdown = document.getElementById("mobileDropdown");
       const suggestionBtn = document.getElementById("suggestionBtn");
       const suggestionDropdown = document.getElementById("suggestionDropdown");
-      const mobileSuggestionBtn = document.getElementById("mobileSuggestionBtn");
+      const mobileSuggestionBtn = document.getElementById(
+        "mobileSuggestionBtn"
+      );
       const logoutBtn = document.getElementById("logoutBtn");
       const logoutBtnMobile = document.getElementById("logoutBtnMobile");
       const desktopArrow = document.getElementById("desktopArrow");
@@ -877,7 +914,11 @@
       if (mobileSuggestionBtn) {
         mobileSuggestionBtn.addEventListener("click", function (e) {
           e.stopPropagation();
-          showNotification("info", "اقتراحات", "اضغط على رابط اقتراح الاجتماع في القائمة");
+          showNotification(
+            "info",
+            "اقتراحات",
+            "اضغط على رابط اقتراح الاجتماع في القائمة"
+          );
         });
       }
 
@@ -928,7 +969,11 @@
           try {
             const response = await fetch("/logout", { method: "POST" });
             if (response.ok) {
-              showNotification("success", "تم تسجيل الخروج", "تم إنهاء الجلسة بأمان");
+              showNotification(
+                "success",
+                "تم تسجيل الخروج",
+                "تم إنهاء الجلسة بأمان"
+              );
               setTimeout(() => {
                 window.location.href = "/";
               }, 1000);
@@ -975,13 +1020,18 @@
         e.preventDefault();
         const text = document.getElementById("suggestion").value.trim();
         if (text.length < 5) {
-          showNotification("warning", "نص قصير", "اكتب اقتراحاً أوضح قبل الإرسال.");
+          showNotification(
+            "warning",
+            "نص قصير",
+            "اكتب اقتراحاً أوضح قبل الإرسال."
+          );
           return;
         }
 
         submitBtn.disabled = true;
         const original = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+        submitBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
 
         try {
           const res = await fetch("/api/suggestions", {
@@ -991,16 +1041,28 @@
           });
           const result = await res.json();
           if (res.ok && result.success) {
-            showNotification("success", "تم الإرسال", "شكرًا! تم استلام اقتراحك.");
+            showNotification(
+              "success",
+              "تم الإرسال",
+              "شكرًا! تم استلام اقتراحك."
+            );
             form.reset();
             setTimeout(() => {
               window.location.href = "/grades/<%= gradeSlug %>";
             }, 1200);
           } else {
-            showNotification("info", "تنبيه", result.message || "تعذر إرسال الاقتراح");
+            showNotification(
+              "info",
+              "تنبيه",
+              result.message || "تعذر إرسال الاقتراح"
+            );
           }
         } catch (err) {
-          showNotification("error", "فشل الإرسال", "حدث خطأ في الاتصال. حاول لاحقًا.");
+          showNotification(
+            "error",
+            "فشل الإرسال",
+            "حدث خطأ في الاتصال. حاول لاحقًا."
+          );
         } finally {
           submitBtn.disabled = false;
           submitBtn.innerHTML = original;

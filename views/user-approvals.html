@@ -52,7 +52,7 @@
 
       <nav class="nav-menu">
         <div class="nav-item">
-          <a href="http://localhost:3000" class="nav-link">
+          <a href="https://kenisa-el-sama2eyeen.ooguy.com" class="nav-link">
             <i class="fas fa-home"></i>
             الصفحة الرئيسية
           </a>
@@ -173,6 +173,18 @@
     </aside>
 
     <main class="main-content">
+      <header class="top-nav">
+        <div class="user-info">
+          <img src="/UI/pfp.jpg" alt="المستخدم" class="user-avatar" />
+          <div class="user-details">
+            <h3 id="username-display">جاري التحميل...</h3>
+            <span id="user-role-pill">مشرف</span>
+          </div>
+          <button class="logout-btn-mobile" id="logoutBtnMobile">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </header>
       <div class="admin-container">
         <h1><i class="fas fa-user-check"></i> مراجعة طلبات التسجيل المعلقة</h1>
 
@@ -308,7 +320,7 @@
           document.getElementById("username").textContent = data.username;
           document.getElementById("userRole").textContent =
             data.role === "leadadmin"
-              ? "قائد عام"
+              ? "ليد أدمن"
               : data.role === "admin"
               ? "مشرف"
               : data.role;
@@ -685,7 +697,8 @@
       if (logoutBtnMobile)
         logoutBtnMobile.addEventListener("click", performLogout);
 
-      if (filterGrade) filterGrade.addEventListener("change", loadRegistrations);
+      if (filterGrade)
+        filterGrade.addEventListener("change", loadRegistrations);
       if (filterDate) filterDate.addEventListener("change", loadRegistrations);
       if (refreshBtn) refreshBtn.addEventListener("click", loadRegistrations);
 

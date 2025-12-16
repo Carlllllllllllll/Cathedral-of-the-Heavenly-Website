@@ -603,6 +603,26 @@ body {
   transition: all var(--transition-speed);
 }
 
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .form-actions .action-btn,
+  .form-actions .submit-btn {
+    width: 100%;
+    min-width: auto !important;
+    max-width: 300px;
+  }
+
+  .form-actions .submit-btn {
+    width: 100%;
+    min-width: auto !important;
+    max-width: 300px;
+  }
+}
+
 .view-btn {
   background: linear-gradient(
     135deg,
@@ -2731,4 +2751,57 @@ select:focus {
   .sidebar {
     overscroll-behavior: contain;
   }
+}
+
+.grades-toggle.active,
+.suggestions-toggle.active {
+  background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+  border-right: 3px solid var(--accent) !important;
+  color: var(--dark) !important;
+  box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3) !important;
+}
+
+.grades-toggle.active i,
+.suggestions-toggle.active i {
+  color: var(--dark) !important;
+}
+
+.section-toggle:hover {
+  background: rgba(255, 204, 0, 0.15) !important;
+  transform: translateX(-3px) !important;
+  color: var(--accent) !important;
+}
+
+.section-toggle.active {
+  background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+  color: var(--dark) !important;
+  border-right: 2px solid var(--accent) !important;
+}
+
+.section-toggle.active i {
+  color: var(--dark) !important;
+}
+
+.submenu-link:hover {
+  background: rgba(255, 204, 0, 0.15) !important;
+  transform: translateX(-5px) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+.submenu-link.active {
+  background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+  color: var(--dark) !important;
+  border-right: 2px solid var(--accent) !important;
+  box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2) !important;
+}
+
+.submenu-link.active i {
+  color: var(--dark) !important;
+}
+
+.suggestions-toggle.active
+  + .suggestions-submenu-container
+  .suggestions-submenu {
+  max-height: 200px !important;
 }

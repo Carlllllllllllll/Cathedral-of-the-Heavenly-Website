@@ -26,7 +26,8 @@ const submissionLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    message: "Too many submissions. Please wait 15 minutes before trying again.",
+    message:
+      "Too many submissions. Please wait 15 minutes before trying again.",
   },
   keyGenerator: (req) => {
     return req.session?.username || req.ip;
@@ -235,8 +236,14 @@ app.use(express.static(path.join(__dirname, "views")));
 app.use(express.static(path.join(__dirname, "design"), staticAssetOptions));
 app.use(express.static(path.join(__dirname, "scripts"), staticAssetOptions));
 app.use(express.static(path.join(__dirname, "UI"), staticAssetOptions));
-app.use("/design", express.static(path.join(__dirname, "design"), staticAssetOptions));
-app.use("/scripts", express.static(path.join(__dirname, "scripts"), staticAssetOptions));
+app.use(
+  "/design",
+  express.static(path.join(__dirname, "design"), staticAssetOptions)
+);
+app.use(
+  "/scripts",
+  express.static(path.join(__dirname, "scripts"), staticAssetOptions)
+);
 app.use("/UI", express.static(path.join(__dirname, "UI"), staticAssetOptions));
 
 app.get("/design2.css", (req, res) => {
@@ -386,9 +393,12 @@ const WEBHOOK_RETRY_ATTEMPTS = 3;
 const WEBHOOK_RETRY_DELAYS = [0, 750, 2000];
 const webhookHealth = new Map();
 
-const sleep = (ms) => (ms && ms > 0 ? new Promise((resolve) => setTimeout(resolve, ms)) : Promise.resolve());
+const sleep = (ms) =>
+  ms && ms > 0
+    ? new Promise((resolve) => setTimeout(resolve, ms))
+    : Promise.resolve();
 
-const os = require('os');
+const os = require("os");
 
 function checkMemoryUsage() {
   const used = process.memoryUsage();
@@ -396,7 +406,7 @@ function checkMemoryUsage() {
   const freeMem = os.freemem();
   const usedMem = totalMem - freeMem;
   const memoryUsagePercent = (usedMem / totalMem) * 100;
-  
+
   return {
     heapUsed: Math.round(used.heapUsed / 1024 / 1024),
     heapTotal: Math.round(used.heapTotal / 1024 / 1024),
@@ -404,7 +414,7 @@ function checkMemoryUsage() {
     systemTotal: Math.round(totalMem / 1024 / 1024),
     systemUsed: Math.round(usedMem / 1024 / 1024),
     systemFree: Math.round(freeMem / 1024 / 1024),
-    memoryUsagePercent: Math.round(memoryUsagePercent * 100) / 100
+    memoryUsagePercent: Math.round(memoryUsagePercent * 100) / 100,
   };
 }
 
@@ -415,47 +425,63 @@ function isMemoryCritical() {
 
 setInterval(async () => {
   const memory = checkMemoryUsage();
-  
+
   if (memory.memoryUsagePercent > 80) {
-    await sendWebhook('SYSTEM', {
-      embeds: [{
-        title: '⚠️ High Memory Usage Warning',
-        color: 0xf59e0b,
-        fields: [
-          { name: 'Heap Used', value: `${memory.heapUsed} MB`, inline: true },
-          { name: 'Heap Total', value: `${memory.heapTotal} MB`, inline: true },
-          { name: 'RSS', value: `${memory.rss} MB`, inline: true },
-          { name: 'System Usage', value: `${memory.memoryUsagePercent}%`, inline: true },
-          { name: 'Status', value: '⚠️ High', inline: true }
-        ],
-        timestamp: new Date().toISOString()
-      }]
+    await sendWebhook("SYSTEM", {
+      embeds: [
+        {
+          title: "⚠️ High Memory Usage Warning",
+          color: 0xf59e0b,
+          fields: [
+            { name: "Heap Used", value: `${memory.heapUsed} MB`, inline: true },
+            {
+              name: "Heap Total",
+              value: `${memory.heapTotal} MB`,
+              inline: true,
+            },
+            { name: "RSS", value: `${memory.rss} MB`, inline: true },
+            {
+              name: "System Usage",
+              value: `${memory.memoryUsagePercent}%`,
+              inline: true,
+            },
+            { name: "Status", value: "⚠️ High", inline: true },
+          ],
+          timestamp: new Date().toISOString(),
+        },
+      ],
     });
   }
-  
+
   if (isMemoryCritical()) {
-    await sendWebhook('ERROR', {
-      embeds: [{
-        title: '🚨 Critical Memory Usage',
-        color: 0xe74c3c,
-        fields: [
-          { name: 'Heap Used', value: `${memory.heapUsed} MB`, inline: true },
-          { name: 'Memory Usage', value: `${memory.memoryUsagePercent}%`, inline: true },
-          { name: 'Status', value: '🚨 CRITICAL', inline: true },
-          { name: 'Action', value: 'Initiated cleanup', inline: true }
-        ],
-        timestamp: new Date().toISOString()
-      }]
+    await sendWebhook("ERROR", {
+      embeds: [
+        {
+          title: "🚨 Critical Memory Usage",
+          color: 0xe74c3c,
+          fields: [
+            { name: "Heap Used", value: `${memory.heapUsed} MB`, inline: true },
+            {
+              name: "Memory Usage",
+              value: `${memory.memoryUsagePercent}%`,
+              inline: true,
+            },
+            { name: "Status", value: "🚨 CRITICAL", inline: true },
+            { name: "Action", value: "Initiated cleanup", inline: true },
+          ],
+          timestamp: new Date().toISOString(),
+        },
+      ],
     });
-    
+
     if (global.gc) {
       global.gc();
     }
-    
+
     try {
       await cleanupOldFiles();
     } catch (error) {
-      console.error('[MEMORY CLEANUP ERROR]', error.message);
+      console.error("[MEMORY CLEANUP ERROR]", error.message);
     }
   }
 }, 60000);
@@ -540,12 +566,11 @@ async function dispatchWebhookTarget(target, payload, meta) {
 
 function updateWebhookStats(envKey, success) {
   if (!envKey) return;
-  const current =
-    webhookHealth.get(envKey) || {
-      success: 0,
-      failure: 0,
-      consecutiveFailures: 0,
-    };
+  const current = webhookHealth.get(envKey) || {
+    success: 0,
+    failure: 0,
+    consecutiveFailures: 0,
+  };
   if (success) {
     current.success += 1;
     current.consecutiveFailures = 0;
@@ -570,9 +595,10 @@ async function dispatchWebhook(webhookType, data = {}) {
     console.warn(`[WEBHOOK][${eventId}] unknown type ${webhookType}`);
     return false;
   }
-  const envKeys = [registryEntry.env, ...(registryEntry.fallbackEnvs || [])].filter(
-    Boolean
-  );
+  const envKeys = [
+    registryEntry.env,
+    ...(registryEntry.fallbackEnvs || []),
+  ].filter(Boolean);
   const targets = envKeys
     .map((envKey) => ({
       envKey,
@@ -848,7 +874,6 @@ const UserRegistrationSchema = new mongoose.Schema({
   verificationCode: { type: String, default: null },
   verificationCodeVerified: { type: Boolean, default: false },
   verificationDate: { type: Date, default: null },
-  // Track actual login time so admin panels can show real online/offline + last login.
   lastLoginAt: { type: Date, default: null, index: true },
   createdAt: { type: Date, default: Date.now },
   reviewedBy: String,
@@ -963,7 +988,11 @@ const ActiveSessionSchema = new mongoose.Schema({
 const ActiveSession = mongoose.model("ActiveSession", ActiveSessionSchema);
 
 async function destroyStoredSession(sessionStore, sessionId) {
-  if (!sessionStore || typeof sessionStore.destroy !== "function" || !sessionId) {
+  if (
+    !sessionStore ||
+    typeof sessionStore.destroy !== "function" ||
+    !sessionId
+  ) {
     return;
   }
   await new Promise((resolve) => {
@@ -1312,13 +1341,19 @@ async function handleInvalidActiveSession(req, res, reason, activeRecord) {
         title: "🚫 Session Validation Failed",
         color: 0xe74c3c,
         fields: [
-          { name: "Username", value: req.session.username || "Unknown", inline: true },
+          {
+            name: "Username",
+            value: req.session.username || "Unknown",
+            inline: true,
+          },
           { name: "Path", value: req.path, inline: true },
           { name: "IP", value: req.ip || "unknown", inline: true },
           { name: "Reason", value: reason, inline: false },
           {
             name: "Request Session ID",
-            value: req.sessionID ? req.sessionID.substring(0, 20) + "..." : "Unknown",
+            value: req.sessionID
+              ? req.sessionID.substring(0, 20) + "..."
+              : "Unknown",
             inline: true,
           },
           {
@@ -1353,12 +1388,22 @@ async function validateActiveSessionOwnership(req, res) {
   });
 
   if (!activeRecord) {
-    await handleInvalidActiveSession(req, res, "Active session record missing", null);
+    await handleInvalidActiveSession(
+      req,
+      res,
+      "Active session record missing",
+      null
+    );
     return false;
   }
 
   if (activeRecord.sessionId !== req.sessionID) {
-    await handleInvalidActiveSession(req, res, "Session mismatch detected", activeRecord);
+    await handleInvalidActiveSession(
+      req,
+      res,
+      "Session mismatch detected",
+      activeRecord
+    );
     return false;
   }
 
@@ -1869,7 +1914,6 @@ app.post("/login", loginLimiter, async (req, res) => {
     ],
   });
 
-
   const isEmail = username.includes("@");
   const isPhone = /^01\d{9}$/.test(username.replace(/\D/g, ""));
 
@@ -2164,7 +2208,6 @@ app.post("/login", loginLimiter, async (req, res) => {
             }
           }
 
-          // Persist last login timestamp (used for admin user-management status)
           registeredUser.lastLoginAt = new Date();
           await registeredUser.save();
 
@@ -2505,10 +2548,7 @@ app.post("/login", loginLimiter, async (req, res) => {
       ],
     });
 
-    if (
-      replacedSession.sessionId &&
-      replacedSession.sessionId !== sessionId
-    ) {
+    if (replacedSession.sessionId && replacedSession.sessionId !== sessionId) {
       await destroyStoredSession(req.sessionStore, replacedSession.sessionId);
     }
   }
@@ -4223,12 +4263,13 @@ app.get(
           const leaderboardAccess = await LeaderboardAccess.findOne({
             username: reg.username.toLowerCase(),
           });
-          
-          // Fetch the most recent session activity for the user
-          const activeSession = await ActiveSession.findOne({ username: reg.username.toLowerCase() }).sort({ lastSeenAt: -1 });
+          const activeSession = await ActiveSession.findOne({
+            username: reg.username.toLowerCase(),
+          }).sort({ lastSeenAt: -1 });
 
-          // Determine the most accurate last activity time
-          const lastActivity = activeSession ? activeSession.lastSeenAt : reg.lastLoginAt;
+          const lastActivity = activeSession
+            ? activeSession.lastSeenAt
+            : reg.lastLoginAt;
 
           return {
             _id: reg._id,
@@ -4247,9 +4288,7 @@ app.get(
               ? leaderboardAccess.hasLeaderboardAccess
               : false,
             createdAt: reg.createdAt,
-            // Use the more accurate lastActivity timestamp
             lastActivity: lastActivity || null,
-            // lastLoginAt can remain for historical data if needed
             lastLoginAt: reg.lastLoginAt || null,
           };
         })
@@ -6608,21 +6647,52 @@ app.get(
   }
 );
 
-app.post("/api/suggestions", requireAuth, submissionLimiter, async (req, res) => {
-  try {
-    const user = getSessionUser(req);
-    if (!user) {
-      await sendWebhook("SECURITY", {
+app.post(
+  "/api/suggestions",
+  requireAuth,
+  submissionLimiter,
+  async (req, res) => {
+    try {
+      const user = getSessionUser(req);
+      if (!user) {
+        await sendWebhook("SECURITY", {
+          embeds: [
+            {
+              title: "❌ Suggestion Submission - No User",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Endpoint", value: "/api/suggestions", inline: true },
+                { name: "Method", value: "POST", inline: true },
+                {
+                  name: "Error",
+                  value: "User not found in session",
+                  inline: true,
+                },
+                { name: "IP", value: req.ip || "unknown", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res.status(401).json({ success: false, message: "غير مصرح" });
+      }
+
+      const { text, category } = req.body;
+      const suggestionText = (text || "").trim();
+
+      await sendWebhook("USER", {
         embeds: [
           {
-            title: "❌ Suggestion Submission - No User",
-            color: 0xe74c3c,
+            title: "💡 New Suggestion Attempt",
+            color: 0xf59e0b,
             fields: [
-              { name: "Endpoint", value: "/api/suggestions", inline: true },
-              { name: "Method", value: "POST", inline: true },
+              { name: "Username", value: req.session.username, inline: true },
+              { name: "Role", value: user.role, inline: true },
+              { name: "Grade", value: user.grade || "N/A", inline: true },
+              { name: "Category", value: category || "meeting", inline: true },
               {
-                name: "Error",
-                value: "User not found in session",
+                name: "Text Length",
+                value: suggestionText.length.toString(),
                 inline: true,
               },
               { name: "IP", value: req.ip || "unknown", inline: true },
@@ -6631,246 +6701,234 @@ app.post("/api/suggestions", requireAuth, submissionLimiter, async (req, res) =>
           },
         ],
       });
-      return res.status(401).json({ success: false, message: "غير مصرح" });
-    }
 
-    const { text, category } = req.body;
-    const suggestionText = (text || "").trim();
+      if (suggestionText.length < 5) {
+        await sendWebhook("USER", {
+          embeds: [
+            {
+              title: "❌ Suggestion Submission - Too Short",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Username", value: req.session.username, inline: true },
+                {
+                  name: "Text Length",
+                  value: suggestionText.length.toString(),
+                  inline: true,
+                },
+                { name: "Minimum Required", value: "5", inline: true },
+                {
+                  name: "Category",
+                  value: category || "meeting",
+                  inline: true,
+                },
+                { name: "Error", value: "Text too short", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res
+          .status(400)
+          .json({ success: false, message: "اكتب اقتراحاً أوضح." });
+      }
+      if (suggestionText.length > 600) {
+        await sendWebhook("USER", {
+          embeds: [
+            {
+              title: "❌ Suggestion Submission - Too Long",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Username", value: req.session.username, inline: true },
+                {
+                  name: "Text Length",
+                  value: suggestionText.length.toString(),
+                  inline: true,
+                },
+                { name: "Maximum Allowed", value: "600", inline: true },
+                {
+                  name: "Category",
+                  value: category || "meeting",
+                  inline: true,
+                },
+                { name: "Error", value: "Text too long", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res
+          .status(400)
+          .json({ success: false, message: "الحد الأقصى 600 حرف." });
+      }
 
-    await sendWebhook("USER", {
-      embeds: [
-        {
-          title: "💡 New Suggestion Attempt",
+      const normalizedCategory = category || "meeting";
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - 7);
+
+      const recent = await Suggestion.findOne({
+        username: (req.session.username || "").toLowerCase(),
+        category: normalizedCategory,
+        createdAt: { $gte: cutoff },
+      });
+
+      if (recent) {
+        const duplicateEmbed = {
+          title: "⏰ Suggestion Submission - Rate Limited",
           color: 0xf59e0b,
           fields: [
             { name: "Username", value: req.session.username, inline: true },
-            { name: "Role", value: user.role, inline: true },
-            { name: "Grade", value: user.grade || "N/A", inline: true },
-            { name: "Category", value: category || "meeting", inline: true },
-            {
-              name: "Text Length",
-              value: suggestionText.length.toString(),
-              inline: true,
-            },
-            { name: "IP", value: req.ip || "unknown", inline: true },
-          ],
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    });
-
-    if (suggestionText.length < 5) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Suggestion Submission - Too Short",
-            color: 0xe74c3c,
-            fields: [
-              { name: "Username", value: req.session.username, inline: true },
-              {
-                name: "Text Length",
-                value: suggestionText.length.toString(),
-                inline: true,
-              },
-              { name: "Minimum Required", value: "5", inline: true },
-              { name: "Category", value: category || "meeting", inline: true },
-              { name: "Error", value: "Text too short", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res
-        .status(400)
-        .json({ success: false, message: "اكتب اقتراحاً أوضح." });
-    }
-    if (suggestionText.length > 600) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Suggestion Submission - Too Long",
-            color: 0xe74c3c,
-            fields: [
-              { name: "Username", value: req.session.username, inline: true },
-              {
-                name: "Text Length",
-                value: suggestionText.length.toString(),
-                inline: true,
-              },
-              { name: "Maximum Allowed", value: "600", inline: true },
-              { name: "Category", value: category || "meeting", inline: true },
-              { name: "Error", value: "Text too long", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res
-        .status(400)
-        .json({ success: false, message: "الحد الأقصى 600 حرف." });
-    }
-
-    const normalizedCategory = category || "meeting";
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 7);
-
-    const recent = await Suggestion.findOne({
-      username: (req.session.username || "").toLowerCase(),
-      category: normalizedCategory,
-      createdAt: { $gte: cutoff },
-    });
-
-    if (recent) {
-      const duplicateEmbed = {
-        title: "⏰ Suggestion Submission - Rate Limited",
-        color: 0xf59e0b,
-        fields: [
-          { name: "Username", value: req.session.username, inline: true },
-          { name: "Category", value: normalizedCategory, inline: true },
-          {
-            name: "Last Submission",
-            value: recent.createdAt.toLocaleString(),
-            inline: true,
-          },
-          {
-            name: "Time Since Last",
-            value: `${Math.floor(
-              (new Date() - recent.createdAt) / (1000 * 60 * 60 * 24)
-            )} days`,
-            inline: true,
-          },
-          {
-            name: "Limit",
-            value: "1 suggestion per week per category",
-            inline: false,
-          },
-          { name: "Error", value: "Rate limited", inline: true },
-          {
-            name: "Attempted Text",
-            value: suggestionText.substring(0, 1024) || "No text",
-            inline: false,
-          },
-        ],
-        timestamp: new Date().toISOString(),
-      };
-
-      await sendWebhook("USER", { embeds: [duplicateEmbed] });
-      await sendWebhook("SUGGESTION", {
-        content: "♻️ Duplicate suggestion attempt blocked",
-        embeds: [
-          {
-            ...duplicateEmbed,
-            title: "♻️ Duplicate Suggestion Attempt",
-          },
-        ],
-      });
-      return res.status(429).json({
-        success: false,
-        message: "يمكنك إرسال اقتراح واحد فقط كل أسبوع لنفس القسم.",
-      });
-    }
-
-    let displayName = req.session.displayName || req.session.username || "";
-    try {
-      const profile = await UserRegistration.findOne({
-        username: (req.session.username || "").toLowerCase(),
-      });
-      if (profile) {
-        displayName = `${profile.firstName} ${profile.secondName}`.trim();
-      }
-    } catch (err) {
-      console.error("[SUGGESTION PROFILE ERROR]", err.message);
-    }
-
-    const userGrade = user.grade || req.session.grade || null;
-    const gradeLabel = userGrade
-      ? GRADE_LABELS[userGrade]?.long || userGrade
-      : "N/A";
-
-    const saved = await Suggestion.create({
-      username: (req.session.username || "").toLowerCase(),
-      displayName,
-      grade: userGrade,
-      category: normalizedCategory,
-      text: suggestionText,
-    });
-
-    const suggestionPayload = {
-      content: `💡 **New Suggestion Submitted**`,
-      embeds: [
-        {
-          title: "New Suggestion",
-          color: 0x9b59b6,
-          fields: [
-            { name: "Display Name", value: displayName, inline: true },
-            { name: "Username", value: req.session.username, inline: true },
-            {
-              name: "Role",
-              value: user.role ? user.role.toUpperCase() : "STUDENT",
-              inline: true,
-            },
-            { name: "Grade", value: gradeLabel, inline: true },
             { name: "Category", value: normalizedCategory, inline: true },
             {
-              name: "Submitted At",
-              value: moment().tz("Africa/Cairo").format("YYYY-MM-DD HH:mm:ss"),
+              name: "Last Submission",
+              value: recent.createdAt.toLocaleString(),
               inline: true,
             },
             {
-              name: "Suggestion ID",
-              value: saved._id.toString(),
+              name: "Time Since Last",
+              value: `${Math.floor(
+                (new Date() - recent.createdAt) / (1000 * 60 * 60 * 24)
+              )} days`,
               inline: true,
             },
             {
-              name: "Text Length",
-              value: `${suggestionText.length} characters`,
-              inline: true,
+              name: "Limit",
+              value: "1 suggestion per week per category",
+              inline: false,
             },
+            { name: "Error", value: "Rate limited", inline: true },
             {
-              name: "Suggestion",
+              name: "Attempted Text",
               value: suggestionText.substring(0, 1024) || "No text",
               inline: false,
             },
-            { name: "IP Address", value: req.ip || "unknown", inline: true },
           ],
           timestamp: new Date().toISOString(),
-        },
-      ],
-    };
+        };
 
-    const suggestionLogged = await sendWebhook("SUGGESTION", suggestionPayload, {
-      awaitResponse: true,
-    });
-    if (!suggestionLogged) {
-      await sendWebhook("USER", suggestionPayload);
-    }
-
-    return res.json({ success: true, suggestion: saved });
-  } catch (error) {
-    await sendWebhook("ERROR", {
-      embeds: [
-        {
-          title: "❌ Suggestion Error",
-          color: 0xe74c3c,
-          fields: [
-            { name: "User", value: req.session.username || "Unknown" },
-            { name: "Error", value: error.message },
+        await sendWebhook("USER", { embeds: [duplicateEmbed] });
+        await sendWebhook("SUGGESTION", {
+          content: "♻️ Duplicate suggestion attempt blocked",
+          embeds: [
             {
-              name: "Stack Trace",
-              value: error.stack?.substring(0, 500) || "No stack",
-              inline: false,
+              ...duplicateEmbed,
+              title: "♻️ Duplicate Suggestion Attempt",
             },
-            { name: "IP", value: req.ip || "unknown", inline: true },
           ],
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    });
-    return res
-      .status(500)
-      .json({ success: false, message: "تعذر حفظ الاقتراح" });
+        });
+        return res.status(429).json({
+          success: false,
+          message: "يمكنك إرسال اقتراح واحد فقط كل أسبوع لنفس القسم.",
+        });
+      }
+
+      let displayName = req.session.displayName || req.session.username || "";
+      try {
+        const profile = await UserRegistration.findOne({
+          username: (req.session.username || "").toLowerCase(),
+        });
+        if (profile) {
+          displayName = `${profile.firstName} ${profile.secondName}`.trim();
+        }
+      } catch (err) {
+        console.error("[SUGGESTION PROFILE ERROR]", err.message);
+      }
+
+      const userGrade = user.grade || req.session.grade || null;
+      const gradeLabel = userGrade
+        ? GRADE_LABELS[userGrade]?.long || userGrade
+        : "N/A";
+
+      const saved = await Suggestion.create({
+        username: (req.session.username || "").toLowerCase(),
+        displayName,
+        grade: userGrade,
+        category: normalizedCategory,
+        text: suggestionText,
+      });
+
+      const suggestionPayload = {
+        content: `💡 **New Suggestion Submitted**`,
+        embeds: [
+          {
+            title: "New Suggestion",
+            color: 0x9b59b6,
+            fields: [
+              { name: "Display Name", value: displayName, inline: true },
+              { name: "Username", value: req.session.username, inline: true },
+              {
+                name: "Role",
+                value: user.role ? user.role.toUpperCase() : "STUDENT",
+                inline: true,
+              },
+              { name: "Grade", value: gradeLabel, inline: true },
+              { name: "Category", value: normalizedCategory, inline: true },
+              {
+                name: "Submitted At",
+                value: moment()
+                  .tz("Africa/Cairo")
+                  .format("YYYY-MM-DD HH:mm:ss"),
+                inline: true,
+              },
+              {
+                name: "Suggestion ID",
+                value: saved._id.toString(),
+                inline: true,
+              },
+              {
+                name: "Text Length",
+                value: `${suggestionText.length} characters`,
+                inline: true,
+              },
+              {
+                name: "Suggestion",
+                value: suggestionText.substring(0, 1024) || "No text",
+                inline: false,
+              },
+              { name: "IP Address", value: req.ip || "unknown", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      };
+
+      const suggestionLogged = await sendWebhook(
+        "SUGGESTION",
+        suggestionPayload,
+        {
+          awaitResponse: true,
+        }
+      );
+      if (!suggestionLogged) {
+        await sendWebhook("USER", suggestionPayload);
+      }
+
+      return res.json({ success: true, suggestion: saved });
+    } catch (error) {
+      await sendWebhook("ERROR", {
+        embeds: [
+          {
+            title: "❌ Suggestion Error",
+            color: 0xe74c3c,
+            fields: [
+              { name: "User", value: req.session.username || "Unknown" },
+              { name: "Error", value: error.message },
+              {
+                name: "Stack Trace",
+                value: error.stack?.substring(0, 500) || "No stack",
+                inline: false,
+              },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      return res
+        .status(500)
+        .json({ success: false, message: "تعذر حفظ الاقتراح" });
+    }
   }
-});
+);
 
 app.get(
   "/api/suggestions",
@@ -7432,7 +7490,9 @@ app.post("/api/ektmaa", async (req, res) => {
   };
 
   try {
-    const delivered = await sendWebhook("EKTMAA", embed, { awaitResponse: true });
+    const delivered = await sendWebhook("EKTMAA", embed, {
+      awaitResponse: true,
+    });
     if (delivered) {
       await sendWebhook("USER", {
         embeds: [
@@ -9900,7 +9960,10 @@ app.post("/form/:link", requireAuth, submissionLimiter, async (req, res) => {
 
     const remainingFieldSlots = Math.max(0, 25 - formEmbed.fields.length);
     if (remainingFieldSlots > 0 && answerDetails.length) {
-      const detailsToInclude = Math.min(remainingFieldSlots, answerDetails.length);
+      const detailsToInclude = Math.min(
+        remainingFieldSlots,
+        answerDetails.length
+      );
       const detailFields = [];
 
       for (let i = 0; i < detailsToInclude; i++) {
@@ -9912,9 +9975,9 @@ app.post("/form/:link", requireAuth, submissionLimiter, async (req, res) => {
           )}`,
           value: `اختيار الطالب: ${detail.userAnswer}\nالإجابة الصحيحة: ${
             detail.correctAnswer
-          }\nالحالة: ${detail.isCorrect ? "✅ صحيح" : "❌ خطأ"}\nالنقاط المكتسبة: ${
-            detail.pointsAwarded
-          }`,
+          }\nالحالة: ${
+            detail.isCorrect ? "✅ صحيح" : "❌ خطأ"
+          }\nالنقاط المكتسبة: ${detail.pointsAwarded}`,
           inline: false,
         });
       }
@@ -10296,121 +10359,69 @@ app.get("/api/gift-shop/my-points", requireAuth, async (req, res) => {
   }
 });
 
-app.post("/api/gift-shop/purchase", requireAuth, submissionLimiter, async (req, res) => {
-  try {
-    const { itemId } = req.body;
+app.post(
+  "/api/gift-shop/purchase",
+  requireAuth,
+  submissionLimiter,
+  async (req, res) => {
+    try {
+      const { itemId } = req.body;
 
-    await sendWebhook("USER", {
-      embeds: [
-        {
-          title: "🛒 Gift Purchase Attempt",
-          color: 0xf59e0b,
-          fields: [
-            { name: "Username", value: req.session.username, inline: true },
-            { name: "Item ID", value: itemId, inline: true },
-            {
-              name: "Endpoint",
-              value: "/api/gift-shop/purchase",
-              inline: true,
-            },
-            { name: "Action", value: "Purchase Gift", inline: true },
-            { name: "IP", value: req.ip || "unknown", inline: true },
-          ],
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    });
-
-    const normalizedUsername = req.session.username.toLowerCase();
-
-    let userPoints = await UserPoints.findOne({ username: normalizedUsername });
-    if (!userPoints) {
-      userPoints = new UserPoints({
-        username: normalizedUsername,
-        points: 0,
-      });
-    }
-
-    const item = await GiftShopItem.findById(itemId);
-    if (!item || !item.active) {
       await sendWebhook("USER", {
         embeds: [
           {
-            title: "❌ Gift Purchase Failed - Item Not Found",
-            color: 0xe74c3c,
+            title: "🛒 Gift Purchase Attempt",
+            color: 0xf59e0b,
             fields: [
               { name: "Username", value: req.session.username, inline: true },
               { name: "Item ID", value: itemId, inline: true },
               {
-                name: "Item Active",
-                value: item ? (item.active ? "✅ Yes" : "❌ No") : "Not found",
+                name: "Endpoint",
+                value: "/api/gift-shop/purchase",
                 inline: true,
               },
-              {
-                name: "Error",
-                value: "Item not found or inactive",
-                inline: true,
-              },
+              { name: "Action", value: "Purchase Gift", inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
             ],
             timestamp: new Date().toISOString(),
           },
         ],
       });
-      return res
-        .status(404)
-        .json({ success: false, message: "العنصر غير موجود" });
-    }
 
-    if (item.stock !== -1 && item.stock <= 0) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Gift Purchase Failed - Out of Stock",
-            color: 0xe74c3c,
-            fields: [
-              { name: "Username", value: req.session.username, inline: true },
-              { name: "Item", value: item.name, inline: true },
-              { name: "Item ID", value: itemId, inline: true },
-              { name: "Stock", value: item.stock.toString(), inline: true },
-              { name: "Error", value: "Item out of stock", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res
-        .status(400)
-        .json({ success: false, message: "العنصر غير متوفر" });
-    }
+      const normalizedUsername = req.session.username.toLowerCase();
 
-    if (item.purchaseLimit !== -1 && item.purchaseLimit > 0) {
-      const userPurchases = await GiftPurchase.countDocuments({
+      let userPoints = await UserPoints.findOne({
         username: normalizedUsername,
-        itemId: itemId,
-        status: { $in: ["pending", "accepted"] },
       });
-      if (userPurchases >= item.purchaseLimit) {
+      if (!userPoints) {
+        userPoints = new UserPoints({
+          username: normalizedUsername,
+          points: 0,
+        });
+      }
+
+      const item = await GiftShopItem.findById(itemId);
+      if (!item || !item.active) {
         await sendWebhook("USER", {
           embeds: [
             {
-              title: "❌ Gift Purchase Failed - Purchase Limit",
+              title: "❌ Gift Purchase Failed - Item Not Found",
               color: 0xe74c3c,
               fields: [
                 { name: "Username", value: req.session.username, inline: true },
-                { name: "Item", value: item.name, inline: true },
+                { name: "Item ID", value: itemId, inline: true },
                 {
-                  name: "Purchases Made",
-                  value: userPurchases.toString(),
-                  inline: true,
-                },
-                {
-                  name: "Purchase Limit",
-                  value: item.purchaseLimit.toString(),
+                  name: "Item Active",
+                  value: item
+                    ? item.active
+                      ? "✅ Yes"
+                      : "❌ No"
+                    : "Not found",
                   inline: true,
                 },
                 {
                   name: "Error",
-                  value: "Purchase limit reached",
+                  value: "Item not found or inactive",
                   inline: true,
                 },
               ],
@@ -10418,167 +10429,242 @@ app.post("/api/gift-shop/purchase", requireAuth, submissionLimiter, async (req, 
             },
           ],
         });
-        return res.status(400).json({
-          success: false,
-          message: `لقد وصلت للحد الأقصى من عمليات الشراء لهذا العنصر (${item.purchaseLimit})`,
-        });
+        return res
+          .status(404)
+          .json({ success: false, message: "العنصر غير موجود" });
       }
-    }
 
-    if (userPoints.points < item.cost) {
-      await sendWebhook("USER", {
+      if (item.stock !== -1 && item.stock <= 0) {
+        await sendWebhook("USER", {
+          embeds: [
+            {
+              title: "❌ Gift Purchase Failed - Out of Stock",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Username", value: req.session.username, inline: true },
+                { name: "Item", value: item.name, inline: true },
+                { name: "Item ID", value: itemId, inline: true },
+                { name: "Stock", value: item.stock.toString(), inline: true },
+                { name: "Error", value: "Item out of stock", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res
+          .status(400)
+          .json({ success: false, message: "العنصر غير متوفر" });
+      }
+
+      if (item.purchaseLimit !== -1 && item.purchaseLimit > 0) {
+        const userPurchases = await GiftPurchase.countDocuments({
+          username: normalizedUsername,
+          itemId: itemId,
+          status: { $in: ["pending", "accepted"] },
+        });
+        if (userPurchases >= item.purchaseLimit) {
+          await sendWebhook("USER", {
+            embeds: [
+              {
+                title: "❌ Gift Purchase Failed - Purchase Limit",
+                color: 0xe74c3c,
+                fields: [
+                  {
+                    name: "Username",
+                    value: req.session.username,
+                    inline: true,
+                  },
+                  { name: "Item", value: item.name, inline: true },
+                  {
+                    name: "Purchases Made",
+                    value: userPurchases.toString(),
+                    inline: true,
+                  },
+                  {
+                    name: "Purchase Limit",
+                    value: item.purchaseLimit.toString(),
+                    inline: true,
+                  },
+                  {
+                    name: "Error",
+                    value: "Purchase limit reached",
+                    inline: true,
+                  },
+                ],
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          });
+          return res.status(400).json({
+            success: false,
+            message: `لقد وصلت للحد الأقصى من عمليات الشراء لهذا العنصر (${item.purchaseLimit})`,
+          });
+        }
+      }
+
+      if (userPoints.points < item.cost) {
+        await sendWebhook("USER", {
+          embeds: [
+            {
+              title: "❌ Gift Purchase Failed - Insufficient Points",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Username", value: req.session.username, inline: true },
+                { name: "Item", value: item.name, inline: true },
+                {
+                  name: "Item Cost",
+                  value: item.cost.toString(),
+                  inline: true,
+                },
+                {
+                  name: "User Points",
+                  value: userPoints.points.toString(),
+                  inline: true,
+                },
+                {
+                  name: "Points Needed",
+                  value: (item.cost - userPoints.points).toString(),
+                  inline: true,
+                },
+                { name: "Error", value: "Insufficient points", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res
+          .status(400)
+          .json({ success: false, message: "نقاطك غير كافية" });
+      }
+
+      const previousPoints = userPoints.points;
+      userPoints.points -= item.cost;
+      userPoints.transactions.push({
+        type: "spent",
+        amount: item.cost,
+        description: `شراء: ${item.name} (قيد المراجعة)`,
+        itemId: itemId,
+      });
+
+      const purchase = new GiftPurchase({
+        username: normalizedUsername,
+        itemId: itemId,
+        itemName: item.name,
+        cost: item.cost,
+        status: "pending",
+      });
+      await purchase.save();
+
+      if (item.stock !== -1) {
+        item.stock -= 1;
+        await item.save();
+      }
+
+      await userPoints.save();
+
+      const giftUser = getSessionUser(req);
+      const giftUserGrade =
+        req.session.grade || (giftUser && giftUser.grade) || null;
+      const giftGradeLabel = giftUserGrade
+        ? GRADE_LABELS[giftUserGrade]?.long || giftUserGrade
+        : "N/A";
+
+      await sendWebhook("GIFT", {
+        content: `🛒 **New Gift Purchase Request**`,
         embeds: [
           {
-            title: "❌ Gift Purchase Failed - Insufficient Points",
-            color: 0xe74c3c,
+            title: "Gift Shop Purchase - Pending Review",
+            color: 0xf59e0b,
             fields: [
               { name: "Username", value: req.session.username, inline: true },
+              { name: "Grade", value: giftGradeLabel, inline: true },
+              {
+                name: "Role",
+                value: giftUser ? giftUser.role.toUpperCase() : "STUDENT",
+                inline: true,
+              },
               { name: "Item", value: item.name, inline: true },
-              { name: "Item Cost", value: item.cost.toString(), inline: true },
+              { name: "Item ID", value: itemId, inline: true },
+              { name: "Cost", value: `🎁 ${item.cost} points`, inline: true },
               {
-                name: "User Points",
-                value: userPoints.points.toString(),
+                name: "Previous Points",
+                value: `🎁 ${previousPoints}`,
                 inline: true,
               },
               {
-                name: "Points Needed",
-                value: (item.cost - userPoints.points).toString(),
+                name: "Remaining Points",
+                value: `🎁 ${userPoints.points}`,
                 inline: true,
               },
-              { name: "Error", value: "Insufficient points", inline: true },
+              { name: "Status", value: "⏳ قيد المراجعة", inline: true },
+              {
+                name: "Purchase ID",
+                value: purchase._id.toString(),
+                inline: true,
+              },
+              {
+                name: "Time",
+                value: moment()
+                  .tz("Africa/Cairo")
+                  .format("YYYY-MM-DD HH:mm:ss"),
+                inline: true,
+              },
+              {
+                name: "Stock After Purchase",
+                value: item.stock === -1 ? "Unlimited" : item.stock.toString(),
+                inline: true,
+              },
+              {
+                name: "Transaction ID",
+                value:
+                  userPoints.transactions[
+                    userPoints.transactions.length - 1
+                  ]._id
+                    .toString()
+                    .substring(0, 10) + "...",
+                inline: true,
+              },
+            ],
+            footer: {
+              text: "يجب مراجعة الطلب من قبل المسؤول",
+            },
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+
+      res.json({
+        success: true,
+        message: `تم تقديم طلب الشراء بنجاح! سنراجع هديتك وسنتواصل معك قريباً.`,
+        remainingPoints: userPoints.points,
+        purchaseId: purchase._id,
+        status: "pending",
+      });
+    } catch (error) {
+      await sendWebhook("ERROR", {
+        embeds: [
+          {
+            title: "❌ Gift Purchase Error",
+            color: 0xe74c3c,
+            fields: [
+              { name: "User", value: req.session.username },
+              { name: "Item ID", value: req.body.itemId || "Unknown" },
+              { name: "Error", value: error.message },
+              {
+                name: "Stack Trace",
+                value: error.stack?.substring(0, 500) || "No stack",
+                inline: false,
+              },
+              { name: "IP", value: req.ip || "unknown", inline: true },
             ],
             timestamp: new Date().toISOString(),
           },
         ],
       });
-      return res
-        .status(400)
-        .json({ success: false, message: "نقاطك غير كافية" });
+      res.status(500).json({ success: false, message: "تعذر إتمام الشراء" });
     }
-
-    const previousPoints = userPoints.points;
-    userPoints.points -= item.cost;
-    userPoints.transactions.push({
-      type: "spent",
-      amount: item.cost,
-      description: `شراء: ${item.name} (قيد المراجعة)`,
-      itemId: itemId,
-    });
-
-    const purchase = new GiftPurchase({
-      username: normalizedUsername,
-      itemId: itemId,
-      itemName: item.name,
-      cost: item.cost,
-      status: "pending",
-    });
-    await purchase.save();
-
-    if (item.stock !== -1) {
-      item.stock -= 1;
-      await item.save();
-    }
-
-    await userPoints.save();
-
-    const giftUser = getSessionUser(req);
-    const giftUserGrade =
-      req.session.grade || (giftUser && giftUser.grade) || null;
-    const giftGradeLabel = giftUserGrade
-      ? GRADE_LABELS[giftUserGrade]?.long || giftUserGrade
-      : "N/A";
-
-    await sendWebhook("GIFT", {
-      content: `🛒 **New Gift Purchase Request**`,
-      embeds: [
-        {
-          title: "Gift Shop Purchase - Pending Review",
-          color: 0xf59e0b,
-          fields: [
-            { name: "Username", value: req.session.username, inline: true },
-            { name: "Grade", value: giftGradeLabel, inline: true },
-            {
-              name: "Role",
-              value: giftUser ? giftUser.role.toUpperCase() : "STUDENT",
-              inline: true,
-            },
-            { name: "Item", value: item.name, inline: true },
-            { name: "Item ID", value: itemId, inline: true },
-            { name: "Cost", value: `🎁 ${item.cost} points`, inline: true },
-            {
-              name: "Previous Points",
-              value: `🎁 ${previousPoints}`,
-              inline: true,
-            },
-            {
-              name: "Remaining Points",
-              value: `🎁 ${userPoints.points}`,
-              inline: true,
-            },
-            { name: "Status", value: "⏳ قيد المراجعة", inline: true },
-            {
-              name: "Purchase ID",
-              value: purchase._id.toString(),
-              inline: true,
-            },
-            {
-              name: "Time",
-              value: moment().tz("Africa/Cairo").format("YYYY-MM-DD HH:mm:ss"),
-              inline: true,
-            },
-            {
-              name: "Stock After Purchase",
-              value: item.stock === -1 ? "Unlimited" : item.stock.toString(),
-              inline: true,
-            },
-            {
-              name: "Transaction ID",
-              value:
-                userPoints.transactions[userPoints.transactions.length - 1]._id
-                  .toString()
-                  .substring(0, 10) + "...",
-              inline: true,
-            },
-          ],
-          footer: {
-            text: "يجب مراجعة الطلب من قبل المسؤول",
-          },
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    });
-
-    res.json({
-      success: true,
-      message: `تم تقديم طلب الشراء بنجاح! سنراجع هديتك وسنتواصل معك قريباً.`,
-      remainingPoints: userPoints.points,
-      purchaseId: purchase._id,
-      status: "pending",
-    });
-  } catch (error) {
-    await sendWebhook("ERROR", {
-      embeds: [
-        {
-          title: "❌ Gift Purchase Error",
-          color: 0xe74c3c,
-          fields: [
-            { name: "User", value: req.session.username },
-            { name: "Item ID", value: req.body.itemId || "Unknown" },
-            { name: "Error", value: error.message },
-            {
-              name: "Stack Trace",
-              value: error.stack?.substring(0, 500) || "No stack",
-              inline: false,
-            },
-            { name: "IP", value: req.ip || "unknown", inline: true },
-          ],
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    });
-    res.status(500).json({ success: false, message: "تعذر إتمام الشراء" });
   }
-});
+);
 
 app.get("/api/gift-shop/transactions", requireAuth, async (req, res) => {
   try {
@@ -12841,101 +12927,117 @@ async function checkAndBanUnverifiedUsers() {
 setInterval(checkAndBanUnverifiedUsers, 60 * 60 * 1000);
 setTimeout(checkAndBanUnverifiedUsers, 5000);
 
+app.use((req, res, next) => {
+  if (isMemoryCritical()) {
+    return res.status(503).json({
+      success: false,
+      message: "Server is under heavy load. Please try again in a few moments.",
+      retryAfter: 30,
+    });
+  }
+  next();
+});
+
+process.on("uncaughtException", async (error) => {
+  await sendWebhook("ERROR", {
+    embeds: [
+      {
+        title: "🚨 Uncaught Exception",
+        color: 0xe74c3c,
+        fields: [
+          { name: "Error", value: error.message },
+          {
+            name: "Stack",
+            value: error.stack?.substring(0, 500) || "No stack",
+          },
+          { name: "Time", value: new Date().toISOString() },
+        ],
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  });
+
+  if (error.code === "EMFILE" || error.message.includes("EMFILE")) {
+    console.error(
+      "[CRITICAL] Too many open files. Consider increasing ulimit."
+    );
+  }
+
+  if (!error.message.includes("ECONNRESET")) {
+    process.exit(1);
+  }
+});
+
+process.on("unhandledRejection", async (reason, promise) => {
+  await sendWebhook("ERROR", {
+    embeds: [
+      {
+        title: "⚠️ Unhandled Promise Rejection",
+        color: 0xf59e0b,
+        fields: [
+          { name: "Reason", value: reason?.message || String(reason) },
+          { name: "Time", value: new Date().toISOString() },
+        ],
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  });
+});
 
 app.use((req, res, next) => {
   if (isMemoryCritical()) {
     return res.status(503).json({
       success: false,
       message: "Server is under heavy load. Please try again in a few moments.",
-      retryAfter: 30
+      retryAfter: 30,
     });
   }
   next();
 });
 
-process.on('uncaughtException', async (error) => {
-  await sendWebhook('ERROR', {
-    embeds: [{
-      title: '🚨 Uncaught Exception',
-      color: 0xe74c3c,
-      fields: [
-        { name: 'Error', value: error.message },
-        { name: 'Stack', value: error.stack?.substring(0, 500) || 'No stack' },
-        { name: 'Time', value: new Date().toISOString() }
-      ],
-      timestamp: new Date().toISOString()
-    }]
+process.on("uncaughtException", async (error) => {
+  await sendWebhook("ERROR", {
+    embeds: [
+      {
+        title: "🚨 Uncaught Exception",
+        color: 0xe74c3c,
+        fields: [
+          { name: "Error", value: error.message },
+          {
+            name: "Stack",
+            value: error.stack?.substring(0, 500) || "No stack",
+          },
+          { name: "Time", value: new Date().toISOString() },
+        ],
+        timestamp: new Date().toISOString(),
+      },
+    ],
   });
-  
-  if (error.code === 'EMFILE' || error.message.includes('EMFILE')) {
-    console.error('[CRITICAL] Too many open files. Consider increasing ulimit.');
+
+  if (error.code === "EMFILE" || error.message.includes("EMFILE")) {
+    console.error(
+      "[CRITICAL] Too many open files. Consider increasing ulimit."
+    );
   }
-  
-  if (!error.message.includes('ECONNRESET')) {
+
+  if (!error.message.includes("ECONNRESET")) {
     process.exit(1);
   }
 });
 
-process.on('unhandledRejection', async (reason, promise) => {
-  await sendWebhook('ERROR', {
-    embeds: [{
-      title: '⚠️ Unhandled Promise Rejection',
-      color: 0xf59e0b,
-      fields: [
-        { name: 'Reason', value: reason?.message || String(reason) },
-        { name: 'Time', value: new Date().toISOString() }
-      ],
-      timestamp: new Date().toISOString()
-    }]
-  });
-});
-
-
-app.use((req, res, next) => {
-  if (isMemoryCritical()) {
-    return res.status(503).json({
-      success: false,
-      message: "Server is under heavy load. Please try again in a few moments.",
-      retryAfter: 30
-    });
-  }
-  next();
-});
-
-process.on('uncaughtException', async (error) => {
-  await sendWebhook('ERROR', {
-    embeds: [{
-      title: '🚨 Uncaught Exception',
-      color: 0xe74c3c,
-      fields: [
-        { name: 'Error', value: error.message },
-        { name: 'Stack', value: error.stack?.substring(0, 500) || 'No stack' },
-        { name: 'Time', value: new Date().toISOString() }
-      ],
-      timestamp: new Date().toISOString()
-    }]
-  });
-  
-  if (error.code === 'EMFILE' || error.message.includes('EMFILE')) {
-    console.error('[CRITICAL] Too many open files. Consider increasing ulimit.');
-  }
-  
-  if (!error.message.includes('ECONNRESET')) {
-    process.exit(1);
-  }
-});
-
-process.on('unhandledRejection', async (reason, promise) => {
-  await sendWebhook('ERROR', {
-    embeds: [{
-      title: '⚠️ Unhandled Promise Rejection',
-      color: 0xf59e0b,
-      fields: [
-        { name: 'Reason', value: reason?.message || String(reason) },
-        { name: 'Time', value: new Date().toISOString() }
-      ],
-      timestamp: new Date().toISOString()
-    }]
+process.on("unhandledRejection", async (reason, promise) => {
+  await sendWebhook("ERROR", {
+    embeds: [
+      {
+        title: "⚠️ Unhandled Promise Rejection",
+        color: 0xf59e0b,
+        fields: [
+          { name: "Reason", value: reason?.message || String(reason) },
+          { name: "Time", value: new Date().toISOString() },
+        ],
+        timestamp: new Date().toISOString(),
+      },
+    ],
   });
 });
 

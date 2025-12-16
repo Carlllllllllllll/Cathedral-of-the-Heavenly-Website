@@ -1,747 +1,848 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
-    <meta name="keywords" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta
+      name="description"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
+    <meta
+      name="keywords"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
     <meta name="author" content="كاتدرائية السمائيين" />
     <meta name="theme-color" content="#402958" />
     <meta name="robots" content="noindex, nofollow" />
     <meta property="og:title" content="إنشاء حساب | كاتدرائية السمائيين" />
-    <meta property="og:description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
+    <meta
+      property="og:description"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <title>إنشاء حساب | كاتدرائية السمائيين</title>
     <link rel="icon" href="/UI/icon.png" type="image/png" sizes="16x16" />
     <link rel="apple-touch-icon" href="/UI/icon.png" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        :root {
-            font-family: "Cairo", system-ui, sans-serif;
-            color-scheme: dark;
-            --bg: radial-gradient(circle at top right, #402958, #2a1b3c 60%);
-            --card-bg: rgba(64, 41, 88, 0.85);
-            --accent: #ffcc00;
-            --accent-soft: rgba(255, 204, 0, 0.12);
-            --text: #f2f4ff;
-            --muted: #d1c4e9;
-            --error: #ff7a8a;
-            --success: #4ade80;
-        }
+      :root {
+        font-family: "Cairo", system-ui, sans-serif;
+        color-scheme: dark;
+        --bg: radial-gradient(circle at top right, #402958, #2a1b3c 60%);
+        --card-bg: rgba(64, 41, 88, 0.85);
+        --accent: #ffcc00;
+        --accent-soft: rgba(255, 204, 0, 0.12);
+        --text: #f2f4ff;
+        --muted: #d1c4e9;
+        --error: #ff7a8a;
+        --success: #4ade80;
+      }
 
-        * {
-            box-sizing: border-box;
-        }
+      * {
+        box-sizing: border-box;
+      }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0;
-            direction: rtl;
-            scrollbar-width: thin;
-            scrollbar-color: #ffcc00 rgba(255, 204, 0, 0.15);
-        }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        direction: rtl;
+        scrollbar-width: thin;
+        scrollbar-color: #ffcc00 rgba(255, 204, 0, 0.15);
+      }
 
-        body::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
+      body::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
 
-        body::-webkit-scrollbar-track {
-            background: rgba(255, 204, 0, 0.1);
-        }
+      body::-webkit-scrollbar-track {
+        background: rgba(255, 204, 0, 0.1);
+      }
 
-        body::-webkit-scrollbar-thumb {
-            background: #ffcc00;
-            border-radius: 12px;
-        }
+      body::-webkit-scrollbar-thumb {
+        background: #ffcc00;
+        border-radius: 12px;
+      }
 
-        body::-webkit-scrollbar-thumb:hover {
-            background: #ffd84d;
-        }
+      body::-webkit-scrollbar-thumb:hover {
+        background: #ffd84d;
+      }
 
-        .auth-shell {
-            width: 100%;
-            max-width: 480px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 160px 20px 20px 20px;
-        }
+      .auth-shell {
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 160px 20px 20px 20px;
+      }
 
-        .nav-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 10000;
-            background: var(--nav-bg);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-            border-bottom: 1px solid rgba(255, 204, 0, 0.15);
-        }
+      .nav-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10000;
+        background: var(--nav-bg);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(255, 204, 0, 0.15);
+      }
 
+      .nav-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2rem;
+        height: 80px;
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+        flex: 1;
+      }
+
+      .nav-logo-container {
+        position: relative;
+      }
+
+      .nav-logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid var(--accent);
+        box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+        object-fit: cover;
+        margin-top: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-logo:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 30px rgba(255, 204, 0, 0.5);
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+        justify-content: flex-end;
+      }
+
+      .user-nav-login {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #ffcc00;
+        color: #000;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .user-nav-login:hover {
+        background: #e6b800;
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 1024px) {
         .nav-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            height: 80px;
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
+          padding: 0 1.5rem;
         }
+      }
 
-        .nav-left {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        .nav-logo-container {
-            position: relative;
-        }
-
-        .nav-logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 2px solid var(--accent);
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
-            object-fit: cover;
-            margin-top: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-logo:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.5);
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex: 1;
-            justify-content: flex-end;
+      @media (max-width: 768px) {
+        .nav-bar {
+          height: 70px;
+          padding: 0 1rem;
         }
 
         .user-nav-login {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #ffcc00;
-            color: #000;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            text-decoration: none;
-            font-weight: 600;
+          padding: 8px 16px;
+          font-size: 0.85rem;
         }
+      }
 
-        .user-nav-login:hover {
-            background: #e6b800;
-            transform: translateY(-2px);
-        }
+      .login-panel {
+        border-radius: 12px;
+        padding: 25px;
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 25px rgba(42, 27, 60, 0.5);
+        width: 100%;
+        max-width: 440px;
+        backdrop-filter: blur(10px);
+      }
 
-        @media (max-width: 1024px) {
-            .nav-bar {
-                padding: 0 1.5rem;
-            }
-        }
+      .login-panel h2 {
+        margin: 0 0 8px;
+        font-size: 1.5rem;
+        color: #ffcc00;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
 
-        @media (max-width: 768px) {
-            .nav-bar {
-                height: 70px;
-                padding: 0 1rem;
-            }
+      .login-panel p {
+        margin: 0 0 15px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
 
-            .user-nav-login {
-                padding: 8px 16px;
-                font-size: 0.85rem;
-            }
+      #register-form {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      #register-form label {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #ffcc00;
+      }
+
+      #register-form input {
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        font-size: 0.95rem;
+        font-family: "Cairo", sans-serif;
+        transition: all 0.2s ease;
+        width: 100%;
+      }
+
+      #register-form input:focus,
+      #register-form select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent-soft);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      #register-form select {
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        font-size: 0.95rem;
+        font-family: "Cairo", sans-serif;
+        transition: all 0.2s ease;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      #register-form select option {
+        background: rgba(64, 41, 88, 0.95);
+        color: #f2f4ff;
+        padding: 10px;
+      }
+
+      #register-form button {
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffcc00, #ffaa00);
+        color: #402958;
+        cursor: pointer;
+        box-shadow: 0 8px 15px rgba(255, 204, 0, 0.3);
+        transition: all 0.2s ease;
+        font-family: "Cairo", sans-serif;
+        margin-top: 10px;
+      }
+
+      #register-form button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(255, 204, 0, 0.4);
+        background: linear-gradient(135deg, #ffd700, #ffbb00);
+      }
+
+      #register-form button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .input-error {
+        font-size: 0.8rem;
+        color: var(--error);
+        min-height: 18px;
+        text-align: right;
+      }
+
+      #error-message {
+        min-height: 18px;
+        color: var(--error);
+        font-size: 0.8rem;
+        text-align: center;
+        margin: 6px 0 0 0;
+        padding: 8px 0;
+      }
+
+      small {
+        color: var(--muted);
+        font-size: 0.85rem;
+        text-align: center;
+        display: block;
+        margin-top: 50px;
+      }
+
+      small a {
+        color: #ffcc00;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      small a:hover {
+        text-decoration: underline;
+      }
+
+      footer {
+        color: #ffffff;
+        text-align: center;
+        padding: 10px 0;
+        width: 100%;
+        background-color: transparent;
+        font-size: 0.85rem;
+        margin-top: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .auth-shell {
+          padding: 140px 15px 15px 15px;
         }
 
         .login-panel {
-            border-radius: 12px;
-            padding: 25px;
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 25px rgba(42, 27, 60, 0.5);
-            width: 100%;
-            max-width: 440px;
-            backdrop-filter: blur(10px);
+          padding: 22px;
+        }
+
+        .nav-logo {
+          width: 54px;
+          height: 54px;
+        }
+
+        .user-nav-login {
+          padding: 8px 16px;
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .auth-shell {
+          padding: 125px 10px 10px 10px;
+        }
+
+        .login-panel {
+          padding: 20px;
+        }
+
+        .nav-logo {
+          width: 48px;
+          height: 48px;
+        }
+
+        .user-nav-login {
+          padding: 7px 12px;
+          font-size: 0.85rem;
         }
 
         .login-panel h2 {
-            margin: 0 0 8px;
-            font-size: 1.5rem;
-            color: #ffcc00;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+          font-size: 1.4rem;
         }
 
         .login-panel p {
-            margin: 0 0 15px;
-            color: var(--muted);
-            font-size: 0.95rem;
+          font-size: 0.9rem;
         }
 
-        #register-form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        #register-form label {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #ffcc00;
-        }
-
-        #register-form input {
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text);
-            font-size: 0.95rem;
-            font-family: "Cairo", sans-serif;
-            transition: all 0.2s ease;
-            width: 100%;
-        }
-
-        #register-form input:focus,
-        #register-form select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px var(--accent-soft);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
+        #register-form input,
         #register-form select {
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text);
-            font-size: 0.95rem;
-            font-family: "Cairo", sans-serif;
-            transition: all 0.2s ease;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        #register-form select option {
-            background: rgba(64, 41, 88, 0.95);
-            color: #f2f4ff;
-            padding: 10px;
+          padding: 9px 11px;
+          font-size: 0.9rem;
         }
 
         #register-form button {
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #ffcc00, #ffaa00);
-            color: #402958;
-            cursor: pointer;
-            box-shadow: 0 8px 15px rgba(255, 204, 0, 0.3);
-            transition: all 0.2s ease;
-            font-family: "Cairo", sans-serif;
-            margin-top: 10px;
+          padding: 11px;
+          font-size: 0.9rem;
         }
+      }
 
-        #register-form button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 204, 0, 0.4);
-            background: linear-gradient(135deg, #ffd700, #ffbb00);
-        }
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
 
-        #register-form button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
+      ::-webkit-scrollbar-track {
+        background: #f0f0f0;
+      }
 
-        .input-error {
-            font-size: 0.8rem;
-            color: var(--error);
-            min-height: 18px;
-            text-align: right;
-        }
+      ::-webkit-scrollbar-thumb {
+        background: #f4c400;
+        border-radius: 10px;
+      }
 
-        #error-message {
-            min-height: 18px;
-            color: var(--error);
-            font-size: 0.8rem;
-            text-align: center;
-            margin: 6px 0 0 0;
-            padding: 8px 0;
-        }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #e0b200;
+      }
 
-        small {
-            color: var(--muted);
-            font-size: 0.85rem;
-            text-align: center;
-            display: block;
-            margin-top: 50px;
-        }
-
-        small a {
-            color: #ffcc00;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        small a:hover {
-            text-decoration: underline;
-        }
-
-        footer {
-            color: #ffffff;
-            text-align: center;
-            padding: 10px 0;
-            width: 100%;
-            background-color: transparent;
-            font-size: 0.85rem;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .auth-shell {
-                padding: 140px 15px 15px 15px;
-            }
-
-            .login-panel {
-                padding: 22px;
-            }
-
-            .nav-logo {
-                width: 54px;
-                height: 54px;
-            }
-
-            .user-nav-login {
-                padding: 8px 16px;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .auth-shell {
-                padding: 125px 10px 10px 10px;
-            }
-
-            .login-panel {
-                padding: 20px;
-            }
-
-            .nav-logo {
-                width: 48px;
-                height: 48px;
-            }
-
-            .user-nav-login {
-                padding: 7px 12px;
-                font-size: 0.85rem;
-            }
-
-            .login-panel h2 {
-                font-size: 1.4rem;
-            }
-
-            .login-panel p {
-                font-size: 0.9rem;
-            }
-
-            #register-form input,
-            #register-form select {
-                padding: 9px 11px;
-                font-size: 0.9rem;
-            }
-
-            #register-form button {
-                padding: 11px;
-                font-size: 0.9rem;
-            }
-        }
-
-        ::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f0f0f0;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #f4c400;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #e0b200;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #f4c400 #f0f0f0;
-}
-
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #f4c400 #f0f0f0;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <nav class="nav-container">
-        <div class="nav-bar">
-            <div class="nav-left">
-                <div class="nav-logo-container">
-                    <img src="/UI/logo.png" alt="كاتدرائية السمائيين" class="nav-logo" />
-                </div>
-            </div>
-            <div class="nav-right">
-                <a href="/" class="user-nav-login" aria-label="العودة إلى الصفحة الرئيسية">
-                    <i class="fas fa-home" aria-hidden="true"></i>
-                    <span>العودة للرئيسية</span>
-                </a>
-            </div>
+      <div class="nav-bar">
+        <div class="nav-left">
+          <div class="nav-logo-container">
+            <img
+              src="/UI/logo.png"
+              alt="كاتدرائية السمائيين"
+              class="nav-logo"
+            />
+          </div>
         </div>
+        <div class="nav-right">
+          <a
+            href="/"
+            class="user-nav-login"
+            aria-label="العودة إلى الصفحة الرئيسية"
+          >
+            <i class="fas fa-home" aria-hidden="true"></i>
+            <span>العودة للرئيسية</span>
+          </a>
+        </div>
+      </div>
     </nav>
 
     <div class="auth-shell">
-        <section class="login-panel">
-            <h2>إنشاء حساب جديد</h2>
-            <p>املأ البيانات التالية وسيتم مراجعة طلبك من قبل الإدارة</p>
-            <form id="register-form">
-                <div class="form-group">
-                    <label for="username">اسم المستخدم</label>
-                    <input type="text" id="username" autocomplete="username" required placeholder="مثال: carl123" />
-                    <div class="input-error" id="username-error"></div>
-                </div>
+      <section class="login-panel">
+        <h2>إنشاء حساب جديد</h2>
+        <p>املأ البيانات التالية وسيتم مراجعة طلبك من قبل الإدارة</p>
+        <form id="register-form">
+          <div class="form-group">
+            <label for="username">اسم المستخدم</label>
+            <input
+              type="text"
+              id="username"
+              autocomplete="username"
+              required
+              placeholder="مثال: carl123"
+            />
+            <div class="input-error" id="username-error"></div>
+          </div>
 
-                <div class="form-group">
-                    <label for="firstName">الاسم الأول</label>
-                    <input type="text" id="firstName" required placeholder="مثال: Carl" />
-                    <div class="input-error" id="firstName-error"></div>
-                </div>
+          <div class="form-group">
+            <label for="firstName">الاسم الأول</label>
+            <input
+              type="text"
+              id="firstName"
+              required
+              placeholder="مثال: Carl"
+            />
+            <div class="input-error" id="firstName-error"></div>
+          </div>
 
-                <div class="form-group">
-                    <label for="secondName">الاسم الثاني</label>
-                    <input type="text" id="secondName" required placeholder="مثال: Mounir" />
-                    <div class="input-error" id="secondName-error"></div>
-                </div>
+          <div class="form-group">
+            <label for="secondName">الاسم الثاني</label>
+            <input
+              type="text"
+              id="secondName"
+              required
+              placeholder="مثال: Mounir"
+            />
+            <div class="input-error" id="secondName-error"></div>
+          </div>
 
-                <div class="form-group">
-                    <label for="password">كلمة المرور</label>
-                    <input type="password" id="password" autocomplete="new-password" required placeholder="كلمة مرور قوية" />
-                    <div class="input-error" id="password-error"></div>
-                </div>
+          <div class="form-group">
+            <label for="password">كلمة المرور</label>
+            <input
+              type="password"
+              id="password"
+              autocomplete="new-password"
+              required
+              placeholder="كلمة مرور قوية"
+            />
+            <div class="input-error" id="password-error"></div>
+          </div>
 
-                <div class="form-group">
-                    <label for="grade">الصف</label>
-                    <select id="grade" required>
-                        <option value="">اختر الصف</option>
-                        <option value="prep1">أولى إعدادي</option>
-                        <option value="prep2">ثانية إعدادي</option>
-                        <option value="prep3">ثالثة إعدادي</option>
-                        <option value="sec1">أولى ثانوي</option>
-                        <option value="sec2">ثانية ثانوي</option>
-                        <option value="sec3">ثالثة ثانوي</option>
-                    </select>
-                    <div class="input-error" id="grade-error"></div>
-                </div>
+          <div class="form-group">
+            <label for="grade">الصف</label>
+            <select id="grade" required>
+              <option value="">اختر الصف</option>
+              <option value="prep1">أولى إعدادي</option>
+              <option value="prep2">ثانية إعدادي</option>
+              <option value="prep3">ثالثة إعدادي</option>
+              <option value="sec1">أولى ثانوي</option>
+              <option value="sec2">ثانية ثانوي</option>
+              <option value="sec3">ثالثة ثانوي</option>
+            </select>
+            <div class="input-error" id="grade-error"></div>
+          </div>
 
-                <div class="form-group">
-                    <label for="email">البريد الإلكتروني</label>
-                    <input type="email" id="email" autocomplete="email" required placeholder="example@email.com" />
-                    <div class="input-error" id="email-error"></div>
-                </div>
+          <div class="form-group">
+            <label for="email">البريد الإلكتروني</label>
+            <input
+              type="email"
+              id="email"
+              autocomplete="email"
+              required
+              placeholder="example@email.com"
+            />
+            <div class="input-error" id="email-error"></div>
+          </div>
 
-                <div class="form-group">
-                    <label for="phone">رقم الهاتف</label>
-                    <input type="tel" id="phone" required placeholder="01012345678" inputmode="numeric" dir="ltr" />
-                    <div class="input-error" id="phone-error"></div>
-                </div>
+          <div class="form-group">
+            <label for="phone">رقم الهاتف</label>
+            <input
+              type="tel"
+              id="phone"
+              required
+              placeholder="01012345678"
+              inputmode="numeric"
+              dir="ltr"
+            />
+            <div class="input-error" id="phone-error"></div>
+          </div>
 
-                <button type="submit">إرسال طلب التسجيل</button>
-                <div id="error-message" aria-live="polite"></div>
-            </form>
-            <small>لديك حساب بالفعل؟ <a href="/login">تسجيل الدخول</a></small>
-        </section>
+          <button type="submit">إرسال طلب التسجيل</button>
+          <div id="error-message" aria-live="polite"></div>
+        </form>
+        <small>لديك حساب بالفعل؟ <a href="/login">تسجيل الدخول</a></small>
+      </section>
     </div>
 
     <footer>
-        <p>&copy; 2025 كاتدرائية السمائيين. جميع الحقوق محفوظة.</p>
+      <p>&copy; 2025 كاتدرائية السمائيين. جميع الحقوق محفوظة.</p>
     </footer>
 
     <script
       src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"
       defer
     ></script>
-<script>
-        const validPhonePrefixes = ["010", "011", "012", "015"];
+    <script>
+      const validPhonePrefixes = ["010", "011", "012", "015"];
 
-        function validateUsername(username) {
-            const usernameRegex = /^[a-zA-Z]+[a-zA-Z0-9]*$/;
-            const errorElement = document.getElementById("username-error");
+      function validateUsername(username) {
+        const usernameRegex = /^[a-zA-Z]+[a-zA-Z0-9]*$/;
+        const errorElement = document.getElementById("username-error");
 
-            if (username.length < 3) {
-                errorElement.textContent = "اسم المستخدم يجب أن يكون 3 أحرف على الأقل";
-                return false;
-            }
-
-            if (!usernameRegex.test(username)) {
-                errorElement.textContent = "يجب أن يبدأ بحرف إنجليزي ولا يحتوي على رموز خاصة";
-                return false;
-            }
-
-            errorElement.textContent = "";
-            return true;
+        if (username.length < 3) {
+          errorElement.textContent =
+            "اسم المستخدم يجب أن يكون 3 أحرف على الأقل";
+          return false;
         }
 
-        function validatePassword(password) {
-            const errorElement = document.getElementById("password-error");
-
-            if (password.length < 8) {
-                errorElement.textContent = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
-                return false;
-            }
-
-            errorElement.textContent = "";
-            return true;
+        if (!usernameRegex.test(username)) {
+          errorElement.textContent =
+            "يجب أن يبدأ بحرف إنجليزي ولا يحتوي على رموز خاصة";
+          return false;
         }
 
-        function validateName(name, fieldName) {
-            const errorElement = document.getElementById(fieldName + "-error");
+        errorElement.textContent = "";
+        return true;
+      }
 
-            if (name.length < 2) {
-                errorElement.textContent = "الاسم يجب أن يكون حرفين على الأقل";
-                return false;
-            }
+      function validatePassword(password) {
+        const errorElement = document.getElementById("password-error");
 
-            if (/[0-9]/.test(name)) {
-                errorElement.textContent = "الاسم لا يمكن أن يحتوي على أرقام";
-                return false;
-            }
-
-            errorElement.textContent = "";
-            return true;
+        if (password.length < 8) {
+          errorElement.textContent = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+          return false;
         }
 
-        function validateEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const errorElement = document.getElementById("email-error");
+        errorElement.textContent = "";
+        return true;
+      }
 
-            if (!emailRegex.test(email)) {
-                errorElement.textContent = "البريد الإلكتروني غير صالح";
-                return false;
-            }
+      function validateName(name, fieldName) {
+        const errorElement = document.getElementById(fieldName + "-error");
 
-            errorElement.textContent = "";
-            return true;
+        if (name.length < 2) {
+          errorElement.textContent = "الاسم يجب أن يكون حرفين على الأقل";
+          return false;
         }
 
-        function validatePhone(phone) {
-            const errorElement = document.getElementById("phone-error");
-            const cleanPhone = phone.replace(/\s/g, "").replace(/\D/g, "");
-
-            if (cleanPhone.length < 10 || cleanPhone.length > 12) {
-                errorElement.textContent = "يجب أن يكون 10 أو 11 رقم";
-                return false;
-            }
-
-            const prefix = cleanPhone.substring(0, 3);
-            if (!validPhonePrefixes.includes(prefix)) {
-                errorElement.textContent = "يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015";
-                return false;
-            }
-
-            errorElement.textContent = "";
-            return true;
+        if (/[0-9]/.test(name)) {
+          errorElement.textContent = "الاسم لا يمكن أن يحتوي على أرقام";
+          return false;
         }
 
-        function validateGrade(grade) {
-            const errorElement = document.getElementById("grade-error");
+        errorElement.textContent = "";
+        return true;
+      }
 
-            if (!grade) {
-                errorElement.textContent = "يجب اختيار الصف";
-                return false;
-            }
+      function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const errorElement = document.getElementById("email-error");
 
-            errorElement.textContent = "";
-            return true;
+        if (!emailRegex.test(email)) {
+          errorElement.textContent = "البريد الإلكتروني غير صالح";
+          return false;
         }
 
-        function formatPhoneInput(input) {
-            let value = input.value.replace(/\D/g, "");
+        errorElement.textContent = "";
+        return true;
+      }
 
-            if (value.length > 0) {
-                if (value.length > 3) {
-                    value = value.substring(0, 3) + " " + value.substring(3);
-                }
-                if (value.length > 7) {
-                    value = value.substring(0, 7) + " " + value.substring(7);
-                }
-                if (value.length > 13) {
-                    value = value.substring(0, 13);
-                }
-            }
+      function validatePhone(phone) {
+        const errorElement = document.getElementById("phone-error");
+        const cleanPhone = phone.replace(/\s/g, "").replace(/\D/g, "");
 
-            input.value = value;
-            validatePhone(value);
+        if (cleanPhone.length < 10 || cleanPhone.length > 12) {
+          errorElement.textContent = "يجب أن يكون 10 أو 11 رقم";
+          return false;
         }
 
-        function formatUsernameInput(input) {
-            let value = input.value.toLowerCase().replace(/[^a-z0-9]/g, "");
-            
-            if (value.length > 0 && /^[0-9]/.test(value)) {
-                value = value.substring(1);
-            }
-            
-            input.value = value;
-            validateUsername(value);
+        const prefix = cleanPhone.substring(0, 3);
+        if (!validPhonePrefixes.includes(prefix)) {
+          errorElement.textContent = "يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015";
+          return false;
         }
 
-        function clearAllErrors() {
-            const errorElements = document.querySelectorAll(".input-error, #error-message");
-            errorElements.forEach((el) => (el.textContent = ""));
+        errorElement.textContent = "";
+        return true;
+      }
+
+      function validateGrade(grade) {
+        const errorElement = document.getElementById("grade-error");
+
+        if (!grade) {
+          errorElement.textContent = "يجب اختيار الصف";
+          return false;
         }
 
-        document.getElementById("username").addEventListener("input", function (e) {
-            formatUsernameInput(e.target);
+        errorElement.textContent = "";
+        return true;
+      }
+
+      function formatPhoneInput(input) {
+        let value = input.value.replace(/\D/g, "");
+
+        if (value.length > 0) {
+          if (value.length > 3) {
+            value = value.substring(0, 3) + " " + value.substring(3);
+          }
+          if (value.length > 7) {
+            value = value.substring(0, 7) + " " + value.substring(7);
+          }
+          if (value.length > 13) {
+            value = value.substring(0, 13);
+          }
+        }
+
+        input.value = value;
+        validatePhone(value);
+      }
+
+      function formatUsernameInput(input) {
+        let value = input.value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+        if (value.length > 0 && /^[0-9]/.test(value)) {
+          value = value.substring(1);
+        }
+
+        input.value = value;
+        validateUsername(value);
+      }
+
+      function clearAllErrors() {
+        const errorElements = document.querySelectorAll(
+          ".input-error, #error-message"
+        );
+        errorElements.forEach((el) => (el.textContent = ""));
+      }
+
+      document
+        .getElementById("username")
+        .addEventListener("input", function (e) {
+          formatUsernameInput(e.target);
         });
 
-        document.getElementById("password").addEventListener("input", function (e) {
-            validatePassword(e.target.value);
+      document
+        .getElementById("password")
+        .addEventListener("input", function (e) {
+          validatePassword(e.target.value);
         });
 
-        document.getElementById("firstName").addEventListener("input", function (e) {
-            validateName(e.target.value, "firstName");
+      document
+        .getElementById("firstName")
+        .addEventListener("input", function (e) {
+          validateName(e.target.value, "firstName");
         });
 
-        document.getElementById("secondName").addEventListener("input", function (e) {
-            validateName(e.target.value, "secondName");
+      document
+        .getElementById("secondName")
+        .addEventListener("input", function (e) {
+          validateName(e.target.value, "secondName");
         });
 
-        document.getElementById("email").addEventListener("input", function (e) {
-            validateEmail(e.target.value);
-        });
+      document.getElementById("email").addEventListener("input", function (e) {
+        validateEmail(e.target.value);
+      });
 
-        document.getElementById("phone").addEventListener("input", function (e) {
-            formatPhoneInput(e.target);
-        });
+      document.getElementById("phone").addEventListener("input", function (e) {
+        formatPhoneInput(e.target);
+      });
 
-        document.getElementById("grade").addEventListener("change", function (e) {
-            validateGrade(e.target.value);
-        });
+      document.getElementById("grade").addEventListener("change", function (e) {
+        validateGrade(e.target.value);
+      });
 
-        document.getElementById("phone").addEventListener("keydown", function (e) {
-            if (!/[\d\s]/.test(e.key) && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) {
-                e.preventDefault();
-            }
-        });
-
-        document.getElementById("register-form").addEventListener("submit", async (e) => {
+      document
+        .getElementById("phone")
+        .addEventListener("keydown", function (e) {
+          if (
+            !/[\d\s]/.test(e.key) &&
+            !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(
+              e.key
+            )
+          ) {
             e.preventDefault();
-            clearAllErrors();
+          }
+        });
 
-            const submitButton = e.target.querySelector('button[type="submit"]');
-            const errorMessage = document.getElementById("error-message");
+      document
+        .getElementById("register-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          clearAllErrors();
 
-            const formData = {
-                username: document.getElementById("username").value.trim().toLowerCase().replace(/[^a-z0-9]/g, ""),
-                password: document.getElementById("password").value,
-                firstName: document.getElementById("firstName").value.trim(),
-                secondName: document.getElementById("secondName").value.trim(),
-                email: document.getElementById("email").value.trim(),
-                phone: document.getElementById("phone").value.replace(/\s/g, ""),
-                grade: document.getElementById("grade").value,
-            };
+          const submitButton = e.target.querySelector('button[type="submit"]');
+          const errorMessage = document.getElementById("error-message");
 
-            if (/^[0-9]/.test(formData.username)) {
-                formData.username = formData.username.substring(1);
+          const formData = {
+            username: document
+              .getElementById("username")
+              .value.trim()
+              .toLowerCase()
+              .replace(/[^a-z0-9]/g, ""),
+            password: document.getElementById("password").value,
+            firstName: document.getElementById("firstName").value.trim(),
+            secondName: document.getElementById("secondName").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            phone: document.getElementById("phone").value.replace(/\s/g, ""),
+            grade: document.getElementById("grade").value,
+          };
+
+          if (/^[0-9]/.test(formData.username)) {
+            formData.username = formData.username.substring(1);
+          }
+
+          const validations = [
+            validateUsername(formData.username),
+            validatePassword(formData.password),
+            validateName(formData.firstName, "firstName"),
+            validateName(formData.secondName, "secondName"),
+            validateEmail(formData.email),
+            validatePhone(formData.phone),
+            validateGrade(formData.grade),
+          ];
+
+          if (validations.includes(false)) {
+            errorMessage.textContent = "يرجى تصحيح الأخطاء في النموذج";
+            return;
+          }
+
+          errorMessage.textContent = "";
+          submitButton.disabled = true;
+          submitButton.textContent = "جارٍ الإرسال...";
+
+          try {
+            const response = await fetch("/api/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+              await Swal.fire({
+                title: "تم بنجاح!",
+                text: result.message,
+                icon: "success",
+                confirmButtonText: "حسنًا",
+                background: "#2a1b3c",
+                color: "#f2f4ff",
+              });
+              window.location.href = "/login";
+            } else {
+              errorMessage.textContent =
+                result.message || "حدث خطأ أثناء التسجيل";
+              throw new Error(result.message || "حدث خطأ أثناء التسجيل");
             }
-
-            const validations = [
-                validateUsername(formData.username),
-                validatePassword(formData.password),
-                validateName(formData.firstName, "firstName"),
-                validateName(formData.secondName, "secondName"),
-                validateEmail(formData.email),
-                validatePhone(formData.phone),
-                validateGrade(formData.grade),
-            ];
-
-            if (validations.includes(false)) {
-                errorMessage.textContent = "يرجى تصحيح الأخطاء في النموذج";
-                return;
-            }
-
-            errorMessage.textContent = "";
-            submitButton.disabled = true;
-            submitButton.textContent = "جارٍ الإرسال...";
-
-            try {
-                const response = await fetch("/api/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData),
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    await Swal.fire({
-                        title: "تم بنجاح!",
-                        text: result.message,
-                        icon: "success",
-                        confirmButtonText: "حسنًا",
-                        background: "#2a1b3c",
-                        color: "#f2f4ff",
-                    });
-                    window.location.href = "/login";
-                } else {
-                    errorMessage.textContent = result.message || "حدث خطأ أثناء التسجيل";
-                    throw new Error(result.message || "حدث خطأ أثناء التسجيل");
-                }
-            } catch (error) {
-                console.error("Registration error:", error);
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = "إرسال طلب التسجيل";
-            }
+          } catch (error) {
+            console.error("Registration error:", error);
+          } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "إرسال طلب التسجيل";
+          }
         });
     </script>
-</body>
-</html><!DOCTYPE html>
+  </body>
+</html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"/>
-    <meta name="keywords" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"/>
-    <meta name="author" content="كاتدرائية السمائيين"/>
-    <meta name="theme-color" content="#402958"/>
-    <meta name="robots" content="noindex, nofollow"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
+    <meta
+      name="keywords"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
+    <meta name="author" content="كاتدرائية السمائيين" />
+    <meta name="theme-color" content="#402958" />
+    <meta name="robots" content="noindex, nofollow" />
     <title>إدارة المستخدمين | كاتدرائية السمائيين</title>
-    <link rel="icon" href="/UI/icon.png" type="image/png" sizes="16x16"/>
-    <link rel="apple-touch-icon" href="/UI/icon.png"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="icon" href="/UI/icon.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/UI/icon.png" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+</html>

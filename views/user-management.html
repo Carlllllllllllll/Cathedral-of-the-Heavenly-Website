@@ -238,7 +238,6 @@
         overflow-x: hidden;
       }
 
-      /* Match the "User Approvals" feel: keep top area stable and avoid weird zoom/scale issues */
       .top-nav {
         position: sticky;
         top: 16px;
@@ -481,7 +480,6 @@
         gap: 10px;
       }
 
-      /* Primary action buttons (Refresh / Toggle view) */
       .toggle-btn {
         padding: 12px 22px;
         background: linear-gradient(90deg, var(--secondary), var(--primary));
@@ -1456,54 +1454,22 @@
 
       .grades-submenu {
         max-height: 0;
-        overflow-y: auto;
+        overflow-y: hidden;
         overflow-x: hidden;
         transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         margin-right: 20px;
-        border-right: 2px solid var(--accent);
+        border-right: 2px solid transparent;
         margin-top: 5px;
         padding-right: 8px;
       }
 
-      .grades-toggle.active + .grades-submenu-container .grades-submenu {
-        max-height: 250px;
-        animation: fadeInDown 0.3s ease-out;
+      .grades-submenu.open {
+        max-height: 400px;
+        border-right-color: var(--accent);
       }
 
-      .grades-submenu-container::before,
-      .grades-submenu-container::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 12px;
-        height: 20px;
-        pointer-events: none;
-        z-index: 2;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .grades-submenu-container::before {
-        top: 0;
-        background: linear-gradient(
-          to bottom,
-          rgba(42, 27, 60, 0.95),
-          transparent
-        );
-      }
-
-      .grades-submenu-container::after {
-        bottom: 0;
-        background: linear-gradient(
-          to top,
-          rgba(42, 27, 60, 0.95),
-          transparent
-        );
-      }
-
-      .grades-toggle.active + .grades-submenu-container::before,
-      .grades-toggle.active + .grades-submenu-container::after {
-        opacity: 1;
+      .grades-toggle.open .toggle-icon {
+        transform: rotate(180deg);
       }
 
       .grades-toggle {
@@ -1514,10 +1480,6 @@
       .toggle-icon {
         transition: transform 0.3s ease;
         margin-right: auto;
-      }
-
-      .grades-toggle.active .toggle-icon {
-        transform: rotate(180deg);
       }
 
       @keyframes fadeInDown {
@@ -1710,96 +1672,202 @@
         }
       }
 
-      /* شارات الحالة الجديدة */
-.status-badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-.online-badge {
-    background: rgba(46, 204, 113, 0.2);
-    color: #2ecc71;
-    border: 1px solid rgba(46, 204, 113, 0.3);
-}
+      .online-badge {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
 
-.idle-badge {
-    background: rgba(241, 196, 15, 0.2);
-    color: #f1c40f;
-    border: 1px solid rgba(241, 196, 15, 0.3);
-}
+      .idle-badge {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.3);
+      }
 
-.signed-in-badge {
-    background: rgba(52, 152, 219, 0.2);
-    color: #3498db;
-    border: 1px solid rgba(52, 152, 219, 0.3);
-}
+      .signed-in-badge {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+      }
 
-.signed-out-badge {
-    background: rgba(149, 165, 166, 0.2);
-    color: #95a5a6;
-    border: 1px solid rgba(149, 165, 166, 0.3);
-}
+      .signed-out-badge {
+        background: rgba(149, 165, 166, 0.2);
+        color: #95a5a6;
+        border: 1px solid rgba(149, 165, 166, 0.3);
+      }
 
-.banned-badge {
-    background: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
-    border: 1px solid rgba(231, 76, 60, 0.3);
-}
+      .banned-badge {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
 
-.verified-badge {
-    background: rgba(46, 204, 113, 0.2);
-    color: #2ecc71;
-    border: 1px solid rgba(46, 204, 113, 0.3);
-}
+      .verified-badge {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
 
-.not-verified-badge {
-    background: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
-    border: 1px solid rgba(231, 76, 60, 0.3);
-}
+      .not-verified-badge {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
 
-/* معلومات الحالة الإضافية */
-.user-status-info {
-    margin-top: 8px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
+      .user-status-info {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
 
-.last-login-text {
-    font-size: 12px;
-    color: #95a5a6;
-    font-style: italic;
-}
+      .last-login-text {
+        font-size: 12px;
+        color: #95a5a6;
+        font-style: italic;
+      }
 
-/* تحسين عرض الشارات */
-.user-badges {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-}
+      .user-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
 
-.user-badges .status-badge {
-    margin: 2px 0;
-}
+      .user-badges .status-badge {
+        margin: 2px 0;
+      }
 
-/* استجابة للشاشات الصغيرة */
-@media (max-width: 480px) {
-    .user-badges {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .status-badge {
-        font-size: 10px;
-        padding: 3px 8px;
-    }
-}
+      @media (max-width: 480px) {
+        .user-badges {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .status-badge {
+          font-size: 10px;
+          padding: 3px 8px;
+        }
+      }
+
+      .suggestions-submenu {
+        max-height: 0;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-right: 20px;
+        border-right: 2px solid transparent;
+        margin-top: 5px;
+        padding-right: 8px;
+      }
+
+      .suggestions-submenu.open {
+        max-height: 200px;
+        border-right-color: var(--accent);
+      }
+
+      .suggestions-toggle.open .toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .section-submenu {
+        max-height: 0;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-right: 15px;
+        margin-top: 5px;
+      }
+
+      .section-submenu.open {
+        max-height: 200px;
+      }
+
+      .section-toggle.open .toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .nav-link:hover {
+        background: rgba(52, 73, 94, 0.5) !important;
+        transform: translateX(-5px) !important;
+        color: var(--accent) !important;
+        border-right: none !important;
+      }
+
+      .nav-link.active {
+        background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+        color: var(--dark) !important;
+        box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3) !important;
+        border-right: 3px solid var(--accent) !important;
+      }
+
+      .nav-link.active i {
+        color: var(--dark) !important;
+      }
+
+      .grades-toggle:hover,
+      .suggestions-toggle:hover {
+        background: rgba(52, 73, 94, 0.5) !important;
+        transform: translateX(-5px) !important;
+        color: var(--accent) !important;
+        border-right: none !important;
+      }
+
+      .grades-toggle.open,
+      .suggestions-toggle.open {
+        background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+        border-right: 3px solid var(--accent) !important;
+        color: var(--dark) !important;
+        box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3) !important;
+      }
+
+      .grades-toggle.open i,
+      .suggestions-toggle.open i {
+        color: var(--dark) !important;
+      }
+
+      .section-toggle:hover {
+        background: rgba(52, 73, 94, 0.5) !important;
+        transform: translateX(-3px) !important;
+        color: var(--accent) !important;
+      }
+
+      .section-toggle.open {
+        background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+        color: var(--dark) !important;
+        border-right: 2px solid var(--accent) !important;
+      }
+
+      .section-toggle.open i {
+        color: var(--dark) !important;
+      }
+
+      .submenu-link:hover {
+        background: rgba(52, 73, 94, 0.5) !important;
+        transform: translateX(-5px) !important;
+        color: var(--accent) !important;
+        border-color: transparent !important;
+      }
+
+      .submenu-link.active {
+        background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+        color: var(--dark) !important;
+        border-right: 2px solid var(--accent) !important;
+        box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2) !important;
+      }
+
+      .submenu-link.active i {
+        color: var(--dark) !important;
+      }
     </style>
   </head>
   <body>
@@ -1822,7 +1890,7 @@
 
       <nav class="nav-menu">
         <div class="nav-item">
-          <a href="http://localhost:3000" class="nav-link">
+          <a href="https://kenisa-el-sama2eyeen.ooguy.com" class="nav-link">
             <i class="fas fa-home"></i>
             الصفحة الرئيسية
           </a>
@@ -2208,8 +2276,8 @@
       src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"
       defer
     ></script>
-<script>
-        const mobileToggle = document.getElementById("mobileToggle");
+    <script>
+      const mobileToggle = document.getElementById("mobileToggle");
       const sidebar = document.getElementById("sidebar");
       const logoutBtn = document.getElementById("logoutBtn");
       const logoutBtnMobile = document.getElementById("logoutBtnMobile");
@@ -2394,22 +2462,29 @@
       }
 
       function displayUsers(users) {
-    const statusRank = { online: 0, idle: 1, "signed-in": 2, "signed-out": 3, banned: 4 };
-    const sorted = [...users].sort((a, b) => {
-      const aStatus = getUserStatus(a);
-      const bStatus = getUserStatus(b);
-      const aRank = statusRank[aStatus] ?? 99;
-      const bRank = statusRank[bStatus] ?? 99;
-      if (aRank !== bRank) return aRank - bRank;
-      const aTime = a.lastActivity ? new Date(a.lastActivity).getTime() : 0;
-      const bTime = b.lastActivity ? new Date(b.lastActivity).getTime() : 0;
-      if (bTime !== aTime) return bTime - aTime;
-      return (a.username || "").localeCompare(b.username || "");
-    });
+        const statusRank = {
+          online: 0,
+          idle: 1,
+          "signed-in": 2,
+          "signed-out": 3,
+          banned: 4,
+        };
+        const sorted = [...users].sort((a, b) => {
+          const aStatus = getUserStatus(a);
+          const bStatus = getUserStatus(b);
+          const aRank = statusRank[aStatus] ?? 99;
+          const bRank = statusRank[bStatus] ?? 99;
+          if (aRank !== bRank) return aRank - bRank;
+          const aTime = a.lastActivity ? new Date(a.lastActivity).getTime() : 0;
+          const bTime = b.lastActivity ? new Date(b.lastActivity).getTime() : 0;
+          if (bTime !== aTime) return bTime - aTime;
+          return (a.username || "").localeCompare(b.username || "");
+        });
 
-    usersList.innerHTML = sorted
-        .map((user) => {
-            const gradeText = {
+        usersList.innerHTML = sorted
+          .map((user) => {
+            const gradeText =
+              {
                 prep1: "إعدادي أولى",
                 prep2: "إعدادي ثانية",
                 prep3: "إعدادي ثالثة",
@@ -2418,47 +2493,54 @@
                 sec3: "ثانوي ثالثة",
                 teachers: "خادم",
                 admins: "مشرف",
-            }[user.grade] || user.grade;
+              }[user.grade] || user.grade;
 
-            const roleText = {
+            const roleText =
+              {
                 leadadmin: "قائد عام",
                 admin: "مشرف",
                 teacher: "خادم",
                 student: "طالب",
-            }[user.role] || user.role;
+              }[user.role] || user.role;
 
             const userStatus = getUserStatus(user);
             const statusBadge = getStatusBadge(userStatus);
-            
-            const verificationBadge = user.verificationCodeVerified ? 
-                '<span class="status-badge verified-badge">✅ تم التحقق</span>' : 
-                '<span class="status-badge not-verified-badge">❌ غير متحقق</span>';
-            
-            const lastActivityText = user.lastActivity ? 
-                `آخر نشاط: ${formatTimeAgo(new Date(user.lastActivity))}` : 
-                'لم يتم تسجيل نشاط بعد';
+
+            const verificationBadge = user.verificationCodeVerified
+              ? '<span class="status-badge verified-badge">✅ تم التحقق</span>'
+              : '<span class="status-badge not-verified-badge">❌ غير متحقق</span>';
+
+            const lastActivityText = user.lastActivity
+              ? `آخر نشاط: ${formatTimeAgo(new Date(user.lastActivity))}`
+              : "لم يتم تسجيل نشاط بعد";
 
             const logoutAllDevicesBtn =
-                user.role !== "leadadmin"
-                    ? `
+              user.role !== "leadadmin"
+                ? `
                     <button class="action-btn logout-all-btn" onclick="logoutAllDevices('${user._id}', '${user.username}')">
                         <i class="fas fa-sign-out-alt"></i>
                         تسجيل الخروج من جميع الأجهزة
                     </button>
                     `
-                    : "";
+                : "";
 
             return `
                 <div class="user-card">
                     <div class="user-card-header">
-                        <div class="user-avatar-large ${userStatus === 'banned' ? 'banned-avatar' : ''}">
+                        <div class="user-avatar-large ${
+                          userStatus === "banned" ? "banned-avatar" : ""
+                        }">
                             <i class="fas fa-user-circle"></i>
                         </div>
                         <div class="user-main-info">
                             <h3>${user.firstName} ${user.secondName}</h3>
                             <div class="user-badges">
-                                <span class="username-badge">@${user.username}</span>
-                                <span class="role-badge ${user.role}">${roleText}</span>
+                                <span class="username-badge">@${
+                                  user.username
+                                }</span>
+                                <span class="role-badge ${
+                                  user.role
+                                }">${roleText}</span>
                                 <span class="grade-badge">${gradeText}</span>
                                 ${statusBadge}
                                 ${verificationBadge}
@@ -2478,7 +2560,10 @@
                             <span class="detail-label">البريد الإلكتروني:</span>
                             <span class="detail-value-wrap">
                               <span class="detail-value">${user.email}</span>
-                              <button class="copy-btn" type="button" title="نسخ البريد" onclick="copyText('${user.email.replace(/'/g, "\\'")}')">
+                              <button class="copy-btn" type="button" title="نسخ البريد" onclick="copyText('${user.email.replace(
+                                /'/g,
+                                "\\'"
+                              )}')">
                                 <i class="fas fa-copy"></i>
                               </button>
                             </span>
@@ -2487,7 +2572,10 @@
                             <span class="detail-label">رقم الهاتف:</span>
                             <span class="detail-value-wrap">
                               <span class="detail-value">${user.phone}</span>
-                              <button class="copy-btn" type="button" title="نسخ رقم الهاتف" onclick="copyText('${user.phone.replace(/'/g, "\\'")}')">
+                              <button class="copy-btn" type="button" title="نسخ رقم الهاتف" onclick="copyText('${user.phone.replace(
+                                /'/g,
+                                "\\'"
+                              )}')">
                                 <i class="fas fa-copy"></i>
                               </button>
                             </span>
@@ -2495,10 +2583,9 @@
                         <div class="detail-row">
                             <span class="detail-label">تاريخ التسجيل:</span>
                             <span class="detail-value-wrap">
-                              <span class="detail-value">${new Date(user.createdAt).toLocaleDateString("ar-EG")}</span>
-                              <button class="copy-btn" type="button" title="نسخ تاريخ التسجيل" onclick="copyText('${new Date(user.createdAt).toLocaleDateString("ar-EG")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
+                              <span class="detail-value">${new Date(
+                                user.createdAt
+                              ).toLocaleDateString("ar-EG")}</span>
                             </span>
                         </div>
                         <div class="detail-row">
@@ -2506,68 +2593,80 @@
                             <span class="detail-value-wrap">
                               <span class="detail-value">${
                                 user.lastActivity
-                                    ? new Date(user.lastActivity).toLocaleString("ar-EG")
-                                    : "لم يتم تسجيل نشاط بعد"
-                            }</span>
-                              <button class="copy-btn" type="button" title="نسخ آخر نشاط" onclick="copyText('${(user.lastActivity ? new Date(user.lastActivity).toLocaleString("ar-EG") : "لم يتم تسجيل نشاط بعد").replace(/'/g, "\\'")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
+                                  ? new Date(user.lastActivity).toLocaleString(
+                                      "ar-EG"
+                                    )
+                                  : "لم يتم تسجيل نشاط بعد"
+                              }</span>
                             </span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">حالة الحساب:</span>
                             <span class="detail-value-wrap">
-                              <span class="detail-value">${getStatusDescription(userStatus)}</span>
-                              <button class="copy-btn" type="button" title="نسخ حالة الحساب" onclick="copyText('${getStatusDescription(userStatus).replace(/'/g, "\\'")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
+                              <span class="detail-value">${getStatusDescription(
+                                userStatus
+                              )}</span>
                             </span>
                         </div>
-                        ${user.verificationCodeVerified
+                        ${
+                          user.verificationCodeVerified
                             ? `
                         <div class="detail-row" style="background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
-                            <span class="detail-label" style="color: #2ecc71; font-weight: 700;">✅ تم التحقق:</span>
+                            <span class="detail-label" style="color: #2ecc71; font-weight: 700;">حالة التحقق من الحساب:</span>
                             <span class="detail-value-wrap">
-                              <span class="detail-value" style="color: #2ecc71; font-weight: 700; font-size: 16px;">متحقق بالبريد</span>
-                              <button class="copy-btn" type="button" title="نسخ حالة التحقق" onclick="copyText('متحقق بالبريد')">
+                              <span class="detail-value" style="color: #2ecc71; font-weight: 700; font-size: 16px;">✅ تم التحقق</span>
+                            </span>
+                        </div>
+                        `
+                            : user.verificationCode
+                            ? `
+                        <div class="detail-row" style="background: rgba(255, 204, 0, 0.1); border: 1px solid rgba(255, 204, 0, 0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
+                            <span class="detail-label" style="color: #ffcc00; font-weight: 700;">🔑 كود التحقق:</span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value" style="color: #ffcc00; font-weight: 700; font-size: 16px; font-family: monospace;">${
+                                user.verificationCode
+                              }</span>
+                              <button class="copy-btn" type="button" title="نسخ كود التحقق" onclick="copyText('${user.verificationCode.replace(
+                                /'/g,
+                                "\\'"
+                              )}')">
                                 <i class="fas fa-copy"></i>
                               </button>
                             </span>
                         </div>
                         `
-                            : user.verificationCode ? 
-                            `
-                        <div class="detail-row" style="background: rgba(255, 204, 0, 0.1); border: 1px solid rgba(255, 204, 0, 0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
-                            <span class="detail-label" style="color: #ffcc00; font-weight: 700;">🔑 كود التحقق:</span>
-                            <span class="detail-value-wrap">
-                              <span class="detail-value" style="color: #ffcc00; font-weight: 700; font-size: 16px; font-family: monospace;">${user.verificationCode}</span>
-                              <button class="copy-btn" type="button" title="نسخ كود التحقق" onclick="copyText('${user.verificationCode.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-copy"></i>
-                              </button>
-                            </span>
-                        </div>
-                        ` : ''
-                            }
+                            : ""
+                        }
                     </div>
                     
                     <div class="user-card-actions">
-                        <button class="action-btn points-btn" onclick="givePoints('${user._id}', '${user.username}')">
+                        <button class="action-btn points-btn" onclick="givePoints('${
+                          user._id
+                        }', '${user.username}')">
                             <i class="fas fa-plus-circle"></i>
                             إضافة نقاط
                         </button>
-                        <button class="action-btn remove-points-btn" onclick="openTakePointsModal('${user._id}', '${user.username}')">
+                        <button class="action-btn remove-points-btn" onclick="openTakePointsModal('${
+                          user._id
+                        }', '${user.username}')">
                             <i class="fas fa-minus-circle"></i>
                             خصم نقاط
                         </button>
-                        <button class="action-btn edit-btn" onclick="openEditUserModal('${user._id}')">
+                        <button class="action-btn edit-btn" onclick="openEditUserModal('${
+                          user._id
+                        }')">
                             <i class="fas fa-edit"></i>
                             تعديل
                         </button>
-                        <button class="action-btn ban-btn" onclick="openBanModal('${user._id}', '${user.username}')">
+                        <button class="action-btn ban-btn" onclick="openBanModal('${
+                          user._id
+                        }', '${user.username}')">
                             <i class="fas fa-ban"></i>
                             حظر
                         </button>
-                        <button class="action-btn delete-btn" onclick="deleteUser('${user._id}', '${user.username}')">
+                        <button class="action-btn delete-btn" onclick="deleteUser('${
+                          user._id
+                        }', '${user.username}')">
                             <i class="fas fa-trash"></i>
                             حذف
                         </button>
@@ -2575,9 +2674,9 @@
                     </div>
                 </div>
             `;
-        })
-        .join("");
-}
+          })
+          .join("");
+      }
       async function logoutAllDevices(userId, username) {
         const result = await Swal.fire({
           title: "تسجيل الخروج من جميع الأجهزة",
@@ -3107,21 +3206,21 @@
         }
       }
 
-function toggleView() {
-    if (bannedSection.style.display === "none") {
-        usersSection.style.display = "none";
-        bannedSection.style.display = "block";
-        toggleViewBtn.innerHTML = '<i class="fas fa-users"></i> عرض النشطين';
-        
-        loadBannedUsers();
-    } else {
-        usersSection.style.display = "block";
-        bannedSection.style.display = "none";
-        toggleViewBtn.innerHTML = '<i class="fas fa-ban"></i> عرض المحظورين';
-        
-        displayUsersByCategory(currentCategory);
-    }
-}
+      function toggleView() {
+        if (bannedSection.style.display === "none") {
+          usersSection.style.display = "none";
+          bannedSection.style.display = "block";
+          toggleViewBtn.innerHTML = '<i class="fas fa-users"></i> عرض النشطين';
+
+          loadBannedUsers();
+        } else {
+          usersSection.style.display = "block";
+          bannedSection.style.display = "none";
+          toggleViewBtn.innerHTML = '<i class="fas fa-ban"></i> عرض المحظورين';
+
+          displayUsersByCategory(currentCategory);
+        }
+      }
       async function performLogout() {
         const result = await Swal.fire({
           title: "تسجيل الخروج",
@@ -3213,53 +3312,162 @@ function toggleView() {
       if (sidebarGradesToggle) {
         sidebarGradesToggle.addEventListener("click", function (e) {
           e.stopPropagation();
-          this.classList.toggle("active");
-          const icon = this.querySelector(".toggle-icon");
-          if (this.classList.contains("active")) {
-            icon.classList.remove("fa-chevron-down");
-            icon.classList.add("fa-chevron-up");
-            sidebarGradesSubmenu.style.maxHeight =
-              Math.min(sidebarGradesSubmenu.scrollHeight, 400) + "px";
-          } else {
-            icon.classList.remove("fa-chevron-up");
-            icon.classList.add("fa-chevron-down");
-            sidebarGradesSubmenu.style.maxHeight = "0";
+          e.preventDefault();
+
+          const isOpening = !sidebarGradesSubmenu.classList.contains("open");
+
+          document
+            .querySelectorAll(".grades-submenu.open, .suggestions-submenu.open")
+            .forEach((menu) => {
+              if (menu !== sidebarGradesSubmenu) {
+                menu.classList.remove("open");
+              }
+            });
+
+          if (!isOpening) {
             document
-              .querySelectorAll(".section-toggle.active")
-              .forEach((toggle) => {
-                toggle.classList.remove("active");
-                const subIcon = toggle.querySelector(".toggle-icon");
-                subIcon.classList.remove("fa-chevron-up");
-                subIcon.classList.add("fa-chevron-down");
-                const sectionSub = document.querySelector(
-                  `.section-submenu[data-section="${toggle.dataset.section}"]`
-                );
-                if (sectionSub) sectionSub.style.maxHeight = "0";
+              .querySelectorAll(".section-submenu.open")
+              .forEach((submenu) => {
+                submenu.classList.remove("open");
               });
+            document
+              .querySelectorAll(".section-toggle.open")
+              .forEach((toggle) => {
+                toggle.classList.remove("open");
+              });
+          }
+
+          sidebarGradesSubmenu.classList.toggle("open");
+          sidebarGradesToggle.classList.toggle("open");
+
+          const suggestionsToggle =
+            document.getElementById("suggestionsToggle");
+          const suggestionsSubmenu =
+            document.getElementById("suggestionsSubmenu");
+          if (
+            suggestionsToggle &&
+            suggestionsSubmenu &&
+            suggestionsSubmenu.classList.contains("open")
+          ) {
+            suggestionsSubmenu.classList.remove("open");
+            suggestionsToggle.classList.remove("open");
           }
         });
       }
 
-      const sectionToggles = document.querySelectorAll(".section-toggle");
-      sectionToggles.forEach((toggle) => {
+      const suggestionsToggle = document.getElementById("suggestionsToggle");
+      const suggestionsSubmenu = document.getElementById("suggestionsSubmenu");
+
+      if (suggestionsToggle && suggestionsSubmenu) {
+        suggestionsSubmenu.classList.remove("open");
+
+        suggestionsToggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          const isOpening = !suggestionsSubmenu.classList.contains("open");
+
+          document
+            .querySelectorAll(".grades-submenu.open, .suggestions-submenu.open")
+            .forEach((menu) => {
+              if (menu !== suggestionsSubmenu) {
+                menu.classList.remove("open");
+              }
+            });
+
+          if (isOpening) {
+            if (
+              sidebarGradesSubmenu &&
+              sidebarGradesSubmenu.classList.contains("open")
+            ) {
+              sidebarGradesSubmenu.classList.remove("open");
+              if (sidebarGradesToggle)
+                sidebarGradesToggle.classList.remove("open");
+            }
+          }
+
+          suggestionsSubmenu.classList.toggle("open");
+          suggestionsToggle.classList.toggle("open");
+        });
+      }
+
+      document.querySelectorAll(".section-toggle").forEach((toggle) => {
         toggle.addEventListener("click", function (e) {
           e.stopPropagation();
-          this.classList.toggle("active");
-          const icon = this.querySelector(".toggle-icon");
-          const sectionSub = document.querySelector(
-            `.section-submenu[data-section="${this.dataset.section}"]`
+          e.preventDefault();
+
+          const section = this.dataset.section;
+          const submenu = document.querySelector(
+            `.section-submenu[data-section="${section}"]`
           );
 
-          if (this.classList.contains("active")) {
-            icon.classList.remove("fa-chevron-down");
-            icon.classList.add("fa-chevron-up");
-            sectionSub.style.maxHeight = sectionSub.scrollHeight + "px";
-          } else {
-            icon.classList.remove("fa-chevron-up");
-            icon.classList.add("fa-chevron-down");
-            sectionSub.style.maxHeight = "0";
-          }
+          if (!submenu) return;
+
+          document
+            .querySelectorAll(".section-submenu.open")
+            .forEach((otherSubmenu) => {
+              if (otherSubmenu !== submenu) {
+                otherSubmenu.classList.remove("open");
+              }
+            });
+
+          document
+            .querySelectorAll(".section-toggle.open")
+            .forEach((otherToggle) => {
+              if (otherToggle !== this) {
+                otherToggle.classList.remove("open");
+              }
+            });
+
+          submenu.classList.toggle("open");
+          this.classList.toggle("open");
         });
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".sidebar") && window.innerWidth <= 992) {
+          document
+            .querySelectorAll(
+              ".grades-submenu.open, .suggestions-submenu.open, .section-submenu.open"
+            )
+            .forEach((menu) => {
+              menu.classList.remove("open");
+            });
+
+          document
+            .querySelectorAll(
+              ".grades-toggle.open, .suggestions-toggle.open, .section-toggle.open"
+            )
+            .forEach((toggle) => {
+              toggle.classList.remove("open");
+            });
+
+          if (sidebar && sidebar.classList.contains("active")) {
+            sidebar.classList.remove("active");
+            const spans = mobileToggle.querySelectorAll("span");
+            spans[0].style.transform = "none";
+            spans[1].style.opacity = "1";
+            spans[2].style.transform = "none";
+          }
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .querySelectorAll(
+            ".grades-submenu, .suggestions-submenu, .section-submenu"
+          )
+          .forEach((menu) => {
+            menu.classList.remove("open");
+          });
+
+        document
+          .querySelectorAll(
+            ".grades-toggle, .suggestions-toggle, .section-toggle"
+          )
+          .forEach((toggle) => {
+            toggle.classList.remove("open");
+          });
       });
 
       document.addEventListener("keydown", function (event) {
@@ -3324,47 +3532,6 @@ function toggleView() {
         }
       });
 
-      const suggestionsToggle = document.getElementById("suggestionsToggle");
-      const suggestionsSubmenu = document.getElementById("suggestionsSubmenu");
-
-      if (suggestionsToggle) {
-        suggestionsToggle.addEventListener("click", function (e) {
-          e.stopPropagation();
-          this.classList.toggle("active");
-          const icon = this.querySelector(".toggle-icon");
-          if (this.classList.contains("active")) {
-            icon.classList.remove("fa-chevron-down");
-            icon.classList.add("fa-chevron-up");
-            suggestionsSubmenu.style.maxHeight =
-              suggestionsSubmenu.scrollHeight + "px";
-          } else {
-            icon.classList.remove("fa-chevron-up");
-            icon.classList.add("fa-chevron-down");
-            suggestionsSubmenu.style.maxHeight = "0";
-          }
-        });
-      }
-
-      document.addEventListener("click", function (e) {
-        if (!e.target.closest(".suggestions-nav-item")) {
-          const suggestionsToggle =
-            document.getElementById("suggestionsToggle");
-          const suggestionsSubmenu =
-            document.getElementById("suggestionsSubmenu");
-
-          if (
-            suggestionsToggle &&
-            suggestionsToggle.classList.contains("active")
-          ) {
-            suggestionsToggle.classList.remove("active");
-            const icon = suggestionsToggle.querySelector(".toggle-icon");
-            icon.classList.remove("fa-chevron-up");
-            icon.classList.add("fa-chevron-down");
-            suggestionsSubmenu.style.maxHeight = "0";
-          }
-        }
-      });
-
       async function copyText(text) {
         try {
           if (navigator.clipboard?.writeText) {
@@ -3414,36 +3581,40 @@ function toggleView() {
 
         if (diffMinutes <= ONLINE_THRESHOLD_MINUTES) return "online";
         if (diffMinutes <= IDLE_THRESHOLD_MINUTES) return "idle";
-        
+
         return "signed-in";
       }
 
       function isUserBanned(user) {
-        return allBannedUsers.some(banned => banned.username === user.username);
+        return allBannedUsers.some(
+          (banned) => banned.username === user.username
+        );
       }
 
       function getStatusBadge(status) {
         const badges = {
-            'online': '<span class="status-badge online-badge">🟢 متصل</span>',
-            'idle': '<span class="status-badge idle-badge">🟠 غير نشط</span>',
-            'signed-in': '<span class="status-badge signed-in-badge">🔵 مسجل دخول</span>',
-            'signed-out': '<span class="status-badge signed-out-badge">⚫ غير متصل</span>',
-            'banned': '<span class="status-badge banned-badge">🔴 محظور</span>'
+          online: '<span class="status-badge online-badge">🟢 متصل</span>',
+          idle: '<span class="status-badge idle-badge">🟠 غير نشط</span>',
+          "signed-in":
+            '<span class="status-badge signed-in-badge">🔵 مسجل دخول</span>',
+          "signed-out":
+            '<span class="status-badge signed-out-badge">⚫ غير متصل</span>',
+          banned: '<span class="status-badge banned-badge">🔴 محظور</span>',
         };
-        
-        return badges[status] || badges['signed-out'];
+
+        return badges[status] || badges["signed-out"];
       }
 
       function getStatusDescription(status) {
         const descriptions = {
-            'online': 'متصل',
-            'idle': 'غير نشط',
-            'signed-in': 'مسجل دخول',
-            'signed-out': 'غير متصل',
-            'banned': 'المستخدم محظور'
+          online: "متصل",
+          idle: "غير نشط",
+          "signed-in": "مسجل دخول",
+          "signed-out": "غير متصل",
+          banned: "المستخدم محظور",
         };
-        
-        return descriptions[status] || 'غير متصل';
+
+        return descriptions[status] || "غير متصل";
       }
 
       function formatTimeAgo(date) {
@@ -3452,20 +3623,19 @@ function toggleView() {
         const diffMinutes = Math.floor(diffMs / 60000);
         const diffHours = Math.floor(diffMinutes / 60);
         const diffDays = Math.floor(diffHours / 24);
-        
+
         if (diffMinutes < 1) {
-            return 'الآن';
+          return "الآن";
         } else if (diffMinutes < 60) {
-            return `منذ ${diffMinutes} دقيقة`;
+          return `منذ ${diffMinutes} دقيقة`;
         } else if (diffHours < 24) {
-            return `منذ ${diffHours} ساعة`;
+          return `منذ ${diffHours} ساعة`;
         } else if (diffDays < 7) {
-            return `منذ ${diffDays} يوم`;
+          return `منذ ${diffDays} يوم`;
         } else {
-            return date.toLocaleDateString('ar-EG');
+          return date.toLocaleDateString("ar-EG");
         }
       }
     </script>
-</script>
   </body>
 </html>
