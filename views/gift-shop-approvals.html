@@ -31,7 +31,6 @@
     <link rel="stylesheet" href="/design1.css" />
     <link rel="stylesheet" href="/design9.css" />
     <link rel="stylesheet" href="/design8.css" />
-    <link rel="stylesheet" href="/design/sidebar.css" />
     <style>
       body {
         user-select: none;
@@ -136,7 +135,361 @@
         transform: translateY(-2px);
       }
 
+      .grades-submenu {
+        max-height: 0;
+        overflow-y: hidden;
+        transition: max-height 0.3s ease;
+        margin-right: 20px;
+        border-right: 2px solid var(--accent);
+        margin-top: 5px;
+        padding-right: 10px;
+      }
 
+      .grades-toggle.active + .grades-submenu-container .grades-submenu {
+        max-height: 250px;
+        overflow-y: auto;
+      }
+
+      .grades-submenu::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .grades-submenu::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+
+      .grades-submenu::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 10px;
+        transition: background 0.3s ease;
+      }
+
+      .grades-submenu::-webkit-scrollbar-thumb:hover {
+        background: #ffd700;
+      }
+
+      .section-submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        margin-right: 20px;
+        margin-top: 5px;
+      }
+
+      @media (max-width: 992px) {
+        .sidebar {
+          overflow-y: auto;
+          overflow-x: hidden;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .sidebar::-webkit-scrollbar {
+          width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+          background: var(--accent);
+          border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+          background: #ffd700;
+        }
+
+        .grades-submenu {
+          max-height: 0;
+          margin-right: 15px;
+        }
+
+        .grades-toggle.active + .grades-submenu-container .grades-submenu {
+          max-height: 200px;
+          overflow-y: auto;
+        }
+      }
+
+      .grades-submenu {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+      }
+
+      @media (max-width: 992px) {
+        .sidebar {
+          scrollbar-width: thin;
+          scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+        }
+      }
+
+      @media (max-width: 992px) {
+        html {
+          scroll-behavior: smooth;
+        }
+
+        .sidebar {
+          overscroll-behavior: contain;
+        }
+      }
+      .grades-nav-item {
+        position: relative;
+      }
+
+      .grades-submenu-container {
+        overflow: hidden;
+        position: relative;
+      }
+
+      .grades-submenu {
+        max-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-right: 20px;
+        border-right: 2px solid var(--accent);
+        margin-top: 5px;
+        padding-right: 8px;
+      }
+
+      .grades-submenu::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .grades-submenu::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+
+      .grades-submenu::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 10px;
+      }
+
+      .grades-submenu::-webkit-scrollbar-thumb:hover {
+        background: #ffd700;
+      }
+
+      .grades-submenu-container::before,
+      .grades-submenu-container::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 12px;
+        height: 20px;
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .grades-submenu-container::before {
+        top: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(42, 27, 60, 0.95),
+          transparent
+        );
+      }
+
+      .grades-submenu-container::after {
+        bottom: 0;
+        background: linear-gradient(
+          to top,
+          rgba(42, 27, 60, 0.95),
+          transparent
+        );
+      }
+
+      .grades-toggle.active + .grades-submenu-container::before,
+      .grades-toggle.active + .grades-submenu-container::after {
+        opacity: 1;
+      }
+
+      .section-submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        margin-right: 20px;
+        margin-top: 5px;
+      }
+
+      .grades-toggle.active + .grades-submenu-container .grades-submenu {
+        max-height: 250px;
+        overflow-y: auto;
+      }
+
+      .section-toggle.active + .section-submenu {
+        max-height: 150px;
+      }
+
+      .grades-submenu {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+      }
+
+      .suggestions-nav-item {
+        position: relative;
+      }
+
+      .suggestions-submenu-container {
+        overflow: hidden;
+        position: relative;
+      }
+
+      .suggestions-submenu {
+        max-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-right: 20px;
+        border-right: 2px solid var(--accent);
+        margin-top: 5px;
+        padding-right: 8px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+      }
+
+      .suggestions-toggle.active
+        + .suggestions-submenu-container
+        .suggestions-submenu {
+        max-height: 200px;
+        animation: fadeInDown 0.3s ease-out;
+      }
+
+      .suggestions-submenu::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .suggestions-submenu::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        margin: 5px 0;
+      }
+
+      .suggestions-submenu::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, var(--accent), #ffd700);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .suggestions-submenu::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom, #ffd700, var(--accent));
+        box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+      }
+
+      .suggestions-submenu-container::before,
+      .suggestions-submenu-container::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 12px;
+        height: 20px;
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .suggestions-submenu-container::before {
+        top: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(42, 27, 60, 0.95),
+          transparent
+        );
+      }
+
+      .suggestions-submenu-container::after {
+        bottom: 0;
+        background: linear-gradient(
+          to top,
+          rgba(42, 27, 60, 0.95),
+          transparent
+        );
+      }
+
+      .suggestions-toggle.active + .suggestions-submenu-container::before,
+      .suggestions-toggle.active + .suggestions-submenu-container::after {
+        opacity: 1;
+      }
+
+      .suggestions-submenu .submenu-link {
+        padding: 12px 15px;
+        font-size: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        margin-bottom: 3px;
+        display: block;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid transparent;
+      }
+
+      .suggestions-submenu .submenu-link:hover {
+        background: rgba(255, 204, 0, 0.15);
+        transform: translateX(-5px);
+        border-color: var(--accent);
+        box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2);
+      }
+
+      .suggestions-submenu .submenu-link::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .suggestions-submenu .submenu-link:hover::before {
+        left: 100%;
+      }
+
+      .suggestions-submenu .submenu-link i {
+        font-size: 12px;
+        color: var(--accent);
+        transition: transform 0.3s ease;
+      }
+
+      .suggestions-submenu .submenu-link:hover i {
+        transform: translateX(-3px);
+      }
+
+      @media (max-width: 992px) {
+        .suggestions-submenu {
+          max-height: 0;
+          margin-right: 15px;
+        }
+
+        .suggestions-toggle.active
+          + .suggestions-submenu-container
+          .suggestions-submenu {
+          max-height: 180px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .suggestions-toggle.active
+          + .suggestions-submenu-container
+          .suggestions-submenu {
+          max-height: 160px;
+        }
+
+        .suggestions-submenu .submenu-link {
+          padding: 10px 12px;
+          font-size: 13px;
+        }
+      }
     </style>
   </head>
   <body>
