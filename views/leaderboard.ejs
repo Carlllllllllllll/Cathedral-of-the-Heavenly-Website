@@ -1398,9 +1398,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js" defer></script>
     <script src="/notifications.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script>
         const mobileToggle = document.getElementById("mobileToggle");
         const sidebar = document.getElementById("sidebar");
@@ -1567,6 +1567,25 @@
             }
         }
 
+        function waitForLibrary(libraryName, checkFunction) {
+            return new Promise((resolve) => {
+                if (checkFunction()) {
+                    resolve();
+                    return;
+                }
+                const checkInterval = setInterval(() => {
+                    if (checkFunction()) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    resolve();
+                }, 10000);
+            });
+        }
+
         if (downloadPhoto) {
             downloadPhoto.addEventListener("click", async function () {
                 const btn = this;
@@ -1574,6 +1593,12 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
 
                 try {
+                    await waitForLibrary('html2canvas', () => typeof html2canvas !== 'undefined');
+                    
+                    if (typeof html2canvas === 'undefined') {
+                        throw new Error('html2canvas library not loaded');
+                    }
+
                     const container = document.querySelector(".leaderboard-container");
                     const formTopic = "<%= form.topic %>";
                     
@@ -1587,14 +1612,14 @@
                     container.style.maxWidth = "100%";
                     container.style.padding = "40px";
 
-                    await new Promise(resolve => setTimeout(resolve, 300));
+                    await new Promise(resolve => setTimeout(resolve, 500));
 
                     const canvas = await html2canvas(container, {
-                        backgroundColor: "#2a1b3c",
+                        backgroundColor: null,
                         scale: 2,
                         useCORS: true,
                         logging: false,
-                        allowTaint: true,
+                        allowTaint: false,
                         foreignObjectRendering: true,
                         imageTimeout: 15000,
                         windowWidth: container.scrollWidth,
@@ -1605,6 +1630,7 @@
                                 clonedContainer.style.fontFamily = "'Cairo', sans-serif";
                                 clonedContainer.style.direction = "rtl";
                                 clonedContainer.style.width = "100%";
+                                clonedContainer.style.background = "radial-gradient(circle at top right, #402958, #2a1b3c 60%)";
                             }
                         }
                     });
@@ -1647,12 +1673,18 @@
         }
 
         if (downloadExcel) {
-            downloadExcel.addEventListener("click", function () {
+            downloadExcel.addEventListener("click", async function () {
                 const btn = this;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
 
                 try {
+                    await waitForLibrary('XLSX', () => typeof XLSX !== 'undefined');
+                    
+                    if (typeof XLSX === 'undefined') {
+                        throw new Error('XLSX library not loaded');
+                    }
+
                     // Get data from server-side variables embedded in the page
                     const leaderboardData = <%- JSON.stringify(leaderboard) %>;
                     const formTopic = "<%= form.topic %>";
@@ -1768,6 +1800,12 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
 
                 try {
+                    await waitForLibrary('jspdf', () => typeof window.jspdf !== 'undefined');
+                    
+                    if (typeof window.jspdf === 'undefined') {
+                        throw new Error('jsPDF library not loaded');
+                    }
+
                     // Get data from server-side variables
                     const leaderboardData = <%- JSON.stringify(leaderboard) %>;
                     const formTopic = "<%= form.topic %>";
@@ -1917,6 +1955,8 @@
         }
 
         function filterLeaderboard() {
+            if (!filterGrade || !filterDate) return;
+            
             const gradeFilter = filterGrade.value;
             const dateFilter = filterDate.value;
             const rows = document.querySelectorAll(".leaderboard-row");
@@ -1930,6 +1970,20 @@
                 });
             }
 
+            if (dateFilter === "newest") {
+                visibleRows.sort((a, b) => {
+                    const dateA = new Date(a.dataset.date || 0);
+                    const dateB = new Date(b.dataset.date || 0);
+                    return dateB - dateA;
+                });
+            } else if (dateFilter === "oldest") {
+                visibleRows.sort((a, b) => {
+                    const dateA = new Date(a.dataset.date || 0);
+                    const dateB = new Date(b.dataset.date || 0);
+                    return dateA - dateB;
+                });
+            }
+
             // Hide all rows first
             rows.forEach(row => row.style.display = "none");
 
@@ -1938,16 +1992,29 @@
                     leaderboardTable.style.display = "none";
                 }
                 const wrapper = document.querySelector(".leaderboard-table-wrapper");
-                if (wrapper && !wrapper.querySelector(".empty-state")) {
-                    wrapper.innerHTML = `
-                        <div class="empty-state">
+                if (wrapper) {
+                    const existingEmpty = wrapper.querySelector(".empty-state");
+                    if (!existingEmpty) {
+                        const emptyState = document.createElement("div");
+                        emptyState.className = "empty-state";
+                        emptyState.innerHTML = `
                             <i class="fas fa-search"></i>
                             <h3>لا توجد نتائج</h3>
                             <p>لا توجد نتائج تطابق معايير التصفية المحددة</p>
-                        </div>
-                    `;
+                        `;
+                        wrapper.appendChild(emptyState);
+                    }
                 }
                 return;
+            }
+
+            // Remove empty state if exists
+            const wrapper = document.querySelector(".leaderboard-table-wrapper");
+            if (wrapper) {
+                const emptyState = wrapper.querySelector(".empty-state");
+                if (emptyState) {
+                    emptyState.remove();
+                }
             }
 
             // Show filtered rows
