@@ -76,6 +76,9 @@
         z-index: 1001;
         cursor: pointer;
         padding: 8px;
+        background: rgba(42, 27, 60, 0.9);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 204, 0, 0.3);
       }
 
       .mobile-toggle span {
@@ -1301,7 +1304,7 @@
         }
 
         .sidebar.active {
-          transform: translateX(0);
+          transform: translateX(0) !important;
         }
 
         .main-content {
@@ -2335,6 +2338,7 @@
       };
 
       function toggleSidebar() {
+        if (!sidebar || !mobileToggle) return;
         sidebar.classList.toggle("active");
         const spans = mobileToggle.querySelectorAll("span");
         if (sidebar.classList.contains("active")) {
@@ -2348,7 +2352,9 @@
         }
       }
 
-      mobileToggle.addEventListener("click", toggleSidebar);
+      if (mobileToggle) {
+        mobileToggle.addEventListener("click", toggleSidebar);
+      }
 
       async function loadUserInfo() {
         try {
@@ -3542,7 +3548,7 @@
       });
 
       document.addEventListener("click", function (event) {
-        if (window.innerWidth <= 992) {
+        if (window.innerWidth <= 992 && sidebar && mobileToggle) {
           if (
             !sidebar.contains(event.target) &&
             !mobileToggle.contains(event.target)
