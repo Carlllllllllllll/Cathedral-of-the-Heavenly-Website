@@ -1243,7 +1243,15 @@
 
             <div class="stats-grid">
                 <% 
-                    const topScore = leaderboard && leaderboard.length > 0 ? leaderboard[0] : null;
+                    const sortedByScore = leaderboard && leaderboard.length > 0
+                        ? [...leaderboard].sort((a, b) => {
+                            if (b.score !== a.score) return b.score - a.score;
+                            const timeA = new Date(a.submissionTime || 0);
+                            const timeB = new Date(b.submissionTime || 0);
+                            return timeA - timeB;
+                        })
+                        : [];
+                    const topScore = sortedByScore && sortedByScore.length > 0 ? sortedByScore[0] : null;
                     const totalQuestions = form && form.questions ? form.questions.length : 1;
                     const topScoreValue = topScore ? topScore.score : 0;
                     const topScorePercentage = totalQuestions > 0 ? Math.round((topScoreValue / totalQuestions) * 100) : 0;
@@ -1266,10 +1274,6 @@
                     </div>
                     <div class="stat-meta">
                         <%= topScorePercentage %>% من إجمالي الأسئلة
-                    </div>
-                    <div class="stat-chip">
-                        <i class="fas fa-trophy"></i>
-                        <%= topScoreName %>
                     </div>
                 </div>
                 <div class="stat-card success">
@@ -1307,13 +1311,6 @@
                         <option value="sec1">أولى ثانوي</option>
                         <option value="sec2">ثانية ثانوي</option>
                         <option value="sec3">ثالثة ثانوي</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="filter-date">ترتيب حسب التاريخ:</label>
-                    <select id="filter-date" class="filter-select">
-                        <option value="newest">الأحدث أولاً</option>
-                        <option value="oldest">الأقدم أولاً</option>
                     </select>
                 </div>
                 <button id="refreshBtn" class="refresh-btn">
@@ -1399,7 +1396,6 @@
         const gradesSubmenu = document.getElementById("gradesSubmenu");
         const sectionToggles = document.querySelectorAll(".section-toggle");
         const filterGrade = document.getElementById("filter-grade");
-        const filterDate = document.getElementById("filter-date");
         const refreshBtn = document.getElementById("refreshBtn");
         const leaderboardList = document.getElementById("leaderboardList");
         const leaderboardTable = document.getElementById("leaderboardTable");
@@ -1533,6 +1529,54 @@
         const usernameDisplay = document.getElementById("username-display");
         const userRolePill = document.getElementById("user-role-pill");
 
+        function recalculateRanks() {
+            const rows = Array.from(document.querySelectorAll(".leaderboard-row"));
+            if (!rows.length) return;
+            rows.sort((a, b) => {
+                const scoreA = Number(a.dataset.score || 0);
+                const scoreB = Number(b.dataset.score || 0);
+                if (scoreB !== scoreA) return scoreB - scoreA;
+
+                const timeA = new Date(a.dataset.time || 0);
+                const timeB = new Date(b.dataset.time || 0);
+                return timeA - timeB;
+            });
+
+            if (leaderboardList) {
+                rows.forEach(row => leaderboardList.appendChild(row));
+            }
+
+            let lastScore = null;
+            let currentRank = 0;
+
+            rows.forEach((row, index) => {
+                const score = Number(row.dataset.score || 0);
+                if (lastScore === null) {
+                    currentRank = 1;
+                } else if (score !== lastScore) {
+                    currentRank = index + 1;
+                }
+                lastScore = score;
+
+                row.dataset.rank = String(currentRank);
+
+                const rankCell = row.querySelector(".rank-cell");
+                if (rankCell) {
+                    rankCell.textContent = String(currentRank);
+                    rankCell.classList.remove("rank-1", "rank-2", "rank-3");
+                    if (currentRank === 1) rankCell.classList.add("rank-1");
+                    else if (currentRank === 2) rankCell.classList.add("rank-2");
+                    else if (currentRank === 3) rankCell.classList.add("rank-3");
+                }
+
+                if (currentRank <= 3) {
+                    row.classList.add("podium-row");
+                } else {
+                    row.classList.remove("podium-row");
+                }
+            });
+        }
+
         async function hydrateUser() {
             try {
                 const res = await fetch("/api/user-info", { credentials: "include" });
@@ -1555,10 +1599,9 @@
 
 
         function filterLeaderboard() {
-            if (!filterGrade || !filterDate) return;
+            if (!filterGrade) return;
             
             const gradeFilter = filterGrade.value;
-            const dateFilter = filterDate.value;
             const rows = document.querySelectorAll(".leaderboard-row");
 
             let visibleRows = Array.from(rows);
@@ -1570,21 +1613,6 @@
                 });
             }
 
-            if (dateFilter === "newest") {
-                visibleRows.sort((a, b) => {
-                    const dateA = new Date(a.dataset.date || 0);
-                    const dateB = new Date(b.dataset.date || 0);
-                    return dateB - dateA;
-                });
-            } else if (dateFilter === "oldest") {
-                visibleRows.sort((a, b) => {
-                    const dateA = new Date(a.dataset.date || 0);
-                    const dateB = new Date(b.dataset.date || 0);
-                    return dateA - dateB;
-                });
-            }
-
-            
             rows.forEach(row => row.style.display = "none");
 
             if (visibleRows.length === 0) {
@@ -1608,7 +1636,6 @@
                 return;
             }
 
-            
             const wrapper = document.querySelector(".leaderboard-table-wrapper");
             if (wrapper) {
                 const emptyState = wrapper.querySelector(".empty-state");
@@ -1617,7 +1644,6 @@
                 }
             }
 
-            
             if (leaderboardTable) {
                 leaderboardTable.style.display = "table";
             }
@@ -1625,7 +1651,6 @@
         }
 
         if (filterGrade) filterGrade.addEventListener("change", filterLeaderboard);
-        if (filterDate) filterDate.addEventListener("change", filterLeaderboard);
         if (refreshBtn) {
             refreshBtn.addEventListener("click", function () {
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديث...';
@@ -1635,7 +1660,10 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", hydrateUser);
+        document.addEventListener("DOMContentLoaded", () => {
+            hydrateUser();
+            recalculateRanks();
+        });
 
         const suggestionsToggle = document.getElementById("suggestionsToggle");
         const suggestionsSubmenu = document.getElementById("suggestionsSubmenu");

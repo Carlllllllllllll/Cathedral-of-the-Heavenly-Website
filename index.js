@@ -2314,8 +2314,15 @@ app.post("/login", loginLimiter, async (req, res) => {
               } catch (err) {
                 console.error("Failed to update local user verification:", err);
               }
-            } else {
-              await registeredUser.save();
+            } else if (registeredUser && registeredUser._id) {
+              try {
+                await UserRegistration.updateOne(
+                  { _id: registeredUser._id },
+                  { $set: { verificationCodeVerified: true } }
+                );
+              } catch (err) {
+                console.error("Failed to update mongo user verification:", err);
+              }
             }
 
             await sendWebhook("USER", {
@@ -2366,14 +2373,21 @@ app.post("/login", loginLimiter, async (req, res) => {
             try {
               await localUserStore.adminUpdate(
                 registeredUser._id,
-                { lastLoginAt: new Date() },
+                { lastLoginAt: registeredUser.lastLoginAt },
                 "carl"
               );
             } catch (err) {
               console.error("Failed to update local user lastLoginAt:", err);
             }
-          } else {
-            await registeredUser.save();
+          } else if (registeredUser && registeredUser._id) {
+            try {
+              await UserRegistration.updateOne(
+                { _id: registeredUser._id },
+                { $set: { lastLoginAt: registeredUser.lastLoginAt } }
+              );
+            } catch (err) {
+              console.error("Failed to update mongo user lastLoginAt:", err);
+            }
           }
 
           user = {

@@ -96,8 +96,6 @@ whenReady(() => {
             backdrop: "rgba(0,0,0,0.8)",
             allowOutsideClick: false,
             allowEscapeKey: false,
-            width: "90%",
-            maxWidth: "400px",
             customClass: {
               popup: "swal2-popup-responsive",
               container: "swal2-container-responsive",
