@@ -2401,7 +2401,18 @@
       `;
 
           const response = await fetch("/api/admin/users");
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
           const allUsersFromAPI = await response.json();
+          
+          // Check if response is an array, if not, handle error
+          if (!Array.isArray(allUsersFromAPI)) {
+            console.error("API returned non-array response:", allUsersFromAPI);
+            throw new Error("Invalid response format from server");
+          }
 
           const bannedResponse = await fetch("/api/banned-users");
           const bannedUsers = await bannedResponse.json();

@@ -917,13 +917,15 @@ async function findUserById(id) {
 async function findUserByUsername(username) {
   try {
     const normalized = (username || "").toString().toLowerCase().trim();
-    const localUser = await localUserStore.findByUsername(normalized);
-    if (localUser) {
-      return { ...localUser, _isLocal: true };
-    }
+    // Check MongoDB first (preferred source for active sessions)
     const mongoUser = await UserRegistration.findOne({ username: normalized });
     if (mongoUser) {
       return { ...mongoUser.toObject(), _isLocal: false };
+    }
+    // Fall back to local only if not found in MongoDB
+    const localUser = await localUserStore.findByUsername(normalized);
+    if (localUser) {
+      return { ...localUser, _isLocal: true };
     }
     return null;
   } catch (error) {
@@ -934,13 +936,15 @@ async function findUserByUsername(username) {
 async function findUserByEmail(email) {
   try {
     const normalized = (email || "").toString().toLowerCase().trim();
-    const localUser = await localUserStore.findByEmail(normalized);
-    if (localUser) {
-      return { ...localUser, _isLocal: true };
-    }
+    // Check MongoDB first (preferred source for active sessions)
     const mongoUser = await UserRegistration.findOne({ email: normalized });
     if (mongoUser) {
       return { ...mongoUser.toObject(), _isLocal: false };
+    }
+    // Fall back to local only if not found in MongoDB
+    const localUser = await localUserStore.findByEmail(normalized);
+    if (localUser) {
+      return { ...localUser, _isLocal: true };
     }
     return null;
   } catch (error) {
@@ -956,10 +960,27 @@ async function getAllUsers(query = {}) {
       localUserStore.find(query),
     ]);
     
-    const allUsers = [
-      ...mongoUsers.map((u) => ({ ...u, _isLocal: false })),
-      ...localUsers.map((u) => ({ ...u, _isLocal: true })),
-    ];
+    // Create a map to track users by username and email to handle duplicates
+    const userMap = new Map();
+    
+    // First, add all MongoDB users (preferred source)
+    mongoUsers.forEach((u) => {
+      const key = (u.username || '').toLowerCase();
+      if (key) {
+        userMap.set(key, { ...u, _isLocal: false });
+      }
+    });
+    
+    // Then, add local users only if they don't exist in MongoDB (no duplicate)
+    localUsers.forEach((u) => {
+      const key = (u.username || '').toLowerCase();
+      if (key && !userMap.has(key)) {
+        userMap.set(key, { ...u, _isLocal: true });
+      }
+    });
+    
+    // Convert map values to array
+    const allUsers = Array.from(userMap.values());
     
     return allUsers;
   } catch (error) {
@@ -4335,7 +4356,7 @@ app.get(
       if (grade && grade !== "all") {
         query.grade = grade;
       }
-e
+
       const allUsers = await getAllUsers(query);
 
       allUsers.sort((a, b) => {
