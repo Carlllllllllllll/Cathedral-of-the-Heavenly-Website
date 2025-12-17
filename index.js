@@ -179,7 +179,6 @@ const staticAssetOptions = {
   immutable: process.env.NODE_ENV === "production",
   maxAge: process.env.NODE_ENV === "production" ? "365d" : "1d",
   setHeaders: (res, filePath) => {
-    // Set proper MIME types
     if (filePath.match(/\.css$/i)) {
       res.setHeader("Content-Type", "text/css; charset=utf-8");
       res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
@@ -296,10 +295,9 @@ const loginLimiter = rateLimit({
   },
 });
 
-// Strict rate limiter for admin endpoints - prevents brute force and abuse
 const adminApiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 10, // Maximum 10 requests per minute
+  windowMs: 60 * 1000, 
+  max: 10, 
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -307,11 +305,9 @@ const adminApiLimiter = rateLimit({
     message: "Too many requests. Please slow down.",
   },
   keyGenerator: (req) => {
-    // Use both IP and username for rate limiting
     return `${req.ip}-${req.session?.username || 'anonymous'}`;
   },
   skip: (req) => {
-    // Only skip for verified leadadmins
     const user = req.session?.role;
     return user === "leadadmin";
   },
@@ -964,12 +960,10 @@ async function findUserById(id) {
 async function findUserByUsername(username) {
   try {
     const normalized = (username || "").toString().toLowerCase().trim();
-    // Check MongoDB first (preferred source for active sessions)
     const mongoUser = await UserRegistration.findOne({ username: normalized });
     if (mongoUser) {
       return { ...mongoUser.toObject(), _isLocal: false };
     }
-    // Fall back to local only if not found in MongoDB
     const localUser = await localUserStore.findByUsername(normalized);
     if (localUser) {
       return { ...localUser, _isLocal: true };
@@ -983,12 +977,10 @@ async function findUserByUsername(username) {
 async function findUserByEmail(email) {
   try {
     const normalized = (email || "").toString().toLowerCase().trim();
-    // Check MongoDB first (preferred source for active sessions)
     const mongoUser = await UserRegistration.findOne({ email: normalized });
     if (mongoUser) {
       return { ...mongoUser.toObject(), _isLocal: false };
     }
-    // Fall back to local only if not found in MongoDB
     const localUser = await localUserStore.findByEmail(normalized);
     if (localUser) {
       return { ...localUser, _isLocal: true };
@@ -1006,27 +998,22 @@ async function getAllUsers(query = {}) {
       UserRegistration.find(query).lean().exec(),
       localUserStore.find(query),
     ]);
-    
-    // Create a map to track users by username and email to handle duplicates
+
     const userMap = new Map();
-    
-    // First, add all MongoDB users (preferred source)
     mongoUsers.forEach((u) => {
       const key = (u.username || '').toLowerCase();
       if (key) {
         userMap.set(key, { ...u, _isLocal: false });
       }
     });
-    
-    // Then, add local users only if they don't exist in MongoDB (no duplicate)
+
     localUsers.forEach((u) => {
       const key = (u.username || '').toLowerCase();
       if (key && !userMap.has(key)) {
         userMap.set(key, { ...u, _isLocal: true });
       }
     });
-    
-    // Convert map values to array
+
     const allUsers = Array.from(userMap.values());
     
     return allUsers;
@@ -2077,7 +2064,6 @@ app.post("/login", loginLimiter, async (req, res) => {
         registeredUser = await findUserByEmail(username);
       } else if (isPhone) {
         const cleanedPhone = username.replace(/\D/g, "");
-        // Try to find by phone in both MongoDB and local
         const mongoUser = await UserRegistration.findOne({
           phone: cleanedPhone,
         });
@@ -2318,10 +2304,7 @@ app.post("/login", loginLimiter, async (req, res) => {
               });
             }
             registeredUser.verificationCodeVerified = true;
-            // Save based on user type
             if (registeredUser._isLocal) {
-              // For local users, we need to use adminUpdate with "carl" or update the JSON directly
-              // Since this is a system operation during login, we'll allow it
               try {
                 await localUserStore.adminUpdate(
                   registeredUser._id,
@@ -2330,7 +2313,6 @@ app.post("/login", loginLimiter, async (req, res) => {
                 );
               } catch (err) {
                 console.error("Failed to update local user verification:", err);
-                // Continue with login even if update fails
               }
             } else {
               await registeredUser.save();
@@ -2380,10 +2362,7 @@ app.post("/login", loginLimiter, async (req, res) => {
           }
 
           registeredUser.lastLoginAt = new Date();
-          // Save based on user type
           if (registeredUser._isLocal) {
-            // For local users, we need to use adminUpdate with "carl"
-            // Since this is a system operation during login, we'll allow it
             try {
               await localUserStore.adminUpdate(
                 registeredUser._id,
@@ -2392,7 +2371,6 @@ app.post("/login", loginLimiter, async (req, res) => {
               );
             } catch (err) {
               console.error("Failed to update local user lastLoginAt:", err);
-              // Continue with login even if update fails
             }
           } else {
             await registeredUser.save();
@@ -4417,8 +4395,6 @@ app.get(
   requireRole(["admin", "leadadmin"]),
   adminApiLimiter,
   async (req, res) => {
-    // CRITICAL SECURITY: Multiple layers of verification
-    // Layer 1: Session validation (already done by requireAuth)
     if (!req.session || !req.session.isAuthenticated) {
       await sendWebhook("SECURITY", {
         embeds: [
@@ -4438,7 +4414,6 @@ app.get(
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    // Layer 2: Verify user exists and get from database (not just session)
     const sessionUsername = req.session.username;
     if (!sessionUsername) {
       await sendWebhook("SECURITY", {
@@ -4458,20 +4433,16 @@ app.get(
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    // Layer 3: Get user from database to verify role (defense in depth)
     let dbUser = null;
     try {
       const normalizedUsername = sessionUsername.toLowerCase();
-      // Check MongoDB first
       dbUser = await UserRegistration.findOne({ username: normalizedUsername }).lean();
-      // If not in MongoDB, check local store
       if (!dbUser) {
         const localUsers = await localUserStore.find({ username: normalizedUsername });
         if (localUsers && localUsers.length > 0) {
           dbUser = localUsers[0];
         }
       }
-      // If still not found, check env users
       if (!dbUser) {
         dbUser = users[sessionUsername] || users[normalizedUsername];
       }
@@ -4494,7 +4465,6 @@ app.get(
       return res.status(500).json({ error: "Internal server error" });
     }
 
-    // Layer 4: Verify user exists
     if (!dbUser) {
       await sendWebhook("SECURITY", {
         embeds: [
@@ -4514,7 +4484,6 @@ app.get(
       return res.status(403).json({ error: "Access denied" });
     }
 
-    // Layer 5: Verify role from database (not just session)
     const userRole = dbUser.role || req.session.role;
     if (userRole !== "admin" && userRole !== "leadadmin") {
       await sendWebhook("SECURITY", {
@@ -4537,7 +4506,6 @@ app.get(
       return res.status(403).json({ error: "Access denied" });
     }
 
-    // Layer 6: Verify active session ownership
     try {
       const sessionValid = await validateActiveSessionOwnership(req, res);
       if (!sessionValid) {
@@ -4577,7 +4545,6 @@ app.get(
       return res.status(403).json({ error: "Access denied" });
     }
 
-    // All security checks passed - proceed with request
     try {
       const { grade } = req.query;
 
@@ -4677,7 +4644,6 @@ app.get(
 
       res.json(usersWithPoints);
     } catch (error) {
-      // Log error but don't leak sensitive information
       await sendWebhook("ERROR", {
         embeds: [
           {
@@ -4697,7 +4663,6 @@ app.get(
           },
         ],
       });
-      // Return generic error - don't leak stack traces or internal details
       console.error(`[SECURITY] Error in /api/admin/users for ${sessionUsername}:`, error);
       res.status(500).json({ error: "Internal server error" });
     }
@@ -5165,7 +5130,6 @@ app.put(
           .json({ success: false, message: "المستخدم غير موجود" });
       }
 
-      // Prevent admin from editing their own account
       if (registration.username.toLowerCase() === req.session.username.toLowerCase()) {
         await sendWebhook("SECURITY", {
           embeds: [
@@ -5485,7 +5449,6 @@ app.delete(
           .json({ success: false, message: "المستخدم غير موجود" });
       }
 
-      // Prevent admin from deleting their own account
       if (registration.username.toLowerCase() === req.session.username.toLowerCase()) {
         await sendWebhook("SECURITY", {
           embeds: [
@@ -5518,7 +5481,6 @@ app.delete(
         });
       }
 
-      // Only allow deletion of MongoDB users, not local users
       if (registration._isLocal === true) {
         await sendWebhook("SECURITY", {
           embeds: [
@@ -5582,11 +5544,9 @@ app.delete(
           .json({ success: false, message: "لا يمكن حذف هذا المستخدم" });
       }
 
-      // Only delete MongoDB users (local users are already blocked above)
       if (registration._isLocal === false) {
         await UserRegistration.deleteOne({ _id: registration._id });
       } else {
-        // This should not happen due to earlier check, but safety check
         return res.status(403).json({
           success: false,
           message: "يرجى التواصل مع كارل لحذف هذا المستخدم",
@@ -10391,33 +10351,40 @@ app.get("/form/:link/leaderboard", requireAuth, async (req, res) => {
       return res.status(403).redirect("/404.html");
     }
 
-    const leaderboardData = await Promise.all(
-      form.submissions
-        .sort((a, b) => b.score - a.score)
-        .map(async (submission, index) => {
-          const user = await UserRegistration.findOne({
-            username: submission.username.toLowerCase(),
-          });
-          const fullName = user
-            ? `${user.firstName} ${user.secondName}`.trim()
-            : submission.username;
-          
-          return {
-            rank: index + 1,
-            username: submission.username,
-            name: fullName,
-            grade: submission.grade || "غير محدد",
-            score: submission.score,
-            totalQuestions: form.questions.length,
-            submissionTime: submission.submissionTime.toLocaleString("en-US", {
-              timeZone: "Africa/Cairo",
-            }),
-            submissionDate: submission.submissionTime,
-          };
-        })
+    const sortedSubmissions = form.submissions.sort((a, b) => b.score - a.score);
+
+    const leaderboardBase = await Promise.all(
+      sortedSubmissions.map(async (submission) => {
+        const user = await UserRegistration.findOne({
+          username: submission.username.toLowerCase(),
+        });
+        const fullName = user
+          ? `${user.firstName} ${user.secondName}`.trim()
+          : submission.username;
+
+        return {
+          username: submission.username,
+          name: fullName,
+          grade: submission.grade || "غير محدد",
+          score: submission.score,
+          totalQuestions: form.questions.length,
+          submissionTime: submission.submissionTime.toLocaleString("en-US", {
+            timeZone: "Africa/Cairo",
+          }),
+          submissionDate: submission.submissionTime,
+        };
+      })
     );
-    
-    const leaderboard = leaderboardData;
+
+    const leaderboard = leaderboardBase.map((entry, index, arr) => {
+      if (index === 0) {
+        return { ...entry, rank: 1 };
+      }
+
+      const prev = arr[index - 1];
+      const rank = entry.score === prev.score ? prev.rank : index + 1;
+      return { ...entry, rank };
+    });
 
     await sendWebhook("USER", {
       embeds: [
@@ -12188,7 +12155,6 @@ class DatabaseBackup {
           collection.name !== "sessions"
       );
 
-      // Add local user registrations as a separate "collection"
       this.allCollections.push({ name: "userregistrations_local", isLocal: true });
 
       if (this.allCollections.length > this.MAX_COLLECTIONS_PER_BACKUP) {
@@ -12239,8 +12205,7 @@ class DatabaseBackup {
     }
 
     const collection = this.allCollections[this.currentCollectionIndex];
-    
-    // Check if this is a local collection
+
     if (collection.isLocal && collection.name === "userregistrations_local") {
       await this.backupLocalUserRegistrations();
     } else {
@@ -12605,10 +12570,8 @@ class DatabaseBackup {
 
       const jsonData = JSON.stringify(localUsers, null, 2);
       const chunks = [];
-      
-      // Split into chunks if needed
+
       if (jsonData.length > this.CHUNK_SIZE * 100) {
-        // If data is very large, split by users
         const usersPerChunk = Math.ceil(count / Math.ceil(jsonData.length / (this.CHUNK_SIZE * 100)));
         for (let i = 0; i < localUsers.length; i += usersPerChunk) {
           const chunk = localUsers.slice(i, i + usersPerChunk);
@@ -13674,10 +13637,8 @@ app.use(async (err, req, res, next) => {
 });
 
 app.use(async (req, res) => {
-  // Handle 404 for static file requests with proper MIME types
   const staticFileExtensions = /\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|json|xml|pdf|zip)$/i;
   if (staticFileExtensions.test(req.path)) {
-    // Set appropriate Content-Type even for 404 responses
     if (req.path.match(/\.css$/i)) {
       res.setHeader("Content-Type", "text/css; charset=utf-8");
     } else if (req.path.match(/\.js$/i)) {

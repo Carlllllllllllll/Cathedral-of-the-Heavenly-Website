@@ -2424,7 +2424,7 @@
           
           const allUsersFromAPI = await response.json();
           
-          // Check if response is an array, if not, handle error
+          
           if (!Array.isArray(allUsersFromAPI)) {
             console.error("API returned non-array response:", allUsersFromAPI);
             throw new Error("Invalid response format from server");
@@ -2640,11 +2640,11 @@
                             ? `
                         <div class="detail-row" style="background: rgba(52, 152, 219, 0.15); border: 1px solid rgba(52, 152, 219, 0.4); border-radius: 8px; padding: 12px; margin-top: 10px;">
                             <span class="detail-label" style="color: #3498db; font-weight: 700;">
-                              <i class="fas fa-database"></i> Local User
+                              <i class="fas fa-database"></i> مستخدم محلي
                             </span>
                             <span class="detail-value-wrap">
                               <span class="detail-value" style="color: #3498db; font-weight: 600; font-size: 14px;">
-                                This user is stored locally and cannot be edited through the admin panel
+                                هذا المستخدم مخزَّن محليًا ولا يمكن تعديله من خلال لوحة الإدارة
                               </span>
                             </span>
                         </div>
@@ -3066,7 +3066,7 @@
           
           const bannedUsers = await response.json();
           
-          // Ensure bannedUsers is an array
+          
           if (!Array.isArray(bannedUsers)) {
             console.error("API returned non-array response:", bannedUsers);
             throw new Error("Invalid response format from server");
@@ -3307,10 +3307,10 @@
       }
 
       async function deleteUser(userId, username) {
-        // Check if user is admin or local user before attempting deletion
+        
         const user = allUsers.find((u) => u._id === userId);
         if (user) {
-          // Check if trying to delete own account
+          
           if (currentAdminUsername && user.username.toLowerCase() === currentAdminUsername.toLowerCase()) {
             Swal.fire({
               title: "غير مسموح!",
@@ -3322,7 +3322,7 @@
             return;
           }
           
-          // Check if user is an admin
+          
           if (user.role === "admin" || user.role === "leadadmin") {
             Swal.fire({
               title: "غير مسموح!",
@@ -3334,7 +3334,7 @@
             return;
           }
           
-          // Check if user is local
+          
           if (user._isLocal === true) {
             Swal.fire({
               title: "غير مسموح!",
@@ -3390,7 +3390,7 @@
               const errorData = await response.json().catch(() => ({}));
               const errorMessage = errorData.message || "فشل حذف المستخدم";
               
-              // Check for specific error messages
+              
               if (errorMessage.includes("contact carl") || errorMessage.includes("تواصل مع كارل") || errorMessage.includes("حسابك الخاص")) {
                 Swal.fire({
                   title: "غير مسموح!",

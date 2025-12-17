@@ -3,7 +3,7 @@
     "version": "1.0",
     "createdAt": "2025-12-17T19:27:09.873Z",
     "lastModified": "2025-12-17T19:27:09.873Z",
-    "totalUsers": 1,
+    "totalUsers": 100,
     "checksum": null
   },
   "users": [
@@ -25,6 +25,86 @@
       "createdAt": "2025-12-16T23:42:34.992Z",
       "reviewedAt": "2025-12-16T23:43:14.075Z",
       "reviewedBy": "carlmounir",
+      "_isLocal": true
+    },
+    {
+      "_id": "user001",
+      "username": "User 1",
+      "password": "$2b$10$zxiU2WLKP1t62Ld0ObHpNOeIvk80iGOPAYQIn/qAwQtCty2vjQss6",
+      "firstName": "User",
+      "secondName": "1",
+      "email": "user1@test.com",
+      "phone": "01000000001",
+      "grade": "prep1",
+      "role": "student",
+      "approvalStatus": "approved",
+      "_isLocal": true
+    },
+    {
+      "_id": "user002",
+      "username": "User 2",
+      "password": "$2b$10$zxiU2WLKP1t62Ld0ObHpNOeIvk80iGOPAYQIn/qAwQtCty2vjQss6",
+      "firstName": "User",
+      "secondName": "2",
+      "email": "user2@test.com",
+      "phone": "01000000002",
+      "grade": "prep2",
+      "role": "student",
+      "approvalStatus": "approved",
+      "_isLocal": true
+    },
+    {
+      "_id": "user003",
+      "username": "User 3",
+      "password": "$2b$10$zxiU2WLKP1t62Ld0ObHpNOeIvk80iGOPAYQIn/qAwQtCty2vjQss6",
+      "firstName": "User",
+      "secondName": "3",
+      "email": "user3@test.com",
+      "phone": "01000000003",
+      "grade": "prep3",
+      "role": "student",
+      "approvalStatus": "approved",
+      "_isLocal": true
+    },
+    {
+      "_id": "user004",
+      "username": "User 4",
+      "password": "$2b$10$zxiU2WLKP1t62Ld0ObHpNOeIvk80iGOPAYQIn/qAwQtCty2vjQss6",
+      "firstName": "User",
+      "secondName": "4",
+      "email": "user4@test.com",
+      "phone": "01000000004",
+      "grade": "sec1",
+      "role": "student",
+      "approvalStatus": "approved",
+      "_isLocal": true
+    },
+
+    {
+      "_id": "user005",
+      "username": "User 5",
+      "password": "$2b$10$zxiU2WLKP1t62Ld0ObHpNOeIvk80iGOPAYQIn/qAwQtCty2vjQss6",
+      "firstName": "User",
+      "secondName": "5",
+      "email": "user5@test.com",
+      "phone": "01000000005",
+      "grade": "sec2",
+      "role": "student",
+      "approvalStatus": "approved",
+      "_isLocal": true
+    },
+
+    {
+      "_id": "user100",
+      "username": "User 100",
+      "password": "$2b$10$zxiU2WLKP1t62Ld0ObHpNOeIvk80iGOPAYQIn/qAwQtCty2vjQss6",
+      "firstName": "User",
+      "secondName": "100",
+      "email": "user100@test.com",
+      "phone": "01000000100",
+      "grade": "sec3",
+      "role": "student",
+      "approvalStatus": "approved",
       "_isLocal": true
     }
   ]

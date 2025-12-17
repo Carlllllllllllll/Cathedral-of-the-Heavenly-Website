@@ -666,16 +666,14 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .leaderboard-table td:last-child {
-            border-right: none;
-        }
-        
         .leaderboard-table th {
             border-right: 1px solid rgba(255, 255, 255, 0.2);
         }
+
         
-        .leaderboard-table th:last-child {
-            border-right: none;
+        .leaderboard-table td:nth-child(5),
+        .leaderboard-table th:nth-child(5) {
+            border-right: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .leaderboard-table td:first-child {
@@ -1391,7 +1389,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js" defer></script>
-    <script src="/notifications.js" defer></script>
+    <script src="/scripts/notifications.js" defer></script>
     <script>
         const mobileToggle = document.getElementById("mobileToggle");
         const sidebar = document.getElementById("sidebar");
@@ -1586,7 +1584,7 @@
                 });
             }
 
-            // Hide all rows first
+            
             rows.forEach(row => row.style.display = "none");
 
             if (visibleRows.length === 0) {
@@ -1610,7 +1608,7 @@
                 return;
             }
 
-            // Remove empty state if exists
+            
             const wrapper = document.querySelector(".leaderboard-table-wrapper");
             if (wrapper) {
                 const emptyState = wrapper.querySelector(".empty-state");
@@ -1619,7 +1617,7 @@
                 }
             }
 
-            // Show filtered rows
+            
             if (leaderboardTable) {
                 leaderboardTable.style.display = "table";
             }

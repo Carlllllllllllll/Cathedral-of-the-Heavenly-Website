@@ -87,6 +87,11 @@
   color: var(--accent);
 }
 
+.grades-toggle,
+.section-toggle {
+  cursor: pointer;
+}
+
 .nav-link.active {
   background: linear-gradient(90deg, var(--accent), #ffd700);
   color: var(--dark);
