@@ -178,8 +178,34 @@ const staticAssetOptions = {
   lastModified: true,
   immutable: process.env.NODE_ENV === "production",
   maxAge: process.env.NODE_ENV === "production" ? "365d" : "1d",
-  setHeaders: (res, path) => {
-    if (path.match(/\.(jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|css|js)$/)) {
+  setHeaders: (res, filePath) => {
+    // Set proper MIME types
+    if (filePath.match(/\.css$/i)) {
+      res.setHeader("Content-Type", "text/css; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (filePath.match(/\.js$/i)) {
+      res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (filePath.match(/\.(jpg|jpeg)$/i)) {
+      res.setHeader("Content-Type", "image/jpeg");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (filePath.match(/\.png$/i)) {
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (filePath.match(/\.gif$/i)) {
+      res.setHeader("Content-Type", "image/gif");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (filePath.match(/\.svg$/i)) {
+      res.setHeader("Content-Type", "image/svg+xml");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (filePath.match(/\.ico$/i)) {
+      res.setHeader("Content-Type", "image/x-icon");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (filePath.match(/\.(woff|woff2)$/i)) {
+      res.setHeader("Content-Type", filePath.match(/\.woff2$/i) ? "font/woff2" : "font/woff");
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (filePath.match(/\.(ttf|eot)$/i)) {
+      res.setHeader("Content-Type", filePath.match(/\.ttf$/i) ? "font/ttf" : "application/vnd.ms-fontobject");
       res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
     }
   },
@@ -267,6 +293,27 @@ const loginLimiter = rateLimit({
   message: {
     success: false,
     message: "Too many login attempts. Try again later.",
+  },
+});
+
+// Strict rate limiter for admin endpoints - prevents brute force and abuse
+const adminApiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // Maximum 10 requests per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests. Please slow down.",
+  },
+  keyGenerator: (req) => {
+    // Use both IP and username for rate limiting
+    return `${req.ip}-${req.session?.username || 'anonymous'}`;
+  },
+  skip: (req) => {
+    // Only skip for verified leadadmins
+    const user = req.session?.role;
+    return user === "leadadmin";
   },
 });
 
@@ -4368,7 +4415,169 @@ app.get(
   "/api/admin/users",
   requireAuth,
   requireRole(["admin", "leadadmin"]),
+  adminApiLimiter,
   async (req, res) => {
+    // CRITICAL SECURITY: Multiple layers of verification
+    // Layer 1: Session validation (already done by requireAuth)
+    if (!req.session || !req.session.isAuthenticated) {
+      await sendWebhook("SECURITY", {
+        embeds: [
+          {
+            title: "🚨 CRITICAL: Unauthorized API Access Attempt",
+            color: 0xe74c3c,
+            fields: [
+              { name: "Endpoint", value: "/api/admin/users", inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+              { name: "User-Agent", value: req.get("user-agent") || "unknown", inline: false },
+              { name: "Reason", value: "No authenticated session", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Layer 2: Verify user exists and get from database (not just session)
+    const sessionUsername = req.session.username;
+    if (!sessionUsername) {
+      await sendWebhook("SECURITY", {
+        embeds: [
+          {
+            title: "🚨 CRITICAL: Invalid Session - No Username",
+            color: 0xe74c3c,
+            fields: [
+              { name: "Endpoint", value: "/api/admin/users", inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+              { name: "Session ID", value: req.sessionID || "none", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Layer 3: Get user from database to verify role (defense in depth)
+    let dbUser = null;
+    try {
+      const normalizedUsername = sessionUsername.toLowerCase();
+      // Check MongoDB first
+      dbUser = await UserRegistration.findOne({ username: normalizedUsername }).lean();
+      // If not in MongoDB, check local store
+      if (!dbUser) {
+        const localUsers = await localUserStore.find({ username: normalizedUsername });
+        if (localUsers && localUsers.length > 0) {
+          dbUser = localUsers[0];
+        }
+      }
+      // If still not found, check env users
+      if (!dbUser) {
+        dbUser = users[sessionUsername] || users[normalizedUsername];
+      }
+    } catch (error) {
+      await sendWebhook("SECURITY", {
+        embeds: [
+          {
+            title: "🚨 CRITICAL: Database Error During Auth Check",
+            color: 0xe74c3c,
+            fields: [
+              { name: "Endpoint", value: "/api/admin/users", inline: true },
+              { name: "Username", value: sessionUsername, inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+              { name: "Error", value: error.message, inline: false },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      return res.status(500).json({ error: "Internal server error" });
+    }
+
+    // Layer 4: Verify user exists
+    if (!dbUser) {
+      await sendWebhook("SECURITY", {
+        embeds: [
+          {
+            title: "🚨 CRITICAL: User Not Found in Database",
+            color: 0xe74c3c,
+            fields: [
+              { name: "Endpoint", value: "/api/admin/users", inline: true },
+              { name: "Session Username", value: sessionUsername, inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+              { name: "Reason", value: "User does not exist in database", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    // Layer 5: Verify role from database (not just session)
+    const userRole = dbUser.role || req.session.role;
+    if (userRole !== "admin" && userRole !== "leadadmin") {
+      await sendWebhook("SECURITY", {
+        embeds: [
+          {
+            title: "🚨 CRITICAL: Unauthorized Role Access Attempt",
+            color: 0xe74c3c,
+            fields: [
+              { name: "Endpoint", value: "/api/admin/users", inline: true },
+              { name: "Username", value: sessionUsername, inline: true },
+              { name: "User Role", value: userRole || "none", inline: true },
+              { name: "Session Role", value: req.session.role || "none", inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+              { name: "Required Roles", value: "admin, leadadmin", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    // Layer 6: Verify active session ownership
+    try {
+      const sessionValid = await validateActiveSessionOwnership(req, res);
+      if (!sessionValid) {
+        await sendWebhook("SECURITY", {
+          embeds: [
+            {
+              title: "🚨 CRITICAL: Invalid Session Ownership",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Endpoint", value: "/api/admin/users", inline: true },
+                { name: "Username", value: sessionUsername, inline: true },
+                { name: "IP", value: req.ip || "unknown", inline: true },
+                { name: "Session ID", value: req.sessionID || "none", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res.status(403).json({ error: "Access denied" });
+      }
+    } catch (error) {
+      await sendWebhook("SECURITY", {
+        embeds: [
+          {
+            title: "🚨 CRITICAL: Session Validation Error",
+            color: 0xe74c3c,
+            fields: [
+              { name: "Endpoint", value: "/api/admin/users", inline: true },
+              { name: "Username", value: sessionUsername, inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+              { name: "Error", value: error.message, inline: false },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    // All security checks passed - proceed with request
     try {
       const { grade } = req.query;
 
@@ -4378,8 +4587,8 @@ app.get(
             title: "👥 Admin Fetching Users",
             color: 0x3498db,
             fields: [
-              { name: "Admin", value: req.session.username, inline: true },
-              { name: "Role", value: req.session.role, inline: true },
+              { name: "Admin", value: sessionUsername, inline: true },
+              { name: "Role", value: userRole, inline: true },
               { name: "Grade Filter", value: grade || "all", inline: true },
               { name: "Endpoint", value: "/api/admin/users", inline: true },
               { name: "IP", value: req.ip || "unknown", inline: true },
@@ -4446,7 +4655,7 @@ app.get(
             title: "✅ Admin Fetched Users",
             color: 0x10b981,
             fields: [
-              { name: "Admin", value: req.session.username, inline: true },
+              { name: "Admin", value: sessionUsername, inline: true },
               {
                 name: "Users Found",
                 value: usersWithPoints.length.toString(),
@@ -4468,27 +4677,29 @@ app.get(
 
       res.json(usersWithPoints);
     } catch (error) {
+      // Log error but don't leak sensitive information
       await sendWebhook("ERROR", {
         embeds: [
           {
             title: "❌ Fetch Users Error",
             color: 0xe74c3c,
             fields: [
-              { name: "Admin", value: req.session.username },
-              { name: "Error", value: error.message },
+              { name: "Admin", value: sessionUsername || "unknown", inline: true },
+              { name: "Error Type", value: error.name || "Unknown", inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
               {
-                name: "Stack Trace",
-                value: error.stack?.substring(0, 500) || "No stack",
+                name: "Error Message",
+                value: error.message?.substring(0, 200) || "Unknown error",
                 inline: false,
               },
-              { name: "IP", value: req.ip || "unknown", inline: true },
             ],
             timestamp: new Date().toISOString(),
           },
         ],
       });
-      // Always return an array, even on error
-      res.status(500).json([]);
+      // Return generic error - don't leak stack traces or internal details
+      console.error(`[SECURITY] Error in /api/admin/users for ${sessionUsername}:`, error);
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 );
@@ -5015,7 +5226,7 @@ app.put(
         });
         return res.status(403).json({
           success: false,
-          message: "Please contact carl to edit this user",
+          message: "يرجى التواصل مع كارل لتعديل هذا المستخدم",
         });
       }
 
@@ -5030,7 +5241,7 @@ app.put(
       } else {
         return res.status(403).json({
           success: false,
-          message: "Please contact carl to edit this user",
+          message: "يرجى التواصل مع كارل لتعديل هذا المستخدم",
         });
       }
       
@@ -5336,7 +5547,7 @@ app.delete(
         });
         return res.status(403).json({
           success: false,
-          message: "Please contact carl to delete this user",
+          message: "يرجى التواصل مع كارل لحذف هذا المستخدم",
         });
       }
 
@@ -5378,7 +5589,7 @@ app.delete(
         // This should not happen due to earlier check, but safety check
         return res.status(403).json({
           success: false,
-          message: "Please contact carl to delete this user",
+          message: "يرجى التواصل مع كارل لحذف هذا المستخدم",
         });
       }
       const pointsDoc = await UserPoints.findOne({
@@ -11961,6 +12172,9 @@ class DatabaseBackup {
           collection.name !== "sessions"
       );
 
+      // Add local user registrations as a separate "collection"
+      this.allCollections.push({ name: "userregistrations_local", isLocal: true });
+
       if (this.allCollections.length > this.MAX_COLLECTIONS_PER_BACKUP) {
         console.log(
           `[BACKUP] Limiting to ${this.MAX_COLLECTIONS_PER_BACKUP} collections per backup cycle`
@@ -12009,7 +12223,13 @@ class DatabaseBackup {
     }
 
     const collection = this.allCollections[this.currentCollectionIndex];
-    await this.backupCollection(db, collection.name);
+    
+    // Check if this is a local collection
+    if (collection.isLocal && collection.name === "userregistrations_local") {
+      await this.backupLocalUserRegistrations();
+    } else {
+      await this.backupCollection(db, collection.name);
+    }
   }
 
   async backupCollection(db, collectionName) {
@@ -12289,6 +12509,273 @@ class DatabaseBackup {
 
       this.currentCollectionIndex++;
       await this.delay(5000);
+      this.isBackupRunning = false;
+      this.backupDatabase();
+    }
+  }
+
+  async backupLocalUserRegistrations() {
+    const collectionName = "userregistrations_local";
+    console.log(`[BACKUP] Backing up Local Collection: ${collectionName}`);
+    
+    await sendWebhook("DATABASE", {
+      embeds: [
+        {
+          title: `📂 Backing up: ${collectionName}`,
+          color: 0xf39c12,
+          fields: [
+            { name: "Collection", value: collectionName, inline: true },
+            {
+              name: "Type",
+              value: "Local JSON File",
+              inline: true,
+            },
+            {
+              name: "Progress",
+              value: `${this.currentCollectionIndex + 1}/${
+                this.allCollections.length
+              }`,
+              inline: true,
+            },
+            { name: "Status", value: "Starting", inline: true },
+          ],
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    });
+
+    try {
+      const localUsers = await localUserStore.readAll();
+      const count = localUsers.length;
+
+      if (count === 0) {
+        this.collectionStats.push({
+          name: collectionName,
+          documents: 0,
+          chunks: 0,
+          size: 0,
+          status: "empty",
+        });
+
+        console.log(`[BACKUP] ${collectionName}: Empty collection`);
+
+        await sendWebhook("DATABASE", {
+          embeds: [
+            {
+              title: `📂 ${collectionName} - Empty`,
+              color: 0x95a5a6,
+              fields: [
+                { name: "Status", value: "Empty collection", inline: true },
+                { name: "Documents", value: "0", inline: true },
+                {
+                  name: "Progress",
+                  value: `${this.currentCollectionIndex + 1}/${
+                    this.allCollections.length
+                  }`,
+                  inline: true,
+                },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+
+        this.currentCollectionIndex++;
+        await this.delay(2000);
+        this.isBackupRunning = false;
+        this.backupDatabase();
+        return;
+      }
+
+      const jsonData = JSON.stringify(localUsers, null, 2);
+      const chunks = [];
+      
+      // Split into chunks if needed
+      if (jsonData.length > this.CHUNK_SIZE * 100) {
+        // If data is very large, split by users
+        const usersPerChunk = Math.ceil(count / Math.ceil(jsonData.length / (this.CHUNK_SIZE * 100)));
+        for (let i = 0; i < localUsers.length; i += usersPerChunk) {
+          const chunk = localUsers.slice(i, i + usersPerChunk);
+          chunks.push(JSON.stringify(chunk, null, 2));
+        }
+      } else {
+        chunks.push(jsonData);
+      }
+
+      console.log(
+        `[BACKUP] ${collectionName}: ${count} total documents, ${chunks.length} parts`
+      );
+
+      this.collectionStats.push({
+        name: collectionName,
+        documents: count,
+        chunks: chunks.length,
+        size: jsonData.length,
+        status: "backing_up",
+      });
+
+      await sendWebhook("DATABASE", {
+        embeds: [
+          {
+            title: `📂 ${collectionName} - Backup Started`,
+            color: 0x3498db,
+            fields: [
+              { name: "Collection", value: collectionName, inline: true },
+              { name: "Documents", value: count.toString(), inline: true },
+              { name: "Chunks", value: chunks.length.toString(), inline: true },
+              {
+                name: "Size",
+                value: `${(jsonData.length / 1024).toFixed(2)} KB`,
+                inline: true,
+              },
+              {
+                name: "Progress",
+                value: `${this.currentCollectionIndex + 1}/${
+                  this.allCollections.length
+                }`,
+                inline: true,
+              },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+
+      for (let i = 0; i < chunks.length; i++) {
+        const chunkNumber = i + 1;
+        const message = `\`\`\`json\n${chunks[i]}\n\`\`\``;
+
+        try {
+          await sendWebhook("DATABASE", {
+            content: `**${collectionName}** - Chunk ${chunkNumber}/${chunks.length}\n${message}`,
+          });
+
+          console.log(
+            `[BACKUP] ${collectionName}: Sent chunk ${chunkNumber}/${chunks.length}`
+          );
+
+          if (chunkNumber < chunks.length) {
+            await this.delay(this.CHUNK_DELAY_MS);
+          }
+        } catch (webhookErr) {
+          if (webhookErr.response?.status === 429) {
+            const retryAfter =
+              parseInt(webhookErr.response.headers["retry-after"]) || 30;
+            console.log(
+              `[BACKUP] Rate limited, waiting ${retryAfter} seconds...`
+            );
+
+            await sendWebhook("ERROR", {
+              embeds: [
+                {
+                  title: "⚠️ Backup Rate Limited",
+                  color: 0xf59e0b,
+                  fields: [
+                    { name: "Collection", value: collectionName },
+                    { name: "Chunk", value: `${chunkNumber}/${chunks.length}` },
+                    { name: "Wait Time", value: `${retryAfter} seconds` },
+                    { name: "Will Retry", value: "Yes" },
+                  ],
+                  timestamp: new Date().toISOString(),
+                },
+              ],
+            });
+
+            await this.delay(retryAfter * 1000 + 1000);
+
+            await sendWebhook("DATABASE", {
+              content: `**${collectionName}** - Chunk ${chunkNumber}/${chunks.length} (Retry)\n${message}`,
+            });
+          } else {
+            throw webhookErr;
+          }
+        }
+      }
+
+      await sendWebhook("DATABASE", {
+        embeds: [
+          {
+            title: `✅ ${collectionName} - Backup Complete`,
+            color: 0x10b981,
+            fields: [
+              { name: "Collection", value: collectionName, inline: true },
+              { name: "Documents", value: count.toString(), inline: true },
+              { name: "Chunks", value: chunks.length.toString(), inline: true },
+              {
+                name: "Size",
+                value: `${(jsonData.length / 1024).toFixed(2)} KB`,
+                inline: true,
+              },
+              {
+                name: "Progress",
+                value: `${this.currentCollectionIndex + 1}/${
+                  this.allCollections.length
+                }`,
+                inline: true,
+              },
+              {
+                name: "Status",
+                value: "✅ Complete",
+                inline: true,
+              },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+
+      const statsIndex = this.collectionStats.findIndex((s) => s.name === collectionName);
+      if (statsIndex !== -1) {
+        this.collectionStats[statsIndex].status = "success";
+      }
+
+      console.log(
+        `[BACKUP] ${collectionName} completed, next collection in 5 seconds...`
+      );
+
+      this.currentCollectionIndex++;
+      await this.delay(this.COLLECTION_DELAY_MS);
+      this.isBackupRunning = false;
+      this.backupDatabase();
+    } catch (err) {
+      console.error(`[BACKUP ERROR] ${collectionName}:`, err.message);
+
+      const statsIndex = this.collectionStats.findIndex((s) => s.name === collectionName);
+      if (statsIndex !== -1) {
+        this.collectionStats[statsIndex].status = "failed";
+      } else {
+        this.collectionStats.push({
+          name: collectionName,
+          documents: 0,
+          chunks: 0,
+          size: 0,
+          status: "failed",
+        });
+      }
+
+      await sendWebhook("ERROR", {
+        embeds: [
+          {
+            title: `❌ ${collectionName} - Backup Failed`,
+            color: 0xe74c3c,
+            fields: [
+              { name: "Collection", value: collectionName, inline: true },
+              { name: "Error", value: err.message, inline: false },
+              {
+                name: "Progress",
+                value: `${this.currentCollectionIndex + 1}/${
+                  this.allCollections.length
+                }`,
+                inline: true,
+              },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+
+      this.currentCollectionIndex++;
+      await this.delay(this.COLLECTION_DELAY_MS);
       this.isBackupRunning = false;
       this.backupDatabase();
     }
@@ -13171,6 +13658,18 @@ app.use(async (err, req, res, next) => {
 });
 
 app.use(async (req, res) => {
+  // Handle 404 for static file requests with proper MIME types
+  const staticFileExtensions = /\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|json|xml|pdf|zip)$/i;
+  if (staticFileExtensions.test(req.path)) {
+    // Set appropriate Content-Type even for 404 responses
+    if (req.path.match(/\.css$/i)) {
+      res.setHeader("Content-Type", "text/css; charset=utf-8");
+    } else if (req.path.match(/\.js$/i)) {
+      res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+    }
+    return res.status(404).send("/* File not found */");
+  }
+
   await sendWebhook("USER", {
     embeds: [
       {

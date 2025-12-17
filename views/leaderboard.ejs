@@ -623,127 +623,133 @@
             border-color: rgba(255, 204, 0, 0.22);
         }
 
-        .leaderboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 25px;
+        .leaderboard-table-wrapper {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            overflow-x: auto;
             margin-top: 20px;
         }
 
-        .leaderboard-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            transition: all var(--transition-speed);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
         }
 
-        .leaderboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border-color: var(--accent);
+        .leaderboard-table thead {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.2), rgba(255, 204, 0, 0.1));
+            border-bottom: 2px solid var(--accent);
         }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .rank-badge {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--accent), #ffd700);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--dark);
-            flex-shrink: 0;
-        }
-
-        .card-info {
-            flex-grow: 1;
-        }
-
-        .card-info h3 {
-            font-size: 18px;
+        .leaderboard-table th {
+            padding: 18px 20px;
+            text-align: right;
             font-weight: 700;
-            color: var(--light);
-            margin-bottom: 5px;
+            font-size: 16px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(255, 204, 0, 0.3);
         }
 
-        .username {
-            font-size: 14px;
-            color: #bdc3c7;
-            background: rgba(52, 73, 94, 0.5);
-            padding: 3px 10px;
-            border-radius: 12px;
-            display: inline-block;
-        }
-
-        .grade-badge {
-            padding: 5px 15px;
-            background: rgba(52, 152, 219, 0.2);
-            color: #3498db;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .card-details {
-            display: grid;
-            gap: 12px;
-        }
-
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-        }
-
-        .detail-label {
-            font-size: 12px;
-            color: #95a5a6;
-            font-weight: 600;
-        }
-
-        .detail-value {
-            font-size: 14px;
-            color: var(--light);
-            font-weight: 500;
-        }
-
-        .score-display {
-            padding: 12px;
-            background: rgba(255, 204, 0, 0.1);
-            border-radius: 8px;
+        .leaderboard-table th:first-child {
             text-align: center;
-            border: 1px solid rgba(255, 204, 0, 0.3);
+            width: 80px;
         }
 
-        .score-value {
+        .leaderboard-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: rgba(255, 204, 0, 0.08);
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .leaderboard-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-table td {
+            padding: 20px;
+            text-align: right;
+            color: var(--text);
+            font-size: 15px;
+            vertical-align: middle;
+        }
+
+        .leaderboard-table td:first-child {
+            text-align: center;
+        }
+
+        .rank-cell {
             font-size: 24px;
             font-weight: 800;
             color: var(--accent);
-            margin-bottom: 5px;
+            text-shadow: 0 2px 8px rgba(255, 204, 0, 0.3);
         }
 
-        .score-label {
-            font-size: 12px;
+        .rank-cell.rank-1 {
+            color: #ffd700;
+            font-size: 28px;
+        }
+
+        .rank-cell.rank-2 {
+            color: #c0c0c0;
+            font-size: 26px;
+        }
+
+        .rank-cell.rank-3 {
+            color: #cd7f32;
+            font-size: 26px;
+        }
+
+        .user-name-cell {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--light);
+        }
+
+        .username-cell {
+            font-size: 13px;
             color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .grade-cell {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .score-cell {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .time-cell {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .podium-row {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.15), rgba(255, 204, 0, 0.05)) !important;
+        }
+
+        .podium-row:hover {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.25), rgba(255, 204, 0, 0.15)) !important;
         }
 
         .empty-state {
@@ -819,8 +825,13 @@
                 justify-content: center;
             }
 
-            .leaderboard-grid {
-                grid-template-columns: 1fr;
+            .leaderboard-table-wrapper {
+                padding: 15px;
+                overflow-x: auto;
+            }
+
+            .leaderboard-table {
+                min-width: 600px;
             }
 
             .leaderboard-header {
@@ -865,20 +876,18 @@
         }
 
         @media (max-width: 480px) {
-            .card-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 12px 8px;
+                font-size: 13px;
             }
 
-            .grade-badge {
-                align-self: center;
+            .rank-cell {
+                font-size: 20px;
             }
 
-            .detail-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
+            .user-name-cell {
+                font-size: 14px;
             }
         }
 
@@ -1338,44 +1347,44 @@
                 </button>
             </div>
 
-            <div id="leaderboardList" class="leaderboard-grid">
+            <div class="leaderboard-table-wrapper">
                 <% if (participantCount) { %>
-                    <% let currentRank = 1; let lastScore = null; for (let index = 0; index < leaderboardEntries.length; index++) { const entry = leaderboardEntries[index]; const scoreValue = typeof entry.score === 'number' ? entry.score : 0; const formattedScore = scoreValue + '/' + questionCount; if (scoreValue !== lastScore) { currentRank = index + 1; lastScore = scoreValue; } %>
-                    <div class="leaderboard-card" data-grade="<%= entry.grade || '' %>" data-date="<%= entry.submissionTime || '' %>">
-                        <div class="card-header">
-                            <div class="rank-badge">
-                                <%= currentRank %>
-                            </div>
-                            <div class="card-info">
-                                <h3>
-                                    <%= entry.username || entry.displayName || 'غير معروف' %>
-                                </h3>
-                                <span class="username">
-                                    <%= entry.username || '—' %>
-                                </span>
-                            </div>
-                            <span class="grade-badge">
-                                <%= entry.grade || '—' %>
-                            </span>
-                        </div>
-                        
-                        <div class="card-details">
-                            <div class="detail-item">
-                                <span class="detail-label">النقاط:</span>
-                                <span class="detail-value"><%= formattedScore %></span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">وقت الإرسال:</span>
-                                <span class="detail-value"><%= entry.submissionTime || 'غير متاح' %></span>
-                            </div>
-                        </div>
-                        
-                        <div class="score-display">
-                            <div class="score-value"><%= scoreValue %>/<%= questionCount %></div>
-                            <div class="score-label">مجموع النقاط</div>
-                        </div>
-                    </div>
-                    <% } %>
+                    <table class="leaderboard-table" id="leaderboardTable">
+                        <thead>
+                            <tr>
+                                <th>الترتيب</th>
+                                <th>الاسم</th>
+                                <th>اسم المستخدم</th>
+                                <th>الصف</th>
+                                <th>النقاط</th>
+                                <th>وقت الإرسال</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardList">
+                            <% let currentRank = 1; let lastScore = null; for (let index = 0; index < leaderboardEntries.length; index++) { const entry = leaderboardEntries[index]; const scoreValue = typeof entry.score === 'number' ? entry.score : 0; const formattedScore = scoreValue + '/' + questionCount; if (scoreValue !== lastScore) { currentRank = index + 1; lastScore = scoreValue; } const isPodium = currentRank <= 3; %>
+                            <tr class="leaderboard-row <%= isPodium ? 'podium-row' : '' %>" data-grade="<%= entry.grade || '' %>" data-date="<%= entry.submissionTime || '' %>" data-rank="<%= currentRank %>" data-username="<%= entry.username || '' %>" data-name="<%= entry.displayName || entry.username || 'غير معروف' %>" data-score="<%= scoreValue %>" data-time="<%= entry.submissionTime || 'غير متاح' %>">
+                                <td>
+                                    <span class="rank-cell rank-<%= currentRank %>"><%= currentRank %></span>
+                                </td>
+                                <td>
+                                    <div class="user-name-cell"><%= entry.displayName || entry.username || 'غير معروف' %></div>
+                                </td>
+                                <td>
+                                    <div class="username-cell"><%= entry.username || '—' %></div>
+                                </td>
+                                <td>
+                                    <span class="grade-cell"><%= entry.grade || '—' %></span>
+                                </td>
+                                <td>
+                                    <span class="score-cell"><%= formattedScore %></span>
+                                </td>
+                                <td>
+                                    <span class="time-cell"><%= entry.submissionTime || 'غير متاح' %></span>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
                 <% } else { %>
                     <div class="empty-state">
                         <i class="fas fa-trophy"></i>
@@ -1404,6 +1413,7 @@
         const filterDate = document.getElementById("filter-date");
         const refreshBtn = document.getElementById("refreshBtn");
         const leaderboardList = document.getElementById("leaderboardList");
+        const leaderboardTable = document.getElementById("leaderboardTable");
         const downloadPhoto = document.getElementById("downloadPhoto");
         const downloadExcel = document.getElementById("downloadExcel");
         const downloadPDF = document.getElementById("downloadPDF");
@@ -1565,6 +1575,7 @@
 
                 try {
                     const container = document.querySelector(".leaderboard-container");
+                    const formTopic = "<%= form.topic %>";
                     
                     const originalStyles = {
                         overflow: document.body.style.overflow,
@@ -1576,7 +1587,7 @@
                     container.style.maxWidth = "100%";
                     container.style.padding = "40px";
 
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await new Promise(resolve => setTimeout(resolve, 300));
 
                     const canvas = await html2canvas(container, {
                         backgroundColor: "#2a1b3c",
@@ -1586,15 +1597,20 @@
                         allowTaint: true,
                         foreignObjectRendering: true,
                         imageTimeout: 15000,
+                        windowWidth: container.scrollWidth,
+                        windowHeight: container.scrollHeight,
                         onclone: function(clonedDoc) {
                             const clonedContainer = clonedDoc.querySelector(".leaderboard-container");
-                            clonedContainer.style.fontFamily = "'Cairo', sans-serif";
-                            clonedContainer.style.direction = "rtl";
+                            if (clonedContainer) {
+                                clonedContainer.style.fontFamily = "'Cairo', sans-serif";
+                                clonedContainer.style.direction = "rtl";
+                                clonedContainer.style.width = "100%";
+                            }
                         }
                     });
 
                     const link = document.createElement("a");
-                    const fileName = "leaderboard-<%= form.topic %>.png".replace(/[^a-z0-9]/gi, "_");
+                    const fileName = ("leaderboard-" + formTopic + ".png").replace(/[^a-z0-9\u0600-\u06FF]/gi, "_");
                     link.download = fileName;
                     link.href = canvas.toDataURL("image/png", 1.0);
                     document.body.appendChild(link);
@@ -1637,43 +1653,63 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
 
                 try {
+                    // Get data from server-side variables embedded in the page
+                    const leaderboardData = <%- JSON.stringify(leaderboard) %>;
+                    const formTopic = "<%= form.topic %>";
+                    const questionCount = <%= questionCount %>;
+                    const bestScore = <%= bestScore %>;
+                    const averageScoreValue = <%= averageScoreValue.toFixed(1) %>;
+                    const participantCount = <%= participantCount %>;
+
                     const workbook = XLSX.utils.book_new();
                     workbook.Props = {
-                        Title: "لوحة الترتيب - <%= form.topic %>",
+                        Title: "لوحة الترتيب - " + formTopic,
                         Subject: "نتائج المشاركين",
                         Author: "كاتدرائية السمائيين",
                         CreatedDate: new Date()
                     };
 
+                    // Prepare worksheet data
                     const worksheetData = [
                         ["الترتيب", "اسم المستخدم", "الاسم المعروض", "الصف", "النقاط", "وقت الإرسال"]
                     ];
 
-                    const leaderboardEntries = Array.from(document.querySelectorAll(".leaderboard-card"));
-                    leaderboardEntries.forEach((card, index) => {
-                        const rank = card.querySelector(".rank-badge").textContent.trim();
-                        const username = card.querySelector(".username").textContent.trim();
-                        const name = card.querySelector("h3").textContent.trim();
-                        const grade = card.querySelector(".grade-badge").textContent.trim();
-                        const score = card.querySelector(".score-value").textContent.trim();
-                        const time = card.querySelector(".detail-item:nth-child(2) .detail-value").textContent.trim();
+                    let currentRank = 1;
+                    let lastScore = null;
+                    
+                    leaderboardData.forEach((entry, index) => {
+                        const scoreValue = typeof entry.score === 'number' ? entry.score : 0;
+                        if (scoreValue !== lastScore) {
+                            currentRank = index + 1;
+                            lastScore = scoreValue;
+                        }
                         
-                        worksheetData.push([rank, username, name, grade, score, time]);
+                        const formattedScore = scoreValue + '/' + questionCount;
+                        worksheetData.push([
+                            currentRank,
+                            entry.username || '—',
+                            entry.displayName || entry.username || 'غير معروف',
+                            entry.grade || '—',
+                            formattedScore,
+                            entry.submissionTime || 'غير متاح'
+                        ]);
                     });
 
+                    // Prepare stats data
                     const statsData = [
                         ["إحصائيات لوحة الترتيب"],
                         [],
                         ["المعيار", "القيمة"],
-                        ["أعلى نتيجة", "<%= bestScore %> / <%= questionCount || '—' %>"],
-                        ["متوسط الدرجات", "<%= averageScoreValue.toFixed(1) %> / <%= questionCount || '—' %>"],
-                        ["عدد المشاركات", "<%= participantCount %>"],
-                        ["موضوع النموذج", "<%= form.topic %>"]
+                        ["أعلى نتيجة", bestScore + " / " + (questionCount || '—')],
+                        ["متوسط الدرجات", averageScoreValue + " / " + (questionCount || '—')],
+                        ["عدد المشاركات", participantCount],
+                        ["موضوع النموذج", formTopic]
                     ];
 
                     const ws1 = XLSX.utils.aoa_to_sheet(worksheetData);
                     const ws2 = XLSX.utils.aoa_to_sheet(statsData);
 
+                    // Set column widths
                     const wscols1 = [
                         { wch: 10 },
                         { wch: 20 },
@@ -1693,13 +1729,21 @@
                     XLSX.utils.book_append_sheet(workbook, ws1, "المشاركين");
                     XLSX.utils.book_append_sheet(workbook, ws2, "الإحصائيات");
 
-                    const fileName = "leaderboard-<%= form.topic %>.xlsx".replace(/[^a-z0-9]/gi, "_");
+                    const fileName = ("leaderboard-" + formTopic + ".xlsx").replace(/[^a-z0-9\u0600-\u06FF]/gi, "_");
                     XLSX.writeFile(workbook, fileName);
 
-                    setTimeout(() => {
+                    Swal.fire({
+                        title: "تم التحميل بنجاح",
+                        text: "تم تحميل ملف Excel بنجاح",
+                        icon: "success",
+                        confirmButtonText: "حسناً",
+                        confirmButtonColor: "#27ae60",
+                        timer: 2000,
+                        timerProgressBar: true
+                    }).then(() => {
                         btn.disabled = false;
                         btn.innerHTML = '<i class="fas fa-file-excel"></i> تحميل Excel';
-                    }, 1000);
+                    });
 
                 } catch (error) {
                     console.error("Error generating Excel:", error);
@@ -1724,6 +1768,14 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
 
                 try {
+                    // Get data from server-side variables
+                    const leaderboardData = <%- JSON.stringify(leaderboard) %>;
+                    const formTopic = "<%= form.topic %>";
+                    const questionCount = <%= questionCount %>;
+                    const bestScore = <%= bestScore %>;
+                    const averageScoreValue = <%= averageScoreValue.toFixed(1) %>;
+                    const participantCount = <%= participantCount %>;
+
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({
                         orientation: "landscape",
@@ -1741,7 +1793,7 @@
                     doc.setFont("helvetica", "bold");
                     doc.setTextColor(255, 204, 0);
                     doc.setFontSize(24);
-                    doc.text("لوحة الترتيب - <%= form.topic %>", pageWidth / 2, 20, { align: "center" });
+                    doc.text("لوحة الترتيب - " + formTopic, pageWidth / 2, 20, { align: "center" });
 
                     doc.setFontSize(12);
                     doc.setTextColor(242, 244, 255);
@@ -1760,10 +1812,10 @@
                     
                     const stats = [
                         ["المعيار", "القيمة"],
-                        ["أعلى نتيجة", "<%= bestScore %> / <%= questionCount || '—' %>"],
-                        ["متوسط الدرجات", "<%= averageScoreValue.toFixed(1) %> / <%= questionCount || '—' %>"],
-                        ["عدد المشاركات", "<%= participantCount %>"],
-                        ["موضوع النموذج", "<%= form.topic %>"]
+                        ["أعلى نتيجة", bestScore + " / " + (questionCount || '—')],
+                        ["متوسط الدرجات", averageScoreValue + " / " + (questionCount || '—')],
+                        ["عدد المشاركات", participantCount],
+                        ["موضوع النموذج", formTopic]
                     ];
 
                     stats.forEach((row, index) => {
@@ -1783,11 +1835,11 @@
                     doc.setTextColor(242, 244, 255);
 
                     const headers = ["الترتيب", "اسم المستخدم", "الاسم المعروض", "الصف", "النقاط", "وقت الإرسال"];
+                    const colWidths = [15, 30, 35, 20, 20, 35];
+                    let xPos = 20;
                     headers.forEach((header, i) => {
-                        const x = 25 + (i * 30);
-                        if (x < pageWidth - 25) {
-                            doc.text(header, x, yPosition);
-                        }
+                        doc.text(header, xPos, yPosition);
+                        xPos += colWidths[i];
                     });
                     yPosition += 5;
 
@@ -1796,8 +1848,10 @@
                     doc.line(20, yPosition, pageWidth - 20, yPosition);
                     yPosition += 10;
 
-                    const leaderboardEntries = Array.from(document.querySelectorAll(".leaderboard-card"));
-                    leaderboardEntries.forEach((card, index) => {
+                    let currentRank = 1;
+                    let lastScore = null;
+                    
+                    leaderboardData.forEach((entry, index) => {
                         if (yPosition > pageHeight - 20) {
                             doc.addPage();
                             doc.setFillColor(42, 27, 60);
@@ -1805,31 +1859,46 @@
                             yPosition = 20;
                         }
 
-                        const rank = card.querySelector(".rank-badge").textContent.trim();
-                        const username = card.querySelector(".username").textContent.trim();
-                        const name = card.querySelector("h3").textContent.trim();
-                        const grade = card.querySelector(".grade-badge").textContent.trim();
-                        const score = card.querySelector(".score-value").textContent.trim();
-                        const time = card.querySelector(".detail-item:nth-child(2) .detail-value").textContent.trim();
+                        const scoreValue = typeof entry.score === 'number' ? entry.score : 0;
+                        if (scoreValue !== lastScore) {
+                            currentRank = index + 1;
+                            lastScore = scoreValue;
+                        }
 
-                        const rowData = [rank, username, name, grade, score, time];
+                        const formattedScore = scoreValue + '/' + questionCount;
+                        const rowData = [
+                            currentRank.toString(),
+                            entry.username || '—',
+                            entry.displayName || entry.username || 'غير معروف',
+                            entry.grade || '—',
+                            formattedScore,
+                            entry.submissionTime || 'غير متاح'
+                        ];
+
+                        xPos = 20;
                         rowData.forEach((cell, i) => {
-                            const x = 25 + (i * 30);
-                            if (x < pageWidth - 25) {
-                                doc.text(cell, x, yPosition);
-                            }
+                            doc.text(cell.toString(), xPos, yPosition);
+                            xPos += colWidths[i];
                         });
 
                         yPosition += 7;
                     });
 
-                    const fileName = "leaderboard-<%= form.topic %>.pdf".replace(/[^a-z0-9]/gi, "_");
+                    const fileName = ("leaderboard-" + formTopic + ".pdf").replace(/[^a-z0-9\u0600-\u06FF]/gi, "_");
                     doc.save(fileName);
 
-                    setTimeout(() => {
+                    Swal.fire({
+                        title: "تم التحميل بنجاح",
+                        text: "تم تحميل ملف PDF بنجاح",
+                        icon: "success",
+                        confirmButtonText: "حسناً",
+                        confirmButtonColor: "#27ae60",
+                        timer: 2000,
+                        timerProgressBar: true
+                    }).then(() => {
                         btn.disabled = false;
                         btn.innerHTML = '<i class="fas fa-file-pdf"></i> تحميل PDF';
-                    }, 1000);
+                    });
 
                 } catch (error) {
                     console.error("Error generating PDF:", error);
@@ -1850,31 +1919,42 @@
         function filterLeaderboard() {
             const gradeFilter = filterGrade.value;
             const dateFilter = filterDate.value;
-            const cards = document.querySelectorAll(".leaderboard-card");
+            const rows = document.querySelectorAll(".leaderboard-row");
 
-            let visibleCards = Array.from(cards);
+            let visibleRows = Array.from(rows);
 
             if (gradeFilter !== "all") {
-                visibleCards = visibleCards.filter(card => {
-                    const grade = card.dataset.grade;
+                visibleRows = visibleRows.filter(row => {
+                    const grade = row.dataset.grade;
                     return grade === gradeFilter;
                 });
             }
 
-            visibleCards.forEach(card => card.style.display = "none");
+            // Hide all rows first
+            rows.forEach(row => row.style.display = "none");
 
-            if (visibleCards.length === 0) {
-                leaderboardList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-search"></i>
-                        <h3>لا توجد نتائج</h3>
-                        <p>لا توجد نتائج تطابق معايير التصفية المحددة</p>
-                    </div>
-                `;
+            if (visibleRows.length === 0) {
+                if (leaderboardTable) {
+                    leaderboardTable.style.display = "none";
+                }
+                const wrapper = document.querySelector(".leaderboard-table-wrapper");
+                if (wrapper && !wrapper.querySelector(".empty-state")) {
+                    wrapper.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>لا توجد نتائج</h3>
+                            <p>لا توجد نتائج تطابق معايير التصفية المحددة</p>
+                        </div>
+                    `;
+                }
                 return;
             }
 
-            visibleCards.forEach(card => card.style.display = "flex");
+            // Show filtered rows
+            if (leaderboardTable) {
+                leaderboardTable.style.display = "table";
+            }
+            visibleRows.forEach(row => row.style.display = "table-row");
         }
 
         if (filterGrade) filterGrade.addEventListener("change", filterLeaderboard);
