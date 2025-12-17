@@ -10,7 +10,7 @@ class SecureUserRegistrationsStore {
     this.dbDir = path.join(__dirname);
     this.filePath = path.join(this.dbDir, "userregistrations.json");
     this.lockFilePath = path.join(this.dbDir, "userregistrations.lock");
-    this.maxFileSize = 50 * 1024 * 1024; e
+    this.maxFileSize = 50 * 1024 * 1024;
     this.writeQueue = [];
     this.isWriting = false;
     this.lastWriteTime = 0;
