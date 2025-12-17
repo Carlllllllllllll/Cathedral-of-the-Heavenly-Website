@@ -1,0 +1,3680 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
+    <meta
+      name="keywords"
+      content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)"
+    />
+    <meta name="author" content="كاتدرائية السمائيين" />
+    <meta name="theme-color" content="#402958" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>إدارة المستخدمين | كاتدرائية السمائيين</title>
+    <link rel="icon" href="/UI/icon.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/UI/icon.png" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <style>
+      :root {
+        --bg: radial-gradient(circle at top right, #402958, #2a1b3c 60%);
+        --panel-bg: rgba(64, 41, 88, 0.85);
+        --accent: #ffcc00;
+        --accent-soft: rgba(255, 204, 0, 0.12);
+        --text: #f2f4ff;
+        --muted: #d1c4e9;
+        --border: rgba(255, 255, 255, 0.15);
+        --primary: #402958;
+        --secondary: #2a1b3c;
+        --danger: #e74c3c;
+        --success: #27ae60;
+        --warning: #f39c12;
+        --info: #3498db;
+        --light: #f2f4ff;
+        --dark: #2a1b3c;
+        --sidebar-width: 280px;
+        --transition-speed: 0.3s;
+        --radius-lg: 28px;
+        --shadow: 0 25px 45px rgba(15, 20, 40, 0.12);
+        --shadow-lg: 0 35px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Cairo", sans-serif;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        direction: rtl;
+      }
+
+      .mobile-toggle {
+        display: none;
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 1001;
+        cursor: pointer;
+        padding: 8px;
+      }
+
+      .mobile-toggle span {
+        display: block;
+        width: 25px;
+        height: 3px;
+        background: var(--accent);
+        margin: 4px 0;
+        transition: var(--transition-speed);
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: var(--sidebar-width);
+        height: 100vh;
+        background: rgba(42, 27, 60, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 20px;
+        box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
+        transition: var(--transition-speed);
+        z-index: 1000;
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.05);
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 10px;
+      }
+
+      .sidebar::-webkit-scrollbar-thumb:hover {
+        background: #ffd700;
+      }
+
+      .sidebar-header {
+        margin-bottom: 20px;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .logo-container img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent);
+      }
+
+      .logo-text h1 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 5px;
+      }
+
+      .logo-text p {
+        font-size: 12px;
+        color: #bdc3c7;
+      }
+
+      .nav-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .nav-item {
+        margin-bottom: 4px;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        color: var(--light);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all var(--transition-speed);
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .nav-link i {
+        width: 20px;
+        text-align: center;
+        font-size: 18px;
+      }
+
+      .nav-link:hover {
+        background: rgba(52, 73, 94, 0.5);
+        transform: translateX(-5px);
+        color: var(--accent);
+      }
+
+      .nav-link.active {
+        background: linear-gradient(90deg, var(--accent), #ffd700);
+        color: var(--dark);
+        box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+      }
+
+      .logout-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(90deg, #e74c3c, #c0392b);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all var(--transition-speed);
+      }
+
+      .logout-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        min-height: 100vh;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      .top-nav {
+        position: sticky;
+        top: 16px;
+        z-index: 900;
+      }
+
+      @media (max-width: 992px) {
+        .top-nav {
+          top: 10px;
+        }
+      }
+
+      .top-nav {
+        background: var(--panel-bg);
+        backdrop-filter: blur(20px);
+        padding: 15px 30px;
+        border-radius: var(--radius-lg);
+        margin-bottom: 30px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent);
+        margin-left: 15px;
+      }
+
+      .user-details {
+        flex-grow: 1;
+      }
+
+      .user-details h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 5px;
+      }
+
+      .user-details span,
+      .role-badge {
+        font-size: 13px;
+        color: var(--accent);
+        background: linear-gradient(
+          135deg,
+          rgba(255, 204, 0, 0.15),
+          rgba(255, 204, 0, 0.08)
+        );
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 204, 0, 0.3);
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(255, 204, 0, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+      }
+
+      .user-details span:hover,
+      .role-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2);
+        background: linear-gradient(
+          135deg,
+          rgba(255, 204, 0, 0.2),
+          rgba(255, 204, 0, 0.12)
+        );
+      }
+
+      .logout-btn-mobile {
+        display: none;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+      }
+
+      .logout-btn-mobile:hover {
+        background: #c0392b;
+        transform: scale(1.1);
+      }
+
+      .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .admin-container h1 {
+        font-size: 32px;
+        margin-bottom: 30px;
+        color: var(--accent);
+        text-shadow: 0 2px 10px rgba(255, 204, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        text-align: center;
+      }
+
+      .user-management-tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin: 30px 0;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-box i {
+        position: absolute;
+        right: 15px;
+        color: #95a5a6;
+        font-size: 18px;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 12px 45px 12px 15px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: var(--light);
+        font-size: 16px;
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+      }
+
+      .clear-search {
+        position: absolute;
+        left: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #95a5a6;
+        cursor: pointer;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all var(--transition-speed);
+        display: none;
+      }
+
+      .clear-search:hover {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+      }
+
+      .tools-middle {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .category-nav {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 10px 5px;
+      }
+
+      .category-tab {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: var(--text);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 15px;
+      }
+
+      .category-tab:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .category-tab.active {
+        background: var(--accent);
+        color: var(--dark);
+        border-color: var(--accent);
+        box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+      }
+
+      .category-count {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .category-tab.active .category-count {
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--dark);
+      }
+
+      .view-toggles {
+        display: flex;
+        gap: 10px;
+      }
+
+      .toggle-btn {
+        padding: 12px 22px;
+        background: linear-gradient(90deg, var(--secondary), var(--primary));
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all var(--transition-speed);
+        white-space: nowrap;
+        will-change: transform;
+        min-height: 44px;
+      }
+
+      .toggle-btn i {
+        transition: transform 0.35s ease;
+      }
+
+      .toggle-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+        border-color: rgba(255, 204, 0, 0.22);
+      }
+
+      .toggle-btn:hover i {
+        transform: rotate(180deg);
+      }
+
+      .toggle-btn:active {
+        transform: translateY(0);
+      }
+
+      .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
+      }
+
+      .user-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 30px;
+        transition: all var(--transition-speed);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .user-card.banned {
+        border-color: rgba(231, 76, 60, 0.5);
+      }
+
+      .user-card.banned:hover {
+        border-color: #e74c3c;
+      }
+
+      .user-card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .user-avatar-large {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 204, 0, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: var(--accent);
+      }
+
+      .banned-avatar {
+        background: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+      }
+
+      .user-main-info {
+        flex-grow: 1;
+      }
+
+      .user-main-info h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--light);
+        margin-bottom: 8px;
+      }
+
+      .user-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .username-badge,
+      .role-badge,
+      .grade-badge,
+      .ban-type-badge,
+      .ban-date,
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .username-badge {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+      }
+
+      .role-badge {
+        background: rgba(155, 89, 182, 0.2);
+        color: #9b59b6;
+      }
+
+      .role-badge.leadadmin {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+      }
+
+      .role-badge.admin {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+      }
+
+      .role-badge.teacher {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+      }
+
+      .role-badge.student {
+        background: rgba(41, 128, 185, 0.2);
+        color: #2980b9;
+      }
+
+      .grade-badge {
+        background: rgba(243, 156, 18, 0.2);
+        color: #f39c12;
+      }
+
+      .ban-type-badge {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+      }
+
+      .ban-date {
+        background: rgba(149, 165, 166, 0.2);
+        color: #95a5a6;
+      }
+
+      .user-points {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 15px;
+        background: rgba(241, 196, 15, 0.1);
+        border-radius: 20px;
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .user-points i {
+        font-size: 16px;
+      }
+
+      .user-status {
+        display: flex;
+        align-items: center;
+      }
+
+      .banned-badge {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+      }
+
+      .user-card-details {
+        display: grid;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .detail-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .detail-value-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        min-width: 0;
+        width: 100%;
+      }
+
+      .copy-btn {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: var(--accent);
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-speed);
+        flex: 0 0 auto;
+      }
+
+      .copy-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+        background: rgba(255, 204, 0, 0.14);
+        border-color: rgba(255, 204, 0, 0.35);
+      }
+
+      .copy-btn:active {
+        transform: translateY(-1px);
+      }
+
+      .copy-btn i {
+        font-size: 14px;
+      }
+
+      @media (max-width: 480px) {
+        .detail-row {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-value-wrap {
+          justify-content: space-between;
+          width: 100%;
+        }
+      }
+
+      .detail-label {
+        font-size: 13px;
+        color: #95a5a6;
+        font-weight: 600;
+      }
+
+      .detail-value {
+        font-size: 15px;
+        color: var(--light);
+        font-weight: 600;
+        min-width: 0;
+        flex: 1 1 auto;
+        text-align: left;
+        overflow-wrap: anywhere;
+      }
+
+      .user-card-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .user-card-actions .action-btn {
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all var(--transition-speed);
+      }
+
+      .points-btn {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
+
+      .points-btn:hover {
+        background: #27ae60;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .edit-btn {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+      }
+
+      .edit-btn:hover {
+        background: #2980b9;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .remove-points-btn {
+        background: rgba(243, 156, 18, 0.2);
+        color: #f39c12;
+        border: 1px solid rgba(243, 156, 18, 0.3);
+      }
+
+      .remove-points-btn:hover {
+        background: #d68910;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .ban-btn {
+        background: rgba(243, 156, 18, 0.2);
+        color: #f39c12;
+        border: 1px solid rgba(243, 156, 18, 0.3);
+      }
+
+      .ban-btn:hover {
+        background: #d68910;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .delete-btn {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
+
+      .delete-btn:hover {
+        background: #c0392b;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .unban-btn {
+        grid-column: span 2;
+        background: rgba(39, 174, 96, 0.2);
+        color: #27ae60;
+        border: 1px solid rgba(39, 174, 96, 0.3);
+      }
+
+      .unban-btn:hover {
+        background: #229954;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .section-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--accent);
+        margin: 40px 0 25px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(255, 204, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-align: center;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: var(--muted);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 300px;
+        margin: 20px 0;
+        gap: 15px;
+        grid-column: 1 / -1;
+      }
+
+      .empty-state i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: var(--accent);
+      }
+
+      .empty-state h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: var(--text);
+      }
+
+      .empty-state p {
+        font-size: 16px;
+        color: var(--muted);
+      }
+
+      .loading-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        min-height: 400px;
+        width: 100%;
+      }
+
+      .loading-state i {
+        font-size: 56px;
+        color: var(--accent);
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        overflow-y: auto;
+        backdrop-filter: blur(5px);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      .modal-content {
+        background: var(--panel-bg);
+        backdrop-filter: blur(20px);
+        width: 90%;
+        max-width: 500px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transform: translateY(-30px);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .modal.active .modal-content {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .modal-header {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 25px 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h2 {
+        color: var(--accent);
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .close-button {
+        background: none;
+        border: none;
+        color: var(--light);
+        font-size: 28px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all var(--transition-speed);
+      }
+
+      .close-button:hover {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        transform: rotate(90deg);
+      }
+
+      .modal-body {
+        padding: 30px;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+
+      .modal-body .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+      }
+
+      .modal-body .submit-btn {
+        width: auto;
+        min-width: 150px;
+        flex: 0 0 auto;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text);
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 16px;
+        transition: all var(--transition-speed);
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+      }
+
+      .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .form-group input[type="datetime-local"] {
+        cursor: text;
+        min-width: 0;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 15px !important;
+      }
+
+      .form-group select option {
+        background: rgba(64, 41, 88, 0.95);
+        color: var(--text);
+        padding: 10px;
+      }
+
+      .cancel-btn {
+        padding: 12px 30px;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.05)
+        );
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .cancel-btn:hover {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.2),
+          rgba(255, 255, 255, 0.1)
+        );
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        border-color: var(--text);
+      }
+
+      .cancel-btn:active {
+        transform: translateY(-1px);
+      }
+
+      .submit-btn {
+        padding: 12px 35px;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-align: center;
+        width: auto;
+        min-width: 150px;
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .submit-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.3s ease;
+        z-index: 1;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(46, 204, 113, 0.5);
+        background: linear-gradient(135deg, #27ae60, #229954);
+      }
+
+      .submit-btn:hover::before {
+        left: 100%;
+      }
+
+      .submit-btn:active {
+        transform: translateY(-1px);
+      }
+
+      #banSubmitBtn {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+      }
+
+      #banSubmitBtn:hover {
+        background: linear-gradient(135deg, #c0392b, #a93226);
+        box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+      }
+
+      .swal2-container {
+        z-index: 10000 !important;
+      }
+
+      .swal2-popup {
+        background: var(--panel-bg) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius-lg) !important;
+        color: var(--text) !important;
+        box-shadow: var(--shadow-lg) !important;
+      }
+
+      .swal2-title {
+        color: var(--text) !important;
+        font-weight: 700 !important;
+        font-size: 24px !important;
+      }
+
+      .swal2-content {
+        color: var(--muted) !important;
+        font-size: 16px !important;
+      }
+
+      .swal2-html-container {
+        color: var(--text) !important;
+      }
+
+      .swal2-confirm {
+        background: linear-gradient(135deg, var(--success), #2ecc71) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 12px 25px !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+        transition: all var(--transition-speed) !important;
+      }
+
+      .swal2-confirm:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4) !important;
+      }
+
+      .swal2-cancel {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        padding: 12px 25px !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+        transition: all var(--transition-speed) !important;
+      }
+
+      .swal2-cancel:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        transform: translateY(-2px) !important;
+      }
+
+      .swal2-icon {
+        border-color: var(--accent) !important;
+      }
+
+      .swal2-icon.swal2-success {
+        border-color: var(--success) !important;
+        color: var(--success) !important;
+      }
+
+      .swal2-icon.swal2-error {
+        border-color: var(--danger) !important;
+        color: var(--danger) !important;
+      }
+
+      .swal2-icon.swal2-warning {
+        border-color: var(--warning) !important;
+        color: var(--warning) !important;
+      }
+
+      .swal2-icon.swal2-info {
+        border-color: var(--info) !important;
+        color: var(--info) !important;
+      }
+
+      .swal2-icon.swal2-question {
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
+      }
+
+      .swal2-input {
+        background: rgba(64, 41, 88, 0.95) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text) !important;
+        border-radius: 8px !important;
+        padding: 12px 15px !important;
+        margin: 8px 0 !important;
+        font-family: "Cairo", sans-serif !important;
+      }
+
+      .swal2-input:focus {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1) !important;
+      }
+
+      .swal2-textarea {
+        background: rgba(64, 41, 88, 0.95) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text) !important;
+        border-radius: 8px !important;
+        padding: 12px 15px !important;
+        margin: 8px 0 !important;
+        font-family: "Cairo", sans-serif !important;
+        min-height: 80px !important;
+        resize: vertical !important;
+      }
+
+      .swal2-textarea:focus {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1) !important;
+      }
+
+      @media (max-width: 992px) {
+        .mobile-toggle {
+          display: block;
+        }
+
+        .sidebar {
+          transform: translateX(-100%);
+          width: 260px;
+          padding: 15px;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 10px;
+        }
+
+        .logout-btn {
+          display: none;
+        }
+
+        .logout-btn-mobile {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .user-management-tools {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search-box {
+          min-width: auto;
+          width: 100%;
+        }
+
+        .tools-middle {
+          width: 100%;
+          overflow-x: auto;
+          padding-bottom: 10px;
+        }
+
+        .category-nav {
+          min-width: 600px;
+        }
+
+        .view-toggles {
+          width: 100%;
+          justify-content: stretch;
+        }
+
+        .toggle-btn {
+          flex: 1;
+          justify-content: center;
+        }
+
+        .users-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .user-card-actions {
+          grid-template-columns: 1fr;
+        }
+
+        .unban-btn {
+          grid-column: span 1;
+        }
+
+        .top-nav {
+          padding: 10px 15px;
+          margin-bottom: 15px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .modal-content {
+          width: 95%;
+          margin: 20px auto;
+        }
+
+        .modal-body {
+          max-height: 60vh;
+        }
+
+        .category-nav {
+          min-width: 500px;
+        }
+
+        .sidebar {
+          width: 240px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .user-card-header {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .detail-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 5px;
+        }
+
+        .detail-value {
+          max-width: 100%;
+          text-align: right;
+        }
+
+        .admin-container h1 {
+          font-size: 24px;
+        }
+
+        .section-title {
+          font-size: 20px;
+        }
+
+        .modal-header h2 {
+          font-size: 20px;
+        }
+
+        .category-nav {
+          min-width: 400px;
+        }
+
+        .category-tab {
+          padding: 8px 15px;
+          font-size: 13px;
+        }
+
+        .mobile-toggle {
+          top: 10px;
+          right: 10px;
+        }
+
+        .sidebar {
+          width: 220px;
+        }
+
+        .nav-link {
+          padding: 10px;
+          font-size: 13px;
+        }
+
+        .nav-link i {
+          font-size: 14px;
+        }
+      }
+
+      .grades-nav-item {
+        position: relative;
+      }
+
+      .grades-submenu-container {
+        overflow: hidden;
+        position: relative;
+      }
+
+      .grades-submenu {
+        max-height: 0;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-right: 20px;
+        border-right: 2px solid transparent;
+        margin-top: 5px;
+        padding-right: 8px;
+      }
+
+      .grades-submenu.open {
+        max-height: 400px;
+        border-right-color: var(--accent);
+      }
+
+      .grades-toggle.open .toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .grades-toggle {
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .toggle-icon {
+        transition: transform 0.3s ease;
+        margin-right: auto;
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom, var(--accent), #ffd700);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom, #ffd700, var(--accent));
+        box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+      }
+
+      ::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.03);
+      }
+
+      .category-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .category-toggle {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: var(--text);
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        min-width: 200px;
+        justify-content: space-between;
+      }
+
+      .category-toggle:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .category-toggle i.fa-chevron-down {
+        font-size: 12px;
+        transition: transform 0.3s ease;
+      }
+
+      .category-dropdown.active .category-toggle i.fa-chevron-down {
+        transform: rotate(180deg);
+      }
+
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--panel-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        min-width: 400px;
+        z-index: 1000;
+        padding: 20px;
+        margin-top: 10px;
+        animation: fadeInUp 0.3s ease;
+      }
+
+      .category-dropdown.active .dropdown-menu {
+        display: block;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .dropdown-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+
+      .dropdown-column h4 {
+        color: var(--accent);
+        font-size: 14px;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .category-option {
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: var(--text);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .category-option:hover {
+        background: rgba(255, 204, 0, 0.1);
+        transform: translateX(-5px);
+        border-color: var(--accent);
+      }
+
+      .category-option.active {
+        background: var(--accent);
+        color: var(--dark);
+        border-color: var(--accent);
+        box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+      }
+
+      .category-option.active .category-count {
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--dark);
+      }
+
+      .category-count {
+        margin-right: auto;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 4px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      @media (max-width: 768px) {
+        .dropdown-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .dropdown-menu {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 90%;
+          max-width: 400px;
+          max-height: 80vh;
+          overflow-y: auto;
+        }
+
+        .category-toggle {
+          min-width: 180px;
+        }
+      }
+
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .online-badge {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
+
+      .idle-badge {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.3);
+      }
+
+      .signed-in-badge {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+      }
+
+      .signed-out-badge {
+        background: rgba(149, 165, 166, 0.2);
+        color: #95a5a6;
+        border: 1px solid rgba(149, 165, 166, 0.3);
+      }
+
+      .banned-badge {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
+
+      .verified-badge {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
+
+      .not-verified-badge {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+      }
+
+      .user-status-info {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .last-login-text {
+        font-size: 12px;
+        color: #95a5a6;
+        font-style: italic;
+      }
+
+      .user-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .user-badges .status-badge {
+        margin: 2px 0;
+      }
+
+      @media (max-width: 480px) {
+        .user-badges {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .status-badge {
+          font-size: 10px;
+          padding: 3px 8px;
+        }
+      }
+
+      .suggestions-submenu {
+        max-height: 0;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-right: 20px;
+        border-right: 2px solid transparent;
+        margin-top: 5px;
+        padding-right: 8px;
+      }
+
+      .suggestions-submenu.open {
+        max-height: 200px;
+        border-right-color: var(--accent);
+      }
+
+      .suggestions-toggle.open .toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .section-submenu {
+        max-height: 0;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-right: 15px;
+        margin-top: 5px;
+      }
+
+      .section-submenu.open {
+        max-height: 200px;
+      }
+
+      .section-toggle.open .toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .nav-link:hover {
+        background: rgba(52, 73, 94, 0.5) !important;
+        transform: translateX(-5px) !important;
+        color: var(--accent) !important;
+        border-right: none !important;
+      }
+
+      .nav-link.active {
+        background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+        color: var(--dark) !important;
+        box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3) !important;
+        border-right: 3px solid var(--accent) !important;
+      }
+
+      .nav-link.active i {
+        color: var(--dark) !important;
+      }
+
+      .grades-toggle:hover,
+      .suggestions-toggle:hover {
+        background: rgba(52, 73, 94, 0.5) !important;
+        transform: translateX(-5px) !important;
+        color: var(--accent) !important;
+        border-right: none !important;
+      }
+
+      .grades-toggle.open,
+      .suggestions-toggle.open {
+        background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+        border-right: 3px solid var(--accent) !important;
+        color: var(--dark) !important;
+        box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3) !important;
+      }
+
+      .grades-toggle.open i,
+      .suggestions-toggle.open i {
+        color: var(--dark) !important;
+      }
+
+      .section-toggle:hover {
+        background: rgba(52, 73, 94, 0.5) !important;
+        transform: translateX(-3px) !important;
+        color: var(--accent) !important;
+      }
+
+      .section-toggle.open {
+        background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+        color: var(--dark) !important;
+        border-right: 2px solid var(--accent) !important;
+      }
+
+      .section-toggle.open i {
+        color: var(--dark) !important;
+      }
+
+      .submenu-link:hover {
+        background: rgba(52, 73, 94, 0.5) !important;
+        transform: translateX(-5px) !important;
+        color: var(--accent) !important;
+        border-color: transparent !important;
+      }
+
+      .submenu-link.active {
+        background: linear-gradient(90deg, var(--accent), #ffd700) !important;
+        color: var(--dark) !important;
+        border-right: 2px solid var(--accent) !important;
+        box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2) !important;
+      }
+
+      .submenu-link.active i {
+        color: var(--dark) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mobile-toggle" id="mobileToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <img src="/UI/logo.png" alt="اللوغو" />
+          <div class="logo-text">
+            <h1>كاتدرائية السمائيين</h1>
+            <p>إدارة المستخدمين</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-item">
+          <a href="https://kenisa-el-sama2eyeen.ooguy.com" class="nav-link">
+            <i class="fas fa-home"></i>
+            الصفحة الرئيسية
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="/form-panel" class="nav-link">
+            <i class="fas fa-tachometer-alt"></i>
+            النماذج
+          </a>
+        </div>
+
+        <div class="nav-item grades-nav-item">
+          <div class="nav-link grades-toggle" id="sidebarGradesToggle">
+            <i class="fas fa-graduation-cap"></i>
+            الصفوف الدراسية
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="grades-submenu-container">
+            <div class="grades-submenu" id="sidebarGradesSubmenu">
+              <div class="submenu-header">
+                <div class="nav-link section-toggle" data-section="prep">
+                  <i class="fas fa-school"></i>
+                  الإعدادية
+                  <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="section-submenu" data-section="prep">
+                  <a href="/grades/prep1" class="nav-link submenu-link">
+                    <i class="fas fa-arrow-left"></i>
+                    إعدادي أول
+                  </a>
+                  <a href="/grades/prep2" class="nav-link submenu-link">
+                    <i class="fas fa-arrow-left"></i>
+                    إعدادي ثاني
+                  </a>
+                  <a href="/grades/prep3" class="nav-link submenu-link">
+                    <i class="fas fa-arrow-left"></i>
+                    إعدادي ثالث
+                  </a>
+                </div>
+              </div>
+
+              <div class="submenu-header">
+                <div class="nav-link section-toggle" data-section="sec">
+                  <i class="fas fa-university"></i>
+                  الثانوية
+                  <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="section-submenu" data-section="sec">
+                  <a href="/grades/sec1" class="nav-link submenu-link">
+                    <i class="fas fa-arrow-left"></i>
+                    ثانوي أول
+                  </a>
+                  <a href="/grades/sec2" class="nav-link submenu-link">
+                    <i class="fas fa-arrow-left"></i>
+                    ثانوي ثاني
+                  </a>
+                  <a href="/grades/sec3" class="nav-link submenu-link">
+                    <i class="fas fa-arrow-left"></i>
+                    ثانوي ثالث
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-item">
+          <a href="/admin/user-approvals" class="nav-link">
+            <i class="fas fa-user-check"></i>
+            طلبات التسجيل
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="/admin/user-management" class="nav-link active">
+            <i class="fas fa-users"></i>
+            إدارة المستخدمين
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="/admin/gift-shop/add" class="nav-link">
+            <i class="fas fa-plus-circle"></i>
+            إضافة هدية
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="/admin/gift-shop/approvals" class="nav-link">
+            <i class="fas fa-check-circle"></i>
+            طلبات المراجعة
+          </a>
+        </div>
+        <div class="nav-item suggestions-nav-item">
+          <div class="nav-link suggestions-toggle" id="suggestionsToggle">
+            <i class="fas fa-lightbulb"></i>
+            الاقتراحات
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="suggestions-submenu-container">
+            <div class="suggestions-submenu" id="suggestionsSubmenu">
+              <a
+                href="/admin/suggestion/ektma3at"
+                class="nav-link submenu-link"
+              >
+                <i class="fas fa-users"></i>
+                اقتراحات الاجتماعات
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i>
+          تسجيل الخروج
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-nav">
+        <div class="user-info">
+          <img src="/UI/pfp.jpg" alt="المستخدم" class="user-avatar" />
+          <div class="user-details">
+            <h3 id="username">جاري التحميل...</h3>
+            <span id="userRole">مشرف</span>
+          </div>
+          <button class="logout-btn-mobile" id="logoutBtnMobile">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-container">
+        <h1>إدارة المستخدمين</h1>
+
+        <div class="user-management-tools">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="ابحث عن مستخدم بالاسم أو البريد الإلكتروني أو اسم المستخدم..."
+            />
+            <button id="clearSearch" class="clear-search">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div class="tools-middle">
+            <div class="category-dropdown" id="categoryDropdown">
+              <button class="category-toggle" id="categoryToggle">
+                <i class="fas fa-filter"></i>
+                تصفية حسب الصف
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-grid">
+                  <div class="dropdown-column">
+                    <h4><i class="fas fa-users"></i> عام</h4>
+                    <div class="category-option active" data-category="all">
+                      <i class="fas fa-users"></i>
+                      جميع المستخدمين
+                      <span class="category-count" id="count-all">0</span>
+                    </div>
+                  </div>
+                  <div class="dropdown-column">
+                    <h4><i class="fas fa-university"></i> الثانوية</h4>
+                    <div class="category-option" data-category="sec1">
+                      <i class="fas fa-user-graduate"></i>
+                      أولى ثانوي
+                      <span class="category-count" id="count-sec1">0</span>
+                    </div>
+                    <div class="category-option" data-category="sec2">
+                      <i class="fas fa-user-graduate"></i>
+                      ثانية ثانوي
+                      <span class="category-count" id="count-sec2">0</span>
+                    </div>
+                    <div class="category-option" data-category="sec3">
+                      <i class="fas fa-user-graduate"></i>
+                      ثالثة ثانوي
+                      <span class="category-count" id="count-sec3">0</span>
+                    </div>
+                  </div>
+                  <div class="dropdown-column">
+                    <h4><i class="fas fa-school"></i> الإعدادية</h4>
+                    <div class="category-option" data-category="prep1">
+                      <i class="fas fa-user-graduate"></i>
+                      أولى إعدادي
+                      <span class="category-count" id="count-prep1">0</span>
+                    </div>
+                    <div class="category-option" data-category="prep2">
+                      <i class="fas fa-user-graduate"></i>
+                      ثانية إعدادي
+                      <span class="category-count" id="count-prep2">0</span>
+                    </div>
+                    <div class="category-option" data-category="prep3">
+                      <i class="fas fa-user-graduate"></i>
+                      ثالثة إعدادي
+                      <span class="category-count" id="count-prep3">0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="view-toggles">
+            <button id="toggleViewBtn" class="toggle-btn">
+              <i class="fas fa-ban"></i>
+              عرض المحظورين
+            </button>
+            <button id="refreshUsersBtn" class="toggle-btn">
+              <i class="fas fa-sync-alt"></i>
+              تحديث
+            </button>
+          </div>
+        </div>
+
+        <div id="usersSection">
+          <h2 class="section-title">
+            <i class="fas fa-users"></i>
+            المستخدمون النشطون
+          </h2>
+          <div id="usersList" class="users-grid">
+            <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>جاري تحميل بيانات المستخدمين...</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="bannedSection" style="display: none">
+          <h2 class="section-title">
+            <i class="fas fa-user-slash"></i>
+            المستخدمون المحظورون
+          </h2>
+          <div id="bannedUsersList" class="users-grid"></div>
+        </div>
+      </div>
+    </main>
+
+    <div id="editUserModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-edit"></i> تعديل المستخدم</h2>
+          <button class="close-button" id="closeEditModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="editUserForm">
+            <input type="hidden" id="editUserId" />
+            <div class="form-group">
+              <label>الاسم الأول:</label>
+              <input type="text" id="editFirstName" required />
+            </div>
+            <div class="form-group">
+              <label>الاسم الثاني:</label>
+              <input type="text" id="editSecondName" required />
+            </div>
+            <div class="form-group">
+              <label>البريد الإلكتروني:</label>
+              <input type="email" id="editEmail" required />
+            </div>
+            <div class="form-group">
+              <label>رقم الهاتف:</label>
+              <input type="text" id="editPhone" required />
+            </div>
+            <div class="form-group">
+              <label>الصف الدراسي:</label>
+              <select id="editGrade" required>
+                <option value="" disabled selected>اختر الصف الدراسي...</option>
+                <option value="prep1">إعدادي أولى</option>
+                <option value="prep2">إعدادي ثانية</option>
+                <option value="prep3">إعدادي ثالثة</option>
+                <option value="sec1">ثانوي أولى</option>
+                <option value="sec2">ثانوي ثانية</option>
+                <option value="sec3">ثانوي ثالثة</option>
+                <option value="teachers">خادم</option>
+                <option value="admins">مشرف</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>كلمة المرور الجديدة (اختياري):</label>
+              <input type="password" id="editPassword" />
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="submit-btn" id="editSubmitBtn">
+                <span id="editBtnText">حفظ التغييرات</span>
+                <span id="editBtnLoading" style="display: none">
+                  <i class="fas fa-spinner fa-spin"></i> جاري المعالجة...
+                </span>
+              </button>
+              <button type="button" class="cancel-btn" id="cancelEditModal">
+                إلغاء
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="takePointsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-star"></i> خصم نقاط</h2>
+          <button class="close-button" id="closeTakePointsModalBtn">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="takePointsForm">
+            <input type="hidden" id="takePointsUserId" />
+            <div class="form-group">
+              <label>عدد النقاط:</label>
+              <input type="number" id="takePointsAmount" required min="1" />
+            </div>
+            <div class="form-group">
+              <label>السبب (اختياري):</label>
+              <textarea id="takePointsReason"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="submit-btn" id="takePointsSubmitBtn">
+                <span id="takePointsBtnText">خصم النقاط</span>
+                <span id="takePointsBtnLoading" style="display: none">
+                  <i class="fas fa-spinner fa-spin"></i> جاري المعالجة...
+                </span>
+              </button>
+              <button
+                type="button"
+                class="cancel-btn"
+                id="cancelTakePointsModal"
+              >
+                إلغاء
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="banModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-ban"></i> حظر المستخدم</h2>
+          <button class="close-button" id="closeBanModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="banForm">
+            <input type="hidden" id="banUserId" />
+            <div class="form-group">
+              <label>نوع الحظر:</label>
+              <select id="banType" required>
+                <option value="" disabled selected>اختر نوع الحظر...</option>
+                <option value="all">حظر كامل</option>
+                <option value="forms">حظر النماذج فقط</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>سبب الحظر (اختياري):</label>
+              <textarea id="banReason" placeholder="أدخل سبب الحظر"></textarea>
+            </div>
+            <div class="form-actions">
+              <button
+                type="submit"
+                class="submit-btn"
+                id="banSubmitBtn"
+                style="background: linear-gradient(135deg, #e74c3c, #c0392b)"
+              >
+                <span id="banBtnText">حظر المستخدم</span>
+                <span id="banBtnLoading" style="display: none">
+                  <i class="fas fa-spinner fa-spin"></i> جاري المعالجة...
+                </span>
+              </button>
+              <button type="button" class="cancel-btn" id="cancelBanModal">
+                إلغاء
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"
+      defer
+    ></script>
+    <script>
+      const mobileToggle = document.getElementById("mobileToggle");
+      const sidebar = document.getElementById("sidebar");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const logoutBtnMobile = document.getElementById("logoutBtnMobile");
+      const usersList = document.getElementById("usersList");
+      const bannedUsersList = document.getElementById("bannedUsersList");
+      const toggleViewBtn = document.getElementById("toggleViewBtn");
+      const refreshUsersBtn = document.getElementById("refreshUsersBtn");
+      const searchInput = document.getElementById("searchInput");
+      const clearSearch = document.getElementById("clearSearch");
+      const usersSection = document.getElementById("usersSection");
+      const bannedSection = document.getElementById("bannedSection");
+      const takePointsModal = document.getElementById("takePointsModal");
+      const takePointsForm = document.getElementById("takePointsForm");
+      const banModal = document.getElementById("banModal");
+      const banForm = document.getElementById("banForm");
+      const editUserModal = document.getElementById("editUserModal");
+      const editUserForm = document.getElementById("editUserForm");
+      const categoryNav = document.getElementById("categoryNav");
+      const categoryTabs = document.querySelectorAll(".category-tab");
+      const sidebarGradesToggle = document.getElementById(
+        "sidebarGradesToggle"
+      );
+      const sidebarGradesSubmenu = document.getElementById(
+        "sidebarGradesSubmenu"
+      );
+      const closeEditModal = document.getElementById("closeEditModal");
+      const cancelEditModal = document.getElementById("cancelEditModal");
+      const closeTakePointsModalBtn = document.getElementById(
+        "closeTakePointsModalBtn"
+      );
+      const cancelTakePointsModal = document.getElementById(
+        "cancelTakePointsModal"
+      );
+      const closeBanModalBtn = document.getElementById("closeBanModal");
+      const cancelBanModal = document.getElementById("cancelBanModal");
+      const categoryDropdown = document.getElementById("categoryDropdown");
+      const categoryToggle = document.getElementById("categoryToggle");
+      const dropdownMenu = document.getElementById("dropdownMenu");
+      const categoryOptions = document.querySelectorAll(".category-option");
+
+      let allUsers = [];
+      let allBannedUsers = [];
+      let currentCategory = "all";
+      let userCounts = {
+        all: 0,
+        sec1: 0,
+        sec2: 0,
+        sec3: 0,
+        prep1: 0,
+        prep2: 0,
+        prep3: 0,
+        teachers: 0,
+        admins: 0,
+      };
+
+      function toggleSidebar() {
+        sidebar.classList.toggle("active");
+        const spans = mobileToggle.querySelectorAll("span");
+        if (sidebar.classList.contains("active")) {
+          spans[0].style.transform = "rotate(45deg) translate(5px, 5px)";
+          spans[1].style.opacity = "0";
+          spans[2].style.transform = "rotate(-45deg) translate(7px, -6px)";
+        } else {
+          spans[0].style.transform = "none";
+          spans[1].style.opacity = "1";
+          spans[2].style.transform = "none";
+        }
+      }
+
+      mobileToggle.addEventListener("click", toggleSidebar);
+
+      async function loadUserInfo() {
+        try {
+          const response = await fetch("/api/user-info");
+          const data = await response.json();
+          if (!data.isAuthenticated) {
+            window.location.href = "/login";
+            return;
+          }
+          document.getElementById("username").textContent = data.username;
+          document.getElementById("userRole").textContent =
+            data.role === "leadadmin"
+              ? "ليد أدمن"
+              : data.role === "admin"
+              ? "مشرف"
+              : data.role;
+        } catch (error) {
+          console.error("Error loading user info:", error);
+        }
+      }
+
+      function updateCategoryCounts() {
+        userCounts = {
+          all: allUsers.length,
+          sec1: allUsers.filter((user) => user.grade === "sec1").length,
+          sec2: allUsers.filter((user) => user.grade === "sec2").length,
+          sec3: allUsers.filter((user) => user.grade === "sec3").length,
+          prep1: allUsers.filter((user) => user.grade === "prep1").length,
+          prep2: allUsers.filter((user) => user.grade === "prep2").length,
+          prep3: allUsers.filter((user) => user.grade === "prep3").length,
+          teachers: allUsers.filter((user) => user.grade === "teachers").length,
+          admins: allUsers.filter((user) => user.grade === "admins").length,
+        };
+
+        for (const category in userCounts) {
+          const countElement = document.getElementById(`count-${category}`);
+          if (countElement) {
+            countElement.textContent = userCounts[category];
+          }
+        }
+      }
+
+      async function loadUsers() {
+        console.log("loadUsers() called at", new Date().toLocaleTimeString());
+        try {
+          usersList.innerHTML = `
+          <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>جاري تحميل بيانات المستخدمين...</p>
+          </div>
+      `;
+
+          const response = await fetch("/api/admin/users");
+          const allUsersFromAPI = await response.json();
+
+          const bannedResponse = await fetch("/api/banned-users");
+          const bannedUsers = await bannedResponse.json();
+          allBannedUsers = Array.isArray(bannedUsers) ? bannedUsers : [];
+
+          const bannedUsernames = allBannedUsers.map((user) => user.username);
+
+          const activeUsers = allUsersFromAPI.filter(
+            (user) => !bannedUsernames.includes(user.username)
+          );
+
+          allUsers = activeUsers;
+
+          if (!activeUsers || activeUsers.length === 0) {
+            usersList.innerHTML = `
+              <div class="empty-state">
+                  <i class="fas fa-users-slash"></i>
+                  <h3>لا يوجد مستخدمون نشطون</h3>
+                  <p>لا يوجد مستخدمون نشطون في النظام</p>
+              </div>
+          `;
+            updateCategoryCounts();
+            return;
+          }
+
+          updateCategoryCounts();
+          displayUsersByCategory(currentCategory);
+        } catch (error) {
+          console.error("Error loading users:", error);
+          usersList.innerHTML = `
+          <div class="empty-state">
+              <i class="fas fa-exclamation-circle"></i>
+              <h3>حدث خطأ</h3>
+              <p>تعذر تحميل بيانات المستخدمين. يرجى المحاولة مرة أخرى.</p>
+          </div>
+      `;
+        }
+      }
+
+      function displayUsersByCategory(category) {
+        let filteredUsers = allUsers;
+
+        if (category !== "all") {
+          filteredUsers = allUsers.filter((user) => user.grade === category);
+        }
+
+        if (filteredUsers.length === 0) {
+          usersList.innerHTML = `
+          <div class="empty-state">
+              <i class="fas fa-users-slash"></i>
+              <h3>لا يوجد مستخدمون</h3>
+              <p>لا يوجد مستخدمون في هذه الفئة</p>
+          </div>
+      `;
+        } else {
+          displayUsers(filteredUsers);
+        }
+      }
+
+      function displayUsers(users) {
+        const statusRank = {
+          online: 0,
+          idle: 1,
+          "signed-in": 2,
+          "signed-out": 3,
+          banned: 4,
+        };
+        const sorted = [...users].sort((a, b) => {
+          const aStatus = getUserStatus(a);
+          const bStatus = getUserStatus(b);
+          const aRank = statusRank[aStatus] ?? 99;
+          const bRank = statusRank[bStatus] ?? 99;
+          if (aRank !== bRank) return aRank - bRank;
+          const aTime = a.lastActivity ? new Date(a.lastActivity).getTime() : 0;
+          const bTime = b.lastActivity ? new Date(b.lastActivity).getTime() : 0;
+          if (bTime !== aTime) return bTime - aTime;
+          return (a.username || "").localeCompare(b.username || "");
+        });
+
+        usersList.innerHTML = sorted
+          .map((user) => {
+            const gradeText =
+              {
+                prep1: "إعدادي أولى",
+                prep2: "إعدادي ثانية",
+                prep3: "إعدادي ثالثة",
+                sec1: "ثانوي أولى",
+                sec2: "ثانوي ثانية",
+                sec3: "ثانوي ثالثة",
+                teachers: "خادم",
+                admins: "مشرف",
+              }[user.grade] || user.grade;
+
+            const roleText =
+              {
+                leadadmin: "ليد أدمن",
+                admin: "مشرف",
+                teacher: "خادم",
+                student: "طالب",
+              }[user.role] || user.role;
+
+            const userStatus = getUserStatus(user);
+            const statusBadge = getStatusBadge(userStatus);
+
+            const verificationBadge = user.verificationCodeVerified
+              ? '<span class="status-badge verified-badge">✅ تم التحقق</span>'
+              : '<span class="status-badge not-verified-badge">❌ غير متحقق</span>';
+
+            const lastActivityText = user.lastActivity
+              ? `آخر نشاط: ${formatTimeAgo(new Date(user.lastActivity))}`
+              : "لم يتم تسجيل نشاط بعد";
+
+            const logoutAllDevicesBtn =
+              user.role !== "leadadmin"
+                ? `
+                    <button class="action-btn logout-all-btn" onclick="logoutAllDevices('${user._id}', '${user.username}')">
+                        <i class="fas fa-sign-out-alt"></i>
+                        تسجيل الخروج من جميع الأجهزة
+                    </button>
+                    `
+                : "";
+
+            return `
+                <div class="user-card">
+                    <div class="user-card-header">
+                        <div class="user-avatar-large ${
+                          userStatus === "banned" ? "banned-avatar" : ""
+                        }">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="user-main-info">
+                            <h3>${user.firstName} ${user.secondName}</h3>
+                            <div class="user-badges">
+                                <span class="username-badge">@${
+                                  user.username
+                                }</span>
+                                <span class="role-badge ${
+                                  user.role
+                                }">${roleText}</span>
+                                <span class="grade-badge">${gradeText}</span>
+                                ${statusBadge}
+                                ${verificationBadge}
+                            </div>
+                            <div class="user-status-info">
+                                <small class="last-login-text">${lastActivityText}</small>
+                            </div>
+                        </div>
+                        <div class="user-points">
+                            <i class="fas fa-star"></i>
+                            <span>${user.points || 0}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="user-card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">البريد الإلكتروني:</span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value">${user.email}</span>
+                              <button class="copy-btn" type="button" title="نسخ البريد" onclick="copyText('${user.email.replace(
+                                /'/g,
+                                "\\'"
+                              )}')">
+                                <i class="fas fa-copy"></i>
+                              </button>
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">رقم الهاتف:</span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value">${user.phone}</span>
+                              <button class="copy-btn" type="button" title="نسخ رقم الهاتف" onclick="copyText('${user.phone.replace(
+                                /'/g,
+                                "\\'"
+                              )}')">
+                                <i class="fas fa-copy"></i>
+                              </button>
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">تاريخ التسجيل:</span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value">${new Date(
+                                user.createdAt
+                              ).toLocaleDateString("ar-EG")}</span>
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">آخر نشاط:</span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value">${
+                                user.lastActivity
+                                  ? new Date(user.lastActivity).toLocaleString(
+                                      "ar-EG"
+                                    )
+                                  : "لم يتم تسجيل نشاط بعد"
+                              }</span>
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">حالة الحساب:</span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value">${getStatusDescription(
+                                userStatus
+                              )}</span>
+                            </span>
+                        </div>
+                        ${
+                          user._isLocal === true
+                            ? `
+                        <div class="detail-row" style="background: rgba(52, 152, 219, 0.15); border: 1px solid rgba(52, 152, 219, 0.4); border-radius: 8px; padding: 12px; margin-top: 10px;">
+                            <span class="detail-label" style="color: #3498db; font-weight: 700;">
+                              <i class="fas fa-database"></i> Local User
+                            </span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value" style="color: #3498db; font-weight: 600; font-size: 14px;">
+                                This user is stored locally and cannot be edited through the admin panel
+                              </span>
+                            </span>
+                        </div>
+                        `
+                            : ""
+                        }
+                        ${
+                          user.verificationCodeVerified
+                            ? `
+                        <div class="detail-row" style="background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
+                            <span class="detail-label" style="color: #2ecc71; font-weight: 700;">حالة التحقق من الحساب:</span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value" style="color: #2ecc71; font-weight: 700; font-size: 16px;">✅ تم التحقق</span>
+                            </span>
+                        </div>
+                        `
+                            : user.verificationCode
+                            ? `
+                        <div class="detail-row" style="background: rgba(255, 204, 0, 0.1); border: 1px solid rgba(255, 204, 0, 0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
+                            <span class="detail-label" style="color: #ffcc00; font-weight: 700;">🔑 كود التحقق:</span>
+                            <span class="detail-value-wrap">
+                              <span class="detail-value" style="color: #ffcc00; font-weight: 700; font-size: 16px; font-family: monospace;">${
+                                user.verificationCode
+                              }</span>
+                              <button class="copy-btn" type="button" title="نسخ كود التحقق" onclick="copyText('${user.verificationCode.replace(
+                                /'/g,
+                                "\\'"
+                              )}')">
+                                <i class="fas fa-copy"></i>
+                              </button>
+                            </span>
+                        </div>
+                        `
+                            : ""
+                        }
+                    </div>
+                    
+                    <div class="user-card-actions">
+                        <button class="action-btn points-btn" onclick="givePoints('${
+                          user._id
+                        }', '${user.username}')">
+                            <i class="fas fa-plus-circle"></i>
+                            إضافة نقاط
+                        </button>
+                        <button class="action-btn remove-points-btn" onclick="openTakePointsModal('${
+                          user._id
+                        }', '${user.username}')">
+                            <i class="fas fa-minus-circle"></i>
+                            خصم نقاط
+                        </button>
+                        <button class="action-btn edit-btn" onclick="openEditUserModal('${
+                          user._id
+                        }')">
+                            <i class="fas fa-edit"></i>
+                            تعديل
+                        </button>
+                        <button class="action-btn ban-btn" onclick="openBanModal('${
+                          user._id
+                        }', '${user.username}')">
+                            <i class="fas fa-ban"></i>
+                            حظر
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteUser('${
+                          user._id
+                        }', '${user.username}')">
+                            <i class="fas fa-trash"></i>
+                            حذف
+                        </button>
+                        ${logoutAllDevicesBtn}
+                    </div>
+                </div>
+            `;
+          })
+          .join("");
+      }
+      async function logoutAllDevices(userId, username) {
+        const result = await Swal.fire({
+          title: "تسجيل الخروج من جميع الأجهزة",
+          text: `هل أنت متأكد أنك تريد تسجيل خروج "${username}" من جميع الأجهزة؟`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "نعم، تسجيل الخروج",
+          cancelButtonText: "إلغاء",
+          confirmButtonColor: "#3498db",
+          cancelButtonColor: "#666",
+        });
+
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "جاري تسجيل الخروج...",
+            text: "يرجى الانتظار جاري تسجيل الخروج من جميع الأجهزة",
+            icon: "info",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          try {
+            const response = await fetch(
+              `/api/admin/users/${userId}/logout-all`,
+              {
+                method: "POST",
+              }
+            );
+
+            Swal.close();
+
+            if (response.ok) {
+              Swal.fire({
+                title: "تم بنجاح!",
+                text: "تم تسجيل خروج المستخدم من جميع الأجهزة",
+                icon: "success",
+                confirmButtonText: "حسناً",
+                confirmButtonColor: "#ffcc00",
+              });
+            } else {
+              throw new Error("فشل تسجيل الخروج من جميع الأجهزة");
+            }
+          } catch (error) {
+            Swal.fire({
+              title: "خطأ!",
+              text: error.message || "تعذر تسجيل الخروج من جميع الأجهزة",
+              icon: "error",
+              confirmButtonText: "حسناً",
+            });
+          }
+        }
+      }
+
+      function openEditUserModal(userId) {
+        const user = allUsers.find((u) => u._id === userId);
+        if (!user) return;
+
+        if (user._isLocal === true) {
+          Swal.fire({
+            title: "غير مسموح!",
+            text: "Please contact carl to edit this user",
+            icon: "warning",
+            confirmButtonText: "حسناً",
+            confirmButtonColor: "#ffcc00",
+          });
+          return;
+        }
+
+        document.getElementById("editUserId").value = userId;
+        document.getElementById("editFirstName").value = user.firstName;
+        document.getElementById("editSecondName").value = user.secondName;
+        document.getElementById("editEmail").value = user.email;
+        document.getElementById("editPhone").value = user.phone;
+        document.getElementById("editGrade").value = user.grade;
+        document.getElementById("editPassword").value = "";
+
+        editUserModal.classList.add("active");
+      }
+
+      function closeEditUserModal() {
+        editUserModal.classList.remove("active");
+      }
+
+      editUserForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const userId = document.getElementById("editUserId").value;
+        const firstName = document.getElementById("editFirstName").value;
+        const secondName = document.getElementById("editSecondName").value;
+        const email = document.getElementById("editEmail").value;
+        const phone = document.getElementById("editPhone").value;
+        const grade = document.getElementById("editGrade").value;
+        const password = document.getElementById("editPassword").value;
+        const editSubmitBtn = document.getElementById("editSubmitBtn");
+        const editBtnText = document.getElementById("editBtnText");
+        const editBtnLoading = document.getElementById("editBtnLoading");
+
+        editSubmitBtn.disabled = true;
+        editBtnText.style.display = "none";
+        editBtnLoading.style.display = "inline";
+
+        try {
+          const updateData = {
+            firstName,
+            secondName,
+            email,
+            phone,
+            grade,
+          };
+          if (password) updateData.password = password;
+
+          const response = await fetch(`/api/admin/users/${userId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updateData),
+          });
+
+          if (response.ok) {
+            closeEditUserModal();
+            Swal.fire({
+              title: "تم بنجاح!",
+              text: "تم تحديث بيانات المستخدم بنجاح",
+              icon: "success",
+              confirmButtonText: "حسناً",
+              confirmButtonColor: "#ffcc00",
+            });
+            loadUsers();
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            const errorMessage = errorData.message || "فشل تحديث بيانات المستخدم";
+            if (errorMessage.includes("contact carl")) {
+              Swal.fire({
+                title: "غير مسموح!",
+                text: "Please contact carl to edit this user",
+                icon: "warning",
+                confirmButtonText: "حسناً",
+                confirmButtonColor: "#ffcc00",
+              });
+            } else {
+              throw new Error(errorMessage);
+            }
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "خطأ!",
+            text: error.message || "تعذر تحديث بيانات المستخدم",
+            icon: "error",
+            confirmButtonText: "حسناً",
+          });
+        } finally {
+          editSubmitBtn.disabled = false;
+          editBtnText.style.display = "inline";
+          editBtnLoading.style.display = "none";
+        }
+      });
+
+      closeEditModal.addEventListener("click", closeEditUserModal);
+      cancelEditModal.addEventListener("click", closeEditUserModal);
+
+      function openTakePointsModal(userId, username) {
+        document.getElementById("takePointsUserId").value = userId;
+        document.getElementById("takePointsAmount").value = "";
+        document.getElementById("takePointsReason").value = "";
+        takePointsModal.classList.add("active");
+      }
+
+      function closeTakePointsModal() {
+        takePointsModal.classList.remove("active");
+      }
+
+      takePointsForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const userId = document.getElementById("takePointsUserId").value;
+        const amount = document.getElementById("takePointsAmount").value;
+        const reason = document.getElementById("takePointsReason").value;
+
+        if (!amount || amount < 1) {
+          Swal.fire({
+            title: "خطأ!",
+            text: "يرجى إدخال عدد نقاط صحيح",
+            icon: "error",
+            confirmButtonText: "حسناً",
+          });
+          return;
+        }
+
+        const takePointsSubmitBtn = document.getElementById(
+          "takePointsSubmitBtn"
+        );
+        const takePointsBtnText = document.getElementById("takePointsBtnText");
+        const takePointsBtnLoading = document.getElementById(
+          "takePointsBtnLoading"
+        );
+
+        takePointsSubmitBtn.disabled = true;
+        takePointsBtnText.style.display = "none";
+        takePointsBtnLoading.style.display = "inline";
+
+        try {
+          const response = await fetch(
+            `/api/admin/users/${userId}/remove-points`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ amount, reason }),
+            }
+          );
+
+          if (response.ok) {
+            closeTakePointsModal();
+            Swal.fire({
+              title: "تم بنجاح!",
+              text: `تم خصم ${amount} نقطة من المستخدم`,
+              icon: "success",
+              confirmButtonText: "حسناً",
+              confirmButtonColor: "#ffcc00",
+            });
+            loadUsers();
+          } else {
+            throw new Error("فشل خصم النقاط");
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "خطأ!",
+            text: error.message || "تعذر خصم النقاط",
+            icon: "error",
+            confirmButtonText: "حسناً",
+          });
+        } finally {
+          takePointsSubmitBtn.disabled = false;
+          takePointsBtnText.style.display = "inline";
+          takePointsBtnLoading.style.display = "none";
+        }
+      });
+
+      closeTakePointsModalBtn.addEventListener("click", closeTakePointsModal);
+      cancelTakePointsModal.addEventListener("click", closeTakePointsModal);
+
+      function openBanModal(userId, username) {
+        document.getElementById("banUserId").value = userId;
+        document.getElementById("banType").value = "";
+        document.getElementById("banReason").value = "";
+        banModal.classList.add("active");
+      }
+
+      function closeBanModal() {
+        banModal.classList.remove("active");
+      }
+
+      banForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const userId = document.getElementById("banUserId").value;
+        const banType = document.getElementById("banType").value;
+        const reason = document.getElementById("banReason").value;
+
+        const banSubmitBtn = document.getElementById("banSubmitBtn");
+        const banBtnText = document.getElementById("banBtnText");
+        const banBtnLoading = document.getElementById("banBtnLoading");
+
+        if (!banType) {
+          Swal.fire({
+            title: "خطأ!",
+            text: "يرجى اختيار نوع الحظر",
+            icon: "error",
+            confirmButtonText: "حسناً",
+          });
+          return;
+        }
+
+        banSubmitBtn.disabled = true;
+        banBtnText.style.display = "none";
+        banBtnLoading.style.display = "inline";
+
+        try {
+          const userResponse = await fetch(`/api/admin/users/${userId}`);
+          const user = await userResponse.json();
+
+          const response = await fetch(`/api/banned-users`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: user.username,
+              banType: banType,
+              reason: reason,
+            }),
+          });
+
+          if (response.ok) {
+            closeBanModal();
+            Swal.fire({
+              title: "تم بنجاح!",
+              text: "تم حظر المستخدم بنجاح",
+              icon: "success",
+              confirmButtonText: "حسناً",
+              confirmButtonColor: "#ffcc00",
+            });
+            loadUsers();
+            loadBannedUsers();
+          } else {
+            throw new Error("فشل حظر المستخدم");
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "خطأ!",
+            text: error.message || "تعذر حظر المستخدم",
+            icon: "error",
+            confirmButtonText: "حسناً",
+          });
+        } finally {
+          banSubmitBtn.disabled = false;
+          banBtnText.style.display = "inline";
+          banBtnLoading.style.display = "none";
+        }
+      });
+
+      closeBanModalBtn.addEventListener("click", closeBanModal);
+      cancelBanModal.addEventListener("click", closeBanModal);
+
+      async function loadBannedUsers() {
+        try {
+          const response = await fetch("/api/banned-users");
+          const bannedUsers = await response.json();
+          allBannedUsers = bannedUsers;
+
+          if (!bannedUsers || bannedUsers.length === 0) {
+            bannedUsersList.innerHTML = `
+              <div class="empty-state">
+                  <i class="fas fa-user-check"></i>
+                  <h3>لا يوجد مستخدمون محظورون</h3>
+                  <p>لا يوجد مستخدمون محظورون حالياً</p>
+              </div>
+          `;
+            return;
+          }
+
+          displayBannedUsers(bannedUsers);
+        } catch (error) {
+          console.error("Error loading banned users:", error);
+          bannedUsersList.innerHTML = `
+          <div class="empty-state">
+              <i class="fas fa-exclamation-circle"></i>
+              <h3>حدث خطأ</h3>
+              <p>تعذر تحميل بيانات المستخدمين المحظورين. يرجى المحاولة مرة أخرى.</p>
+          </div>
+      `;
+        }
+      }
+
+      function searchUsers() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+
+        if (searchTerm) {
+          clearSearch.style.display = "flex";
+        } else {
+          clearSearch.style.display = "none";
+        }
+
+        if (!searchTerm) {
+          displayUsersByCategory(currentCategory);
+          return;
+        }
+
+        const filteredUsers = allUsers.filter((user) => {
+          return (
+            user.firstName.toLowerCase().includes(searchTerm) ||
+            user.secondName.toLowerCase().includes(searchTerm) ||
+            user.username.toLowerCase().includes(searchTerm) ||
+            user.email.toLowerCase().includes(searchTerm) ||
+            user.phone.includes(searchTerm)
+          );
+        });
+
+        if (filteredUsers.length === 0) {
+          usersList.innerHTML = `
+          <div class="empty-state">
+              <i class="fas fa-search"></i>
+              <h3>لا توجد نتائج</h3>
+              <p>لم يتم العثور على مستخدمين يطابقون بحثك</p>
+          </div>
+      `;
+        } else {
+          displayUsers(filteredUsers);
+        }
+      }
+
+      async function givePoints(userId, username) {
+        const { value: formValues } = await Swal.fire({
+          title: "إعطاء نقاط",
+          html: `
+          <input id="swal-amount" class="swal2-input" placeholder="عدد النقاط" type="number" min="1" required>
+          <input id="swal-reason" class="swal2-input" placeholder="السبب (اختياري)">
+      `,
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonText: "إعطاء",
+          cancelButtonText: "إلغاء",
+          confirmButtonColor: "#27ae60",
+          cancelButtonColor: "#666",
+          preConfirm: () => {
+            return {
+              amount: document.getElementById("swal-amount").value,
+              reason: document.getElementById("swal-reason").value,
+            };
+          },
+        });
+
+        if (formValues && formValues.amount) {
+          try {
+            const response = await fetch(
+              `/api/admin/users/${userId}/give-points`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formValues),
+              }
+            );
+
+            if (response.ok) {
+              Swal.fire({
+                title: "تم بنجاح!",
+                text: `تم إعطاء ${formValues.amount} نقطة للمستخدم @${username}`,
+                icon: "success",
+                confirmButtonText: "حسناً",
+                confirmButtonColor: "#ffcc00",
+              });
+              loadUsers();
+            } else {
+              throw new Error("فشل إعطاء النقاط");
+            }
+          } catch (error) {
+            Swal.fire({
+              title: "خطأ!",
+              text: error.message || "تعذر إعطاء النقاط",
+              icon: "error",
+              confirmButtonText: "حسناً",
+            });
+          }
+        }
+      }
+
+      async function deleteUser(userId, username) {
+        const result = await Swal.fire({
+          title: "هل أنت متأكد؟",
+          text: `هل أنت متأكد أنك تريد حذف المستخدم "${username}"؟ هذا الإجراء لا يمكن التراجع عنه!`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "نعم، احذف",
+          cancelButtonText: "إلغاء",
+          confirmButtonColor: "#e74c3c",
+          cancelButtonColor: "#666",
+        });
+
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "جاري الحذف...",
+            text: "يرجى الانتظار جاري حذف المستخدم",
+            icon: "info",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          try {
+            const response = await fetch(`/api/admin/users/${userId}`, {
+              method: "DELETE",
+            });
+
+            Swal.close();
+
+            if (response.ok) {
+              Swal.fire({
+                title: "تم بنجاح!",
+                text: "تم حذف المستخدم بنجاح",
+                icon: "success",
+                confirmButtonText: "حسناً",
+                confirmButtonColor: "#ffcc00",
+              });
+              loadUsers();
+            } else {
+              throw new Error("فشل حذف المستخدم");
+            }
+          } catch (error) {
+            Swal.fire({
+              title: "خطأ!",
+              text: error.message || "تعذر حذف المستخدم",
+              icon: "error",
+              confirmButtonText: "حسناً",
+            });
+          }
+        }
+      }
+
+      async function unbanUser(username) {
+        const result = await Swal.fire({
+          title: "هل أنت متأكد؟",
+          text: `هل أنت متأكد أنك تريد إلغاء حظر المستخدم "${username}"؟`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "نعم، إلغاء الحظر",
+          cancelButtonText: "إلغاء",
+          confirmButtonColor: "#27ae60",
+          cancelButtonColor: "#666",
+        });
+
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "جاري إلغاء الحظر...",
+            text: "يرجى الانتظار جاري إلغاء حظر المستخدم",
+            icon: "info",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          try {
+            const response = await fetch(
+              `/api/banned-users/${encodeURIComponent(username)}`,
+              { method: "DELETE" }
+            );
+
+            Swal.close();
+
+            if (response.ok) {
+              Swal.fire({
+                title: "تم بنجاح!",
+                text: "تم إلغاء حظر المستخدم بنجاح",
+                icon: "success",
+                confirmButtonText: "حسناً",
+                confirmButtonColor: "#ffcc00",
+              });
+              loadUsers();
+              loadBannedUsers();
+            } else {
+              throw new Error("فشل إلغاء حظر المستخدم");
+            }
+          } catch (error) {
+            Swal.fire({
+              title: "خطأ!",
+              text: error.message || "تعذر إلغاء حظر المستخدم",
+              icon: "error",
+              confirmButtonText: "حسناً",
+            });
+          }
+        }
+      }
+
+      function toggleView() {
+        if (bannedSection.style.display === "none") {
+          usersSection.style.display = "none";
+          bannedSection.style.display = "block";
+          toggleViewBtn.innerHTML = '<i class="fas fa-users"></i> عرض النشطين';
+
+          loadBannedUsers();
+        } else {
+          usersSection.style.display = "block";
+          bannedSection.style.display = "none";
+          toggleViewBtn.innerHTML = '<i class="fas fa-ban"></i> عرض المحظورين';
+
+          displayUsersByCategory(currentCategory);
+        }
+      }
+      async function performLogout() {
+        const result = await Swal.fire({
+          title: "تسجيل الخروج",
+          text: "هل تريد فعلاً تسجيل الخروج من النظام؟",
+          icon: "question",
+          iconColor: "#ffcc00",
+          showCancelButton: true,
+          confirmButtonText: "نعم، تسجيل خروج",
+          cancelButtonText: "إلغاء",
+          confirmButtonColor: "#e74c3c",
+          cancelButtonColor: "#666",
+          background: "#2a1b3c",
+          color: "#fff",
+          backdrop: "rgba(0,0,0,0.8)",
+          allowOutsideClick: false,
+        });
+
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch("/logout", { method: "POST" });
+            if (response.ok) {
+              await Swal.fire({
+                title: "تم تسجيل الخروج",
+                text: "وداعاً! تم تسجيل خروجك بنجاح",
+                icon: "success",
+                iconColor: "#27ae60",
+                background: "#2a1b3c",
+                color: "#fff",
+                backdrop: "rgba(0,0,0,0.8)",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+              setTimeout(() => {
+                window.location.href = "/";
+              }, 500);
+            }
+          } catch (error) {
+            console.error("Logout error:", error);
+            window.location.href = "/";
+          }
+        }
+      }
+
+      logoutBtn.addEventListener("click", performLogout);
+      logoutBtnMobile.addEventListener("click", performLogout);
+      toggleViewBtn.addEventListener("click", toggleView);
+      refreshUsersBtn.addEventListener("click", () => {
+        loadUsers();
+        if (bannedSection.style.display !== "none") {
+          loadBannedUsers();
+        }
+      });
+      searchInput.addEventListener("input", searchUsers);
+      clearSearch.addEventListener("click", () => {
+        searchInput.value = "";
+        clearSearch.style.display = "none";
+        displayUsersByCategory(currentCategory);
+      });
+
+      categoryTabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          categoryTabs.forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          currentCategory = tab.dataset.category;
+          displayUsersByCategory(currentCategory);
+        });
+      });
+
+      document.addEventListener("click", function (event) {
+        if (window.innerWidth <= 992) {
+          if (
+            !sidebar.contains(event.target) &&
+            !mobileToggle.contains(event.target)
+          ) {
+            sidebar.classList.remove("active");
+            const spans = mobileToggle.querySelectorAll("span");
+            spans[0].style.transform = "none";
+            spans[1].style.opacity = "1";
+            spans[2].style.transform = "none";
+          }
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        loadUserInfo();
+        loadUsers();
+      });
+
+      if (sidebarGradesToggle) {
+        sidebarGradesToggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          const isOpening = !sidebarGradesSubmenu.classList.contains("open");
+
+          document
+            .querySelectorAll(".grades-submenu.open, .suggestions-submenu.open")
+            .forEach((menu) => {
+              if (menu !== sidebarGradesSubmenu) {
+                menu.classList.remove("open");
+              }
+            });
+
+          if (!isOpening) {
+            document
+              .querySelectorAll(".section-submenu.open")
+              .forEach((submenu) => {
+                submenu.classList.remove("open");
+              });
+            document
+              .querySelectorAll(".section-toggle.open")
+              .forEach((toggle) => {
+                toggle.classList.remove("open");
+              });
+          }
+
+          sidebarGradesSubmenu.classList.toggle("open");
+          sidebarGradesToggle.classList.toggle("open");
+
+          const suggestionsToggle =
+            document.getElementById("suggestionsToggle");
+          const suggestionsSubmenu =
+            document.getElementById("suggestionsSubmenu");
+          if (
+            suggestionsToggle &&
+            suggestionsSubmenu &&
+            suggestionsSubmenu.classList.contains("open")
+          ) {
+            suggestionsSubmenu.classList.remove("open");
+            suggestionsToggle.classList.remove("open");
+          }
+        });
+      }
+
+      const suggestionsToggle = document.getElementById("suggestionsToggle");
+      const suggestionsSubmenu = document.getElementById("suggestionsSubmenu");
+
+      if (suggestionsToggle && suggestionsSubmenu) {
+        suggestionsSubmenu.classList.remove("open");
+
+        suggestionsToggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          const isOpening = !suggestionsSubmenu.classList.contains("open");
+
+          document
+            .querySelectorAll(".grades-submenu.open, .suggestions-submenu.open")
+            .forEach((menu) => {
+              if (menu !== suggestionsSubmenu) {
+                menu.classList.remove("open");
+              }
+            });
+
+          if (isOpening) {
+            if (
+              sidebarGradesSubmenu &&
+              sidebarGradesSubmenu.classList.contains("open")
+            ) {
+              sidebarGradesSubmenu.classList.remove("open");
+              if (sidebarGradesToggle)
+                sidebarGradesToggle.classList.remove("open");
+            }
+          }
+
+          suggestionsSubmenu.classList.toggle("open");
+          suggestionsToggle.classList.toggle("open");
+        });
+      }
+
+      document.querySelectorAll(".section-toggle").forEach((toggle) => {
+        toggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          const section = this.dataset.section;
+          const submenu = document.querySelector(
+            `.section-submenu[data-section="${section}"]`
+          );
+
+          if (!submenu) return;
+
+          document
+            .querySelectorAll(".section-submenu.open")
+            .forEach((otherSubmenu) => {
+              if (otherSubmenu !== submenu) {
+                otherSubmenu.classList.remove("open");
+              }
+            });
+
+          document
+            .querySelectorAll(".section-toggle.open")
+            .forEach((otherToggle) => {
+              if (otherToggle !== this) {
+                otherToggle.classList.remove("open");
+              }
+            });
+
+          submenu.classList.toggle("open");
+          this.classList.toggle("open");
+        });
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".sidebar") && window.innerWidth <= 992) {
+          document
+            .querySelectorAll(
+              ".grades-submenu.open, .suggestions-submenu.open, .section-submenu.open"
+            )
+            .forEach((menu) => {
+              menu.classList.remove("open");
+            });
+
+          document
+            .querySelectorAll(
+              ".grades-toggle.open, .suggestions-toggle.open, .section-toggle.open"
+            )
+            .forEach((toggle) => {
+              toggle.classList.remove("open");
+            });
+
+          if (sidebar && sidebar.classList.contains("active")) {
+            sidebar.classList.remove("active");
+            const spans = mobileToggle.querySelectorAll("span");
+            spans[0].style.transform = "none";
+            spans[1].style.opacity = "1";
+            spans[2].style.transform = "none";
+          }
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .querySelectorAll(
+            ".grades-submenu, .suggestions-submenu, .section-submenu"
+          )
+          .forEach((menu) => {
+            menu.classList.remove("open");
+          });
+
+        document
+          .querySelectorAll(
+            ".grades-toggle, .suggestions-toggle, .section-toggle"
+          )
+          .forEach((toggle) => {
+            toggle.classList.remove("open");
+          });
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeEditUserModal();
+          closeTakePointsModal();
+          closeBanModal();
+        }
+      });
+
+      window.addEventListener("click", function (event) {
+        if (event.target === editUserModal) closeEditUserModal();
+        if (event.target === takePointsModal) closeTakePointsModal();
+        if (event.target === banModal) closeBanModal();
+      });
+
+      if (categoryToggle) {
+        categoryToggle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          categoryDropdown.classList.toggle("active");
+
+          if (categoryDropdown.classList.contains("active")) {
+            dropdownMenu.style.animation = "fadeInUp 0.3s ease";
+          }
+        });
+      }
+
+      categoryOptions.forEach((option) => {
+        option.addEventListener("click", function () {
+          const category = this.dataset.category;
+
+          categoryOptions.forEach((opt) => opt.classList.remove("active"));
+
+          this.classList.add("active");
+
+          currentCategory = category;
+          displayUsersByCategory(category);
+
+          const optionText = this.textContent
+            .replace(this.querySelector(".category-count").textContent, "")
+            .trim();
+          categoryToggle.innerHTML = `
+      <i class="fas fa-filter"></i>
+      ${optionText}
+      <i class="fas fa-chevron-down"></i>
+  `;
+
+          categoryDropdown.classList.remove("active");
+        });
+      });
+
+      document.addEventListener("click", function (e) {
+        if (categoryDropdown && !categoryDropdown.contains(e.target)) {
+          categoryDropdown.classList.remove("active");
+        }
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && categoryDropdown) {
+          categoryDropdown.classList.remove("active");
+        }
+      });
+
+      async function copyText(text) {
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+          }
+
+          await Swal.fire({
+            title: "تم النسخ",
+            text: "تم نسخ البيانات إلى الحافظة بنجاح",
+            icon: "success",
+            confirmButtonText: "حسناً",
+            confirmButtonColor: "#ffcc00",
+            timer: 1600,
+            timerProgressBar: true,
+          });
+        } catch (e) {
+          await Swal.fire({
+            title: "فشل النسخ",
+            text: "تعذر نسخ البيانات. حاول مرة أخرى.",
+            icon: "error",
+            confirmButtonText: "حسناً",
+            confirmButtonColor: "#e74c3c",
+          });
+        }
+      }
+
+      function getUserStatus(user) {
+        if (isUserBanned(user)) return "banned";
+
+        if (!user?.lastActivity) return "signed-out";
+
+        const lastActivity = new Date(user.lastActivity);
+        if (Number.isNaN(lastActivity.getTime())) return "signed-out";
+
+        const now = Date.now();
+        const diffMinutes = Math.floor((now - lastActivity.getTime()) / 60000);
+
+        const ONLINE_THRESHOLD_MINUTES = 2;
+        const IDLE_THRESHOLD_MINUTES = 30;
+
+        if (diffMinutes <= ONLINE_THRESHOLD_MINUTES) return "online";
+        if (diffMinutes <= IDLE_THRESHOLD_MINUTES) return "idle";
+
+        return "signed-in";
+      }
+
+      function isUserBanned(user) {
+        return allBannedUsers.some(
+          (banned) => banned.username === user.username
+        );
+      }
+
+      function getStatusBadge(status) {
+        const badges = {
+          online: '<span class="status-badge online-badge">🟢 متصل</span>',
+          idle: '<span class="status-badge idle-badge">🟠 غير نشط</span>',
+          "signed-in":
+            '<span class="status-badge signed-in-badge">🔵 مسجل دخول</span>',
+          "signed-out":
+            '<span class="status-badge signed-out-badge">⚫ غير متصل</span>',
+          banned: '<span class="status-badge banned-badge">🔴 محظور</span>',
+        };
+
+        return badges[status] || badges["signed-out"];
+      }
+
+      function getStatusDescription(status) {
+        const descriptions = {
+          online: "متصل",
+          idle: "غير نشط",
+          "signed-in": "مسجل دخول",
+          "signed-out": "غير متصل",
+          banned: "المستخدم محظور",
+        };
+
+        return descriptions[status] || "غير متصل";
+      }
+
+      function formatTimeAgo(date) {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMinutes = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMinutes / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMinutes < 1) {
+          return "الآن";
+        } else if (diffMinutes < 60) {
+          return `منذ ${diffMinutes} دقيقة`;
+        } else if (diffHours < 24) {
+          return `منذ ${diffHours} ساعة`;
+        } else if (diffDays < 7) {
+          return `منذ ${diffDays} يوم`;
+        } else {
+          return date.toLocaleDateString("ar-EG");
+        }
+      }
+    </script>
+  </body>
+</html>

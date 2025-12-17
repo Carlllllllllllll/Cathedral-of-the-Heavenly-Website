@@ -1,0 +1,28 @@
+{
+  "collection": "userregistrations",
+  "totalDocuments": 1,
+  "backedUpDocuments": 1,
+  "timestamp": "2025-12-17T19:27:09.873Z",
+  "data": [
+    {
+      "_id": "6941ee6a8b03894251713273",
+      "username": "carlmounirr",
+      "password": "$2b$10$zxiU2WLKP1t62Ld0ObHpNOeIvk80iGOPAYQIn/qAwQtCty2vjQss6",
+      "firstName": "Carl",
+      "secondName": "Mounir",
+      "email": "carlmony1@gmail.com",
+      "phone": "01200249240",
+      "grade": "admins",
+      "role": "student",
+      "approvalStatus": "approved",
+      "verificationCode": "322614",
+      "verificationCodeVerified": true,
+      "verificationDate": "2025-12-16T23:43:14.076Z",
+      "lastLoginAt": "2025-12-16T23:46:19.294Z",
+      "createdAt": "2025-12-16T23:42:34.992Z",
+      "__v": 0,
+      "reviewedAt": "2025-12-16T23:43:14.075Z",
+      "reviewedBy": "carlmounir"
+    }
+  ]
+}
