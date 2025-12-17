@@ -2027,18 +2027,23 @@ app.post("/login", loginLimiter, async (req, res) => {
     try {
       let registeredUser = null;
       if (isEmail) {
-        registeredUser = await UserRegistration.findOne({
-          email: username.toLowerCase(),
-        });
+        registeredUser = await findUserByEmail(username);
       } else if (isPhone) {
         const cleanedPhone = username.replace(/\D/g, "");
-        registeredUser = await UserRegistration.findOne({
+        // Try to find by phone in both MongoDB and local
+        const mongoUser = await UserRegistration.findOne({
           phone: cleanedPhone,
         });
+        if (mongoUser) {
+          registeredUser = { ...mongoUser.toObject(), _isLocal: false };
+        } else {
+          const localUsers = await localUserStore.find({ phone: cleanedPhone });
+          if (localUsers && localUsers.length > 0) {
+            registeredUser = { ...localUsers[0], _isLocal: true };
+          }
+        }
       } else {
-        registeredUser = await UserRegistration.findOne({
-          username: normalizedUsername,
-        });
+        registeredUser = await findUserByUsername(normalizedUsername);
       }
 
       if (registeredUser) {
@@ -2266,7 +2271,23 @@ app.post("/login", loginLimiter, async (req, res) => {
               });
             }
             registeredUser.verificationCodeVerified = true;
-            await registeredUser.save();
+            // Save based on user type
+            if (registeredUser._isLocal) {
+              // For local users, we need to use adminUpdate with "carl" or update the JSON directly
+              // Since this is a system operation during login, we'll allow it
+              try {
+                await localUserStore.adminUpdate(
+                  registeredUser._id,
+                  { verificationCodeVerified: true },
+                  "carl"
+                );
+              } catch (err) {
+                console.error("Failed to update local user verification:", err);
+                // Continue with login even if update fails
+              }
+            } else {
+              await registeredUser.save();
+            }
 
             await sendWebhook("USER", {
               embeds: [
@@ -2312,7 +2333,23 @@ app.post("/login", loginLimiter, async (req, res) => {
           }
 
           registeredUser.lastLoginAt = new Date();
-          await registeredUser.save();
+          // Save based on user type
+          if (registeredUser._isLocal) {
+            // For local users, we need to use adminUpdate with "carl"
+            // Since this is a system operation during login, we'll allow it
+            try {
+              await localUserStore.adminUpdate(
+                registeredUser._id,
+                { lastLoginAt: new Date() },
+                "carl"
+              );
+            } catch (err) {
+              console.error("Failed to update local user lastLoginAt:", err);
+              // Continue with login even if update fails
+            }
+          } else {
+            await registeredUser.save();
+          }
 
           user = {
             originalUsername: registeredUser.username,
@@ -4450,7 +4487,8 @@ app.get(
           },
         ],
       });
-      res.status(500).json({ error: "تعذر تحميل المستخدمين" });
+      // Always return an array, even on error
+      res.status(500).json([]);
     }
   }
 );
@@ -4597,7 +4635,7 @@ app.post(
         ],
       });
 
-      const registration = await UserRegistration.findById(req.params.id);
+      const registration = await findUserById(req.params.id);
       if (!registration) {
         await sendWebhook("ADMIN", {
           embeds: [
@@ -4748,7 +4786,7 @@ app.post(
         ],
       });
 
-      const registration = await UserRegistration.findById(req.params.id);
+      const registration = await findUserById(req.params.id);
       if (!registration) {
         await sendWebhook("ADMIN", {
           embeds: [
@@ -4914,6 +4952,39 @@ app.put(
         return res
           .status(404)
           .json({ success: false, message: "المستخدم غير موجود" });
+      }
+
+      // Prevent admin from editing their own account
+      if (registration.username.toLowerCase() === req.session.username.toLowerCase()) {
+        await sendWebhook("SECURITY", {
+          embeds: [
+            {
+              title: "🚫 Attempted Self-Edit Blocked",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Admin", value: req.session.username, inline: true },
+                { name: "User ID", value: req.params.id, inline: true },
+                { name: "Username", value: registration.username, inline: true },
+                {
+                  name: "Action",
+                  value: "Update User (Self-Edit Blocked)",
+                  inline: true,
+                },
+                {
+                  name: "Reason",
+                  value: "Admins cannot edit their own account",
+                  inline: false,
+                },
+                { name: "IP", value: req.ip || "unknown", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res.status(403).json({
+          success: false,
+          message: "لا يمكنك تعديل حسابك الخاص",
+        });
       }
 
       if (registration._isLocal === true) {
@@ -5182,7 +5253,7 @@ app.delete(
         ],
       });
 
-      const registration = await UserRegistration.findById(req.params.id);
+      const registration = await findUserById(req.params.id);
       if (!registration) {
         await sendWebhook("ADMIN", {
           embeds: [
@@ -5202,6 +5273,73 @@ app.delete(
           .status(404)
           .json({ success: false, message: "المستخدم غير موجود" });
       }
+
+      // Prevent admin from deleting their own account
+      if (registration.username.toLowerCase() === req.session.username.toLowerCase()) {
+        await sendWebhook("SECURITY", {
+          embeds: [
+            {
+              title: "🚫 Attempted Self-Delete Blocked",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Admin", value: req.session.username, inline: true },
+                { name: "User ID", value: req.params.id, inline: true },
+                { name: "Username", value: registration.username, inline: true },
+                {
+                  name: "Action",
+                  value: "Delete User (Self-Delete Blocked)",
+                  inline: true,
+                },
+                {
+                  name: "Reason",
+                  value: "Admins cannot delete their own account",
+                  inline: false,
+                },
+                { name: "IP", value: req.ip || "unknown", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res.status(403).json({
+          success: false,
+          message: "لا يمكنك حذف حسابك الخاص",
+        });
+      }
+
+      // Only allow deletion of MongoDB users, not local users
+      if (registration._isLocal === true) {
+        await sendWebhook("SECURITY", {
+          embeds: [
+            {
+              title: "🚫 Attempted Delete of Local User Blocked",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Admin", value: req.session.username, inline: true },
+                { name: "User ID", value: req.params.id, inline: true },
+                { name: "Username", value: registration.username, inline: true },
+                {
+                  name: "Action",
+                  value: "Delete User (Blocked)",
+                  inline: true,
+                },
+                {
+                  name: "Reason",
+                  value: "Local users cannot be deleted through admin panel",
+                  inline: false,
+                },
+                { name: "IP", value: req.ip || "unknown", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res.status(403).json({
+          success: false,
+          message: "Please contact carl to delete this user",
+        });
+      }
+
       const criticalRoles = ["teacher", "admin", "leadadmin"];
       if (criticalRoles.includes(registration.role)) {
         await sendWebhook("ADMIN", {
@@ -5232,7 +5370,17 @@ app.delete(
           .status(403)
           .json({ success: false, message: "لا يمكن حذف هذا المستخدم" });
       }
-      await UserRegistration.deleteOne({ _id: registration._id });
+
+      // Only delete MongoDB users (local users are already blocked above)
+      if (registration._isLocal === false) {
+        await UserRegistration.deleteOne({ _id: registration._id });
+      } else {
+        // This should not happen due to earlier check, but safety check
+        return res.status(403).json({
+          success: false,
+          message: "Please contact carl to delete this user",
+        });
+      }
       const pointsDoc = await UserPoints.findOne({
         username: registration.username,
       }).lean();
