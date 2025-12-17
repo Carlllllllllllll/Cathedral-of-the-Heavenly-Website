@@ -76,9 +76,6 @@
         z-index: 1001;
         cursor: pointer;
         padding: 8px;
-        background: rgba(42, 27, 60, 0.9);
-        border-radius: 8px;
-        border: 1px solid rgba(255, 204, 0, 0.3);
       }
 
       .mobile-toggle span {
@@ -100,7 +97,7 @@
         backdrop-filter: blur(20px);
         padding: 20px;
         box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
-        transition: var(--transition-speed);
+        transition: transform var(--transition-speed);
         z-index: 1000;
         border-right: 1px solid var(--border);
         display: flex;
@@ -1305,6 +1302,7 @@
 
         .sidebar.active {
           transform: translateX(0) !important;
+          box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
         }
 
         .main-content {
@@ -2337,7 +2335,9 @@
         admins: 0,
       };
 
-      function toggleSidebar() {
+      function toggleSidebar(e) {
+        if (e) e.preventDefault();
+        if (e) e.stopPropagation();
         if (!sidebar || !mobileToggle) return;
         sidebar.classList.toggle("active");
         const spans = mobileToggle.querySelectorAll("span");
@@ -2352,8 +2352,9 @@
         }
       }
 
-      if (mobileToggle) {
+      if (mobileToggle && sidebar) {
         mobileToggle.addEventListener("click", toggleSidebar);
+        mobileToggle.addEventListener("touchstart", toggleSidebar);
       }
 
       async function loadUserInfo() {
@@ -3683,29 +3684,35 @@
       });
 
       document.addEventListener("click", function (e) {
-        if (!e.target.closest(".sidebar") && window.innerWidth <= 992) {
-          document
-            .querySelectorAll(
-              ".grades-submenu.open, .suggestions-submenu.open, .section-submenu.open"
-            )
-            .forEach((menu) => {
-              menu.classList.remove("open");
-            });
+        if (window.innerWidth <= 992 && sidebar && mobileToggle) {
+          if (
+            !e.target.closest(".sidebar") &&
+            !e.target.closest(".mobile-toggle") &&
+            !mobileToggle.contains(e.target)
+          ) {
+            document
+              .querySelectorAll(
+                ".grades-submenu.open, .suggestions-submenu.open, .section-submenu.open"
+              )
+              .forEach((menu) => {
+                menu.classList.remove("open");
+              });
 
-          document
-            .querySelectorAll(
-              ".grades-toggle.open, .suggestions-toggle.open, .section-toggle.open"
-            )
-            .forEach((toggle) => {
-              toggle.classList.remove("open");
-            });
+            document
+              .querySelectorAll(
+                ".grades-toggle.open, .suggestions-toggle.open, .section-toggle.open"
+              )
+              .forEach((toggle) => {
+                toggle.classList.remove("open");
+              });
 
-          if (sidebar && sidebar.classList.contains("active")) {
-            sidebar.classList.remove("active");
-            const spans = mobileToggle.querySelectorAll("span");
-            spans[0].style.transform = "none";
-            spans[1].style.opacity = "1";
-            spans[2].style.transform = "none";
+            if (sidebar.classList.contains("active")) {
+              sidebar.classList.remove("active");
+              const spans = mobileToggle.querySelectorAll("span");
+              spans[0].style.transform = "none";
+              spans[1].style.opacity = "1";
+              spans[2].style.transform = "none";
+            }
           }
         }
       });
