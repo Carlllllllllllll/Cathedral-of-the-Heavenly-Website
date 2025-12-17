@@ -10391,17 +10391,33 @@ app.get("/form/:link/leaderboard", requireAuth, async (req, res) => {
       return res.status(403).redirect("/404.html");
     }
 
-    const leaderboard = form.submissions
-      .sort((a, b) => b.score - a.score)
-      .map((submission, index) => ({
-        rank: index + 1,
-        username: submission.username,
-        grade: submission.grade,
-        score: submission.score,
-        submissionTime: submission.submissionTime.toLocaleString("en-US", {
-          timeZone: "Africa/Cairo",
-        }),
-      }));
+    const leaderboardData = await Promise.all(
+      form.submissions
+        .sort((a, b) => b.score - a.score)
+        .map(async (submission, index) => {
+          const user = await UserRegistration.findOne({
+            username: submission.username.toLowerCase(),
+          });
+          const fullName = user
+            ? `${user.firstName} ${user.secondName}`.trim()
+            : submission.username;
+          
+          return {
+            rank: index + 1,
+            username: submission.username,
+            name: fullName,
+            grade: submission.grade || "غير محدد",
+            score: submission.score,
+            totalQuestions: form.questions.length,
+            submissionTime: submission.submissionTime.toLocaleString("en-US", {
+              timeZone: "Africa/Cairo",
+            }),
+            submissionDate: submission.submissionTime,
+          };
+        })
+    );
+    
+    const leaderboard = leaderboardData;
 
     await sendWebhook("USER", {
       embeds: [

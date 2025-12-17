@@ -181,6 +181,7 @@
         transition: all var(--transition-speed);
         font-weight: 600;
         font-size: 16px;
+        cursor: pointer;
       }
 
       .nav-link i {
@@ -1473,7 +1474,9 @@
         transform: rotate(180deg);
       }
 
-      .grades-toggle {
+      .grades-toggle,
+      .section-toggle,
+      .suggestions-toggle {
         cursor: pointer;
         user-select: none;
       }
@@ -1850,6 +1853,10 @@
 
       .section-toggle.open i {
         color: var(--dark) !important;
+      }
+
+      .submenu-link {
+        cursor: pointer;
       }
 
       .submenu-link:hover {

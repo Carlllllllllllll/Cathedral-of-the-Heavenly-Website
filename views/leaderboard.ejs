@@ -8,12 +8,12 @@
     <meta name="author" content="كاتدرائية السمائيين" />
     <meta name="theme-color" content="#402958" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta property="og:title" content="لوحة الترتيب - <%= form.topic %> | كاتدرائية السمائيين" />
+    <meta property="og:title" content="لوحة الترتيب - dasd | كاتدرائية السمائيين" />
     <meta property="og:description" content="كاتدرائية السمائيين – «اِفْرَحُوا فِي الرَّبِّ كُلَّ حِينٍ» (فيلبي ٤: ٤)" />
     <meta property="og:image" content="/UI/icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ar_AR" />
-    <title>لوحة الترتيب - <%= form.topic %> | كاتدرائية السمائيين</title>
+    <title>لوحة الترتيب - dasd | كاتدرائية السمائيين</title>
     <link rel="icon" href="/UI/icon.png" type="image/png" sizes="16x16" />
     <link rel="apple-touch-icon" href="/UI/icon.png" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -583,6 +583,7 @@
             background: linear-gradient(90deg, var(--secondary), var(--primary));
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.12);
+            margin-top: 35px;
             border-radius: 12px;
             font-size: 15px;
             font-weight: 800;
@@ -642,21 +643,14 @@
         }
 
         .leaderboard-table tbody tr {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             background: rgba(255, 255, 255, 0.03);
         }
 
         .leaderboard-table tbody tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .leaderboard-table tbody tr:hover {
-            background: rgba(255, 204, 0, 0.12);
-            transform: translateX(-3px);
-            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.15);
-            border-left: 3px solid var(--accent);
-        }
 
         .leaderboard-table tbody tr:last-child {
             border-bottom: none;
@@ -668,10 +662,19 @@
             color: var(--text);
             font-size: 15px;
             vertical-align: middle;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .leaderboard-table td:last-child {
+            border-right: none;
+        }
+        
+        .leaderboard-table th {
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .leaderboard-table th:last-child {
             border-right: none;
         }
 
@@ -738,9 +741,6 @@
             background: linear-gradient(135deg, rgba(255, 204, 0, 0.15), rgba(255, 204, 0, 0.05)) !important;
         }
 
-        .podium-row:hover {
-            background: linear-gradient(135deg, rgba(255, 204, 0, 0.25), rgba(255, 204, 0, 0.15)) !important;
-        }
 
         .empty-state {
             text-align: center;
@@ -1085,7 +1085,7 @@
     </style>
 </head>
 <body>
-    <% const leaderboardEntries = Array.isArray(leaderboard) ? leaderboard : []; const participantCount = leaderboardEntries.length; const questionCount = Array.isArray(form.questions) ? form.questions.length : 0; const totalScore = leaderboardEntries.reduce((sum, entry) => sum + (entry.score || 0), 0); const bestScore = participantCount ? (leaderboardEntries[0].score || 0) : 0; const averageScoreValue = participantCount ? (totalScore / participantCount) : 0; const bestPercentage = questionCount ? Math.round((bestScore / questionCount) * 100) : 0; const averagePercentage = questionCount ? Math.round((averageScoreValue / questionCount) * 100) : 0; %>
+    
 
     <div class="mobile-toggle" id="mobileToggle">
         <span></span>
@@ -1239,28 +1239,45 @@
             <div class="leaderboard-header">
                 <h1 class="leaderboard-title">
                     <i class="fas fa-trophy"></i>
-                    لوحة الترتيب - <%= form.topic %>
+                    لوحة الترتيب<% if (typeof form !== 'undefined' && form && form.topic) { %> - <%= form.topic %><% } %>
                 </h1>
             </div>
 
             <div class="stats-grid">
+                <% 
+                    const topScore = leaderboard && leaderboard.length > 0 ? leaderboard[0] : null;
+                    const totalQuestions = form && form.questions ? form.questions.length : 1;
+                    const topScoreValue = topScore ? topScore.score : 0;
+                    const topScorePercentage = totalQuestions > 0 ? Math.round((topScoreValue / totalQuestions) * 100) : 0;
+                    const topScoreName = topScore ? topScore.name : 'لا يوجد';
+                    
+                    const averageScore = leaderboard && leaderboard.length > 0 
+                        ? leaderboard.reduce((sum, entry) => sum + entry.score, 0) / leaderboard.length 
+                        : 0;
+                    const averagePercentage = totalQuestions > 0 ? Math.round((averageScore / totalQuestions) * 100) : 0;
+                    const participantCount = leaderboard ? leaderboard.length : 0;
+                    
+                    const lastUpdate = leaderboard && leaderboard.length > 0 
+                        ? leaderboard[0].submissionTime 
+                        : new Date().toLocaleString("ar-EG", { timeZone: "Africa/Cairo" });
+                %>
                 <div class="stat-card primary">
                     <div class="stat-label">أعلى نتيجة</div>
                     <div class="stat-value">
-                        <%= bestScore %> / <%= questionCount || '—' %>
+                        <%= topScoreValue %> / <%= totalQuestions %>
                     </div>
                     <div class="stat-meta">
-                        <%= bestPercentage %>% من إجمالي الأسئلة
+                        <%= topScorePercentage %>% من إجمالي الأسئلة
                     </div>
                     <div class="stat-chip">
                         <i class="fas fa-trophy"></i>
-                        <% if (participantCount) { %> <%= leaderboardEntries[0].username || leaderboardEntries[0].displayName || 'غير معروف' %> <% } else { %> بانتظار مشاركات <% } %>
+                        <%= topScoreName %>
                     </div>
                 </div>
                 <div class="stat-card success">
                     <div class="stat-label">متوسط الدرجات</div>
                     <div class="stat-value">
-                        <%= averageScoreValue.toFixed(1) %> / <%= questionCount || '—' %>
+                        <%= averageScore.toFixed(1) %> / <%= totalQuestions %>
                     </div>
                     <div class="stat-meta"><%= averagePercentage %>% متوسط النجاح</div>
                     <div class="stat-chip">
@@ -1272,7 +1289,7 @@
                     <div class="stat-label">عدد المشاركات</div>
                     <div class="stat-value"><%= participantCount %></div>
                     <div class="stat-meta">
-                        آخر تحديث: <% if (participantCount) { %> <%= leaderboardEntries[0].submissionTime %> <% } else { %> بانتظار المشاركات <% } %>
+                        آخر تحديث: <%= lastUpdate %>
                     </div>
                     <div class="stat-chip">
                         <i class="fas fa-clock"></i>
@@ -1308,7 +1325,7 @@
             </div>
 
             <div class="leaderboard-table-wrapper">
-                <% if (participantCount) { %>
+                
                     <table class="leaderboard-table" id="leaderboardTable">
                         <thead>
                             <tr>
@@ -1321,37 +1338,54 @@
                             </tr>
                         </thead>
                         <tbody id="leaderboardList">
-                            <% let currentRank = 1; let lastScore = null; for (let index = 0; index < leaderboardEntries.length; index++) { const entry = leaderboardEntries[index]; const scoreValue = typeof entry.score === 'number' ? entry.score : 0; const formattedScore = scoreValue + '/' + questionCount; if (scoreValue !== lastScore) { currentRank = index + 1; lastScore = scoreValue; } const isPodium = currentRank <= 3; %>
-                            <tr class="leaderboard-row <%= isPodium ? 'podium-row' : '' %>" data-grade="<%= entry.grade || '' %>" data-date="<%= entry.submissionTime || '' %>" data-rank="<%= currentRank %>" data-username="<%= entry.username || '' %>" data-name="<%= entry.displayName || entry.username || 'غير معروف' %>" data-score="<%= scoreValue %>" data-time="<%= entry.submissionTime || 'غير متاح' %>">
-                                <td>
-                                    <span class="rank-cell rank-<%= currentRank %>"><%= currentRank %></span>
-                                </td>
-                                <td>
-                                    <div class="user-name-cell"><%= entry.displayName || entry.username || 'غير معروف' %></div>
-                                </td>
-                                <td>
-                                    <div class="username-cell"><%= entry.username || '—' %></div>
-                                </td>
-                                <td>
-                                    <span class="grade-cell"><%= entry.grade || '—' %></span>
-                                </td>
-                                <td>
-                                    <span class="score-cell"><%= formattedScore %></span>
-                                </td>
-                                <td>
-                                    <span class="time-cell"><%= entry.submissionTime || 'غير متاح' %></span>
-                                </td>
-                            </tr>
+                            <% if (typeof leaderboard !== 'undefined' && leaderboard && leaderboard.length > 0) { %>
+                                <% leaderboard.forEach((entry, index) => { %>
+                                    <% 
+                                        const rankClass = entry.rank === 1 ? 'rank-1' : entry.rank === 2 ? 'rank-2' : entry.rank === 3 ? 'rank-3' : '';
+                                        const isPodium = entry.rank <= 3;
+                                    %>
+                                    <tr class="leaderboard-row <%= isPodium ? 'podium-row' : '' %>" 
+                                        data-grade="<%= entry.grade %>" 
+                                        data-date="<%= entry.submissionDate %>" 
+                                        data-rank="<%= entry.rank %>" 
+                                        data-username="<%= entry.username %>" 
+                                        data-name="<%= entry.name %>" 
+                                        data-score="<%= entry.score %>" 
+                                        data-time="<%= entry.submissionTime %>">
+                                        <td>
+                                            <span class="rank-cell <%= rankClass %>"><%= entry.rank %></span>
+                                        </td>
+                                        <td>
+                                            <div class="user-name-cell"><%= entry.name %></div>
+                                        </td>
+                                        <td>
+                                            <div class="username-cell"><%= entry.username %></div>
+                                        </td>
+                                        <td>
+                                            <span class="grade-cell"><%= entry.grade %></span>
+                                        </td>
+                                        <td>
+                                            <span class="score-cell"><%= entry.score %>/<%= entry.totalQuestions %></span>
+                                        </td>
+                                        <td>
+                                            <span class="time-cell"><%= entry.submissionTime %></span>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 40px;">
+                                        <div class="empty-state">
+                                            <i class="fas fa-trophy"></i>
+                                            <h3>لا توجد نتائج</h3>
+                                            <p>لا توجد مشاركات في لوحة الترتيب بعد</p>
+                                        </div>
+                                    </td>
+                                </tr>
                             <% } %>
                         </tbody>
                     </table>
-                <% } else { %>
-                    <div class="empty-state">
-                        <i class="fas fa-trophy"></i>
-                        <h3>لا توجد مشاركات حتى الآن</h3>
-                        <p>لا توجد نتائج متاحة للعرض في لوحة الترتيب</p>
-                    </div>
-                <% } %>
+                
             </div>
         </div>
     </main>
