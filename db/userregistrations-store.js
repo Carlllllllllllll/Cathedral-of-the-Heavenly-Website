@@ -454,6 +454,28 @@ class SecureUserRegistrationsStore {
     return users.find((u) => u.email === normalized) || null;
   }
 
+  async findByPhone(phone) {
+    const normalized = sanitizeString((phone || "").toString().trim(), {
+      maxLength: 20,
+      stripHtml: true,
+    });
+    const users = await this.readAll();
+    return users.find((u) => u.phone === normalized) || null;
+  }
+
+  async findByName(firstName, secondName) {
+    const normalizedFirstName = sanitizeString((firstName || "").toString().toLowerCase().trim(), {
+      maxLength: 100,
+      stripHtml: true,
+    });
+    const normalizedSecondName = sanitizeString((secondName || "").toString().toLowerCase().trim(), {
+        maxLength: 100,
+        stripHtml: true,
+      });
+    const users = await this.readAll();
+    return users.find((u) => u.firstName.toLowerCase() === normalizedFirstName && u.secondName.toLowerCase() === normalizedSecondName) || null;
+  }
+
   async find(query = {}) {
     const users = await this.readAll();
 

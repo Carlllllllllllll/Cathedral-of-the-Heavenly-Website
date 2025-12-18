@@ -992,6 +992,43 @@ async function findUserByEmail(email) {
   }
 }
 
+async function findUserByPhone(phone) {
+  try {
+    const normalized = (phone || "").toString().trim();
+    const mongoUser = await UserRegistration.findOne({ phone: normalized });
+    if (mongoUser) {
+      return { ...mongoUser.toObject(), _isLocal: false };
+    }
+    const localUser = await localUserStore.findByPhone(normalized);
+    if (localUser) {
+      return { ...localUser, _isLocal: true };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error finding user by phone:", error);
+    return null;
+  }
+}
+
+async function findUserByName(firstName, secondName) {
+    try {
+      const normalizedFirstName = (firstName || "").toString().toLowerCase().trim();
+      const normalizedSecondName = (secondName || "").toString().toLowerCase().trim();
+      const mongoUser = await UserRegistration.findOne({ firstName: normalizedFirstName, secondName: normalizedSecondName });
+      if (mongoUser) {
+        return { ...mongoUser.toObject(), _isLocal: false };
+      }
+      const localUser = await localUserStore.findByName(normalizedFirstName, normalizedSecondName);
+      if (localUser) {
+        return { ...localUser, _isLocal: true };
+      }
+      return null;
+    } catch (error) {
+      console.error("Error finding user by name:", error);
+      return null;
+    }
+}
+
 async function getAllUsers(query = {}) {
   try {
     const [mongoUsers, localUsers] = await Promise.all([
@@ -2983,6 +3020,38 @@ app.post("/api/register", registrationLimiter, async (req, res) => {
         .json({ success: false, message: "جميع الحقول مطلوبة" });
     }
 
+    const existingUserByUsername = await findUserByUsername(username);
+    if (existingUserByUsername) {
+      return res.status(409).json({
+        success: false,
+        message: "Username already exists. Please choose another one.",
+      });
+    }
+
+    const existingUserByEmail = await findUserByEmail(email);
+    if (existingUserByEmail) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists. Please use another one.",
+      });
+    }
+
+    const existingUserByPhone = await findUserByPhone(phone);
+    if (existingUserByPhone) {
+      return res.status(409).json({
+        success: false,
+        message: "Phone number already exists. Please use another one.",
+      });
+    }
+
+    const existingUserByName = await findUserByName(firstName, secondName);
+    if (existingUserByName) {
+      return res.status(409).json({
+        success: false,
+        message: "A user with the same first and last name already exists.",
+      });
+    }
+
     if (!validateUsername(username)) {
       await sendWebhook("USER", {
         embeds: [
@@ -3090,172 +3159,6 @@ app.post("/api/register", registrationLimiter, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "رقم الهاتف غير صالح. يجب أن يكون رقم هاتف مصري صحيح",
-      });
-    }
-
-    if (users[normalizedUsername]) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Registration Failed - Username Exists (Admin User)",
-            color: 0xe74c3c,
-            fields: [
-              { name: "Username", value: username, inline: true },
-              { name: "Conflict Type", value: "Admin User", inline: true },
-              {
-                name: "User Role",
-                value: users[normalizedUsername]?.role || "Unknown",
-                inline: true,
-              },
-              { name: "IP", value: req.ip || "unknown", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res
-        .status(400)
-        .json({ success: false, message: "اسم المستخدم موجود بالفعل" });
-    }
-    const existingUser = await UserRegistration.findOne({
-      username: normalizedUsername,
-    });
-    if (existingUser) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Registration Failed - Username Exists (Registered User)",
-            color: 0xe74c3c,
-            fields: [
-              { name: "Username", value: username, inline: true },
-              { name: "Conflict Type", value: "Registered User", inline: true },
-              {
-                name: "Account Status",
-                value: existingUser.approvalStatus,
-                inline: true,
-              },
-              {
-                name: "Created Date",
-                value: existingUser.createdAt.toLocaleString(),
-                inline: true,
-              },
-              { name: "IP", value: req.ip || "unknown", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res
-        .status(400)
-        .json({ success: false, message: "اسم المستخدم موجود بالفعل" });
-    }
-
-    const existingEmail = await UserRegistration.findOne({
-      email: email.toLowerCase(),
-    });
-    if (existingEmail) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Registration Failed - Email Exists",
-            color: 0xe74c3c,
-            fields: [
-              { name: "Email", value: email, inline: true },
-              {
-                name: "Existing Username",
-                value: existingEmail.username,
-                inline: true,
-              },
-              {
-                name: "Account Status",
-                value: existingEmail.approvalStatus,
-                inline: true,
-              },
-              { name: "IP", value: req.ip || "unknown", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res
-        .status(400)
-        .json({ success: false, message: "البريد الإلكتروني مستخدم بالفعل" });
-    }
-
-    if (password.length < 8) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Registration Failed - Password Too Short",
-            color: 0xe74c3c,
-            fields: [
-              {
-                name: "Password Length",
-                value: password.length.toString(),
-                inline: true,
-              },
-              { name: "Minimum Required", value: "8", inline: true },
-              { name: "IP", value: req.ip || "unknown", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res.status(400).json({
-        success: false,
-        message: "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
-      });
-    }
-    if (password.length > 128) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Registration Failed - Password Too Long",
-            color: 0xe74c3c,
-            fields: [
-              {
-                name: "Password Length",
-                value: password.length.toString(),
-                inline: true,
-              },
-              { name: "Maximum Allowed", value: "128", inline: true },
-              { name: "IP", value: req.ip || "unknown", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res
-        .status(400)
-        .json({ success: false, message: "كلمة المرور طويلة جداً" });
-    }
-    if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
-      await sendWebhook("USER", {
-        embeds: [
-          {
-            title: "❌ Registration Failed - Weak Password",
-            color: 0xe74c3c,
-            fields: [
-              {
-                name: "Contains Letters",
-                value: /[a-zA-Z]/.test(password) ? "✅" : "❌",
-                inline: true,
-              },
-              {
-                name: "Contains Numbers",
-                value: /[0-9]/.test(password) ? "✅" : "❌",
-                inline: true,
-              },
-              { name: "Password Strength", value: "Weak", inline: true },
-              { name: "IP", value: req.ip || "unknown", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-      return res.status(400).json({
-        success: false,
-        message: "كلمة المرور يجب أن تحتوي على أحرف وأرقام",
       });
     }
 
