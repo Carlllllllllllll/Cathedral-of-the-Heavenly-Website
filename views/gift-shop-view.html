@@ -1444,22 +1444,29 @@
         }
       }
 
-      async function loadMyPurchases() {
-        const list = document.getElementById("my-purchases-list");
-        try {
-          list.innerHTML =
-            '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>جاري التحميل...</p></div>';
+async function loadMyPurchases() {
+  const list = document.getElementById("my-purchases-list");
+  try {
+    list.innerHTML =
+      '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>جاري التحميل...</p></div>';
 
-          const response = await fetch("/api/gift-shop/my-purchases");
-          const data = await response.json();
+    const response = await fetch("/api/gift-shop/my-purchases");
+    const data = await response.json();
 
-          userPurchaseCounts = {};
+    userPurchaseCounts = {};
 
-          if (!data.purchases || data.purchases.length === 0) {
-            list.innerHTML =
-              '<div class="empty-state"><i class="fas fa-history"></i><h3>لا توجد طلبات</h3><p>لم تقم بشراء أي هدايا بعد</p></div>';
-            return;
-          }
+    if (!data.purchases || data.purchases.length === 0) {
+      list.innerHTML =
+        '<div class="empty-state"><i class="fas fa-history"></i><h3>لا توجد طلبات</h3><p>لم تقم بشراء أي هدايا بعد</p></div>';
+      return;
+    }
+  } catch (error) {
+    console.error(error);
+    list.innerHTML =
+      '<div class="error-state"><i class="fas fa-exclamation-triangle"></i><p>حدث خطأ أثناء تحميل الطلبات</p></div>';
+  }
+}
+
 
     async function loadPoints() {
       try {
@@ -1518,8 +1525,7 @@
               if (!userPurchaseCounts[key]) userPurchaseCounts[key] = 0;
               if (status === "pending" || status === "accepted") {
                 userPurchaseCounts[key] += 1;
-                  userPurchaseCounts[key] += 1;
-                }
+              }
               }
 
               const purchasedAt = purchase.purchasedAt
@@ -1908,25 +1914,7 @@
         }
       });
 
-      // Add any missing function implementations here if needed
-      async function performLogout() {
-        try {
-          const response = await fetch('/auth/logout', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (response.ok) {
-            window.location.href = '/login';
-          } else {
-            console.error('Logout failed');
-          }
-        } catch (error) {
-          console.error('Error during logout:', error);
-        }
-      }
+      // Initialization complete
     </script>
 
     <script src="/scripts/notifications.js" defer></script>
