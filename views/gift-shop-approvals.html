@@ -141,6 +141,79 @@
         transform: translateY(-2px);
       }
 
+      /* Status Badges */
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 5px;
+      }
+
+      .status-approved {
+        background-color: rgba(46, 213, 115, 0.2);
+        color: #2ed573;
+      }
+
+      .status-rejected {
+        background-color: rgba(255, 71, 87, 0.2);
+        color: #ff4757;
+      }
+
+      .status-received {
+        background-color: rgba(83, 82, 237, 0.2);
+        color: #5352ed;
+      }
+
+      .status-pending {
+        background-color: rgba(255, 165, 2, 0.2);
+        color: #ffa502;
+      }
+
+      /* Received Button */
+      .received-btn {
+        width: 100%;
+        margin-top: 10px;
+        background: linear-gradient(135deg, #5352ed, #3742fa);
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .received-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(83, 82, 237, 0.4);
+      }
+
+      .received-btn:disabled {
+        opacity: 0.8;
+        cursor: not-allowed;
+        background: linear-gradient(135deg, #2ed573, #20bf6b);
+      }
+
+      .purchase-meta {
+        margin: 15px 0;
+        font-size: 13px;
+        color: #a4b0be;
+      }
+
+      .purchase-meta div {
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .purchase-meta i {
+        width: 18px;
+        text-align: center;
+      }
+
       .grades-submenu {
         max-height: 0;
         overflow-y: hidden;
@@ -822,23 +895,43 @@
         list.innerHTML = `
           <div class="loading-state">
             <i class="fas fa-spinner fa-spin"></i>
-            <p>جاري تحميل الطلبات المعالجة...</p>
+            <p>جاري تحميل الطلبات...</p>
           </div>
         `;
 
         try {
-          const response = await fetch(
-            "/api/admin/gift-shop/purchases?status=processed"
-          );
+          // Remove status filter to get all purchases
+          const response = await fetch("/api/admin/gift-shop/purchases");
           const data = await response.json();
 
           if (!data.purchases || data.purchases.length === 0) {
-            list.innerHTML =
-              '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>لا توجد طلبات</h3><p>لا توجد طلبات معالجة حالياً</p></div>';
+            list.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <h3>لا توجد طلبات</h3>
+                <p>لا توجد طلبات معالجة حالياً</p>
+              </div>
+            `;
             return;
           }
 
-          list.innerHTML = data.purchases
+          // Filter out pending purchases since we only want processed ones
+          const processedPurchases = data.purchases.filter(
+            (purchase) => purchase.status !== "pending"
+          );
+
+          if (processedPurchases.length === 0) {
+            list.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <h3>لا توجد طلبات</h3>
+                <p>لا توجد طلبات معالجة حالياً</p>
+              </div>
+            `;
+            return;
+          }
+
+          list.innerHTML = processedPurchases
             .map((purchase) => {
               const purchasedAt = purchase.purchasedAt
                 ? new Date(purchase.purchasedAt).toLocaleString("ar-EG")
@@ -846,16 +939,22 @@
               const processedAt = purchase.processedAt
                 ? new Date(purchase.processedAt).toLocaleString("ar-EG")
                 : "";
-              const statusClass = purchase.status === 'approved' ? 'status-approved' : 
-                                purchase.status === 'rejected' ? 'status-rejected' : 'status-pending';
-              const statusText = purchase.status === 'approved' ? 'مقبول' : 
-                               purchase.status === 'rejected' ? 'مرفوض' : 'قيد المراجعة';
-              const isReceived = purchase.status === 'received';
+              
+              // Status handling
+              const statusClass = 
+                purchase.status === 'approved' ? 'status-approved' : 
+                purchase.status === 'rejected' ? 'status-rejected' : 
+                purchase.status === 'received' ? 'status-received' : 'status-pending';
+                
+              const statusText = 
+                purchase.status === 'approved' ? 'مقبول' : 
+                purchase.status === 'rejected' ? 'مرفوض' : 
+                purchase.status === 'received' ? 'تم الاستلام' : 'قيد المراجعة';
 
               return `
                 <div class="gift-item">
                   ${purchase.itemId?.image
-                    ? `<img src="${purchase.itemId.image}" alt="${purchase.itemId.name}" loading="lazy">`
+                    ? `<img src="${purchase.itemId.image}" alt="${purchase.itemName}" loading="lazy">`
                     : '<div class="no-image"><i class="fas fa-gift"></i></div>'
                   }
                   <h3>${purchase.itemName}</h3>
@@ -868,14 +967,14 @@
                     <div><span class="status-badge ${statusClass}">${statusText}</span></div>
                   </div>
                   
-                  ${purchase.status === 'approved' && !isReceived ? `
-                    <button onclick="markAsReceived('${purchase._id}')" class="received-btn">
+                  ${purchase.status === 'approved' && purchase.status !== 'received' ? `
+                    <button onclick="markAsReceived('${purchase._id}')" class="action-btn received-btn">
                       <i class="fas fa-check-circle"></i> تم الاستلام
                     </button>
                   ` : ''}
                   
-                  ${isReceived ? `
-                    <button class="received-btn" disabled>
+                  ${purchase.status === 'received' ? `
+                    <button class="action-btn received-btn" disabled>
                       <i class="fas fa-check-double"></i> تم الاستلام بنجاح
                     </button>
                   ` : ''}
