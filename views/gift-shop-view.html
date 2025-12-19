@@ -42,10 +42,8 @@
       src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"
       defer
     ></script>
-    <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/design/design9.css" />
     <link rel="stylesheet" href="/design/design8.css" />
-    <link rel="stylesheet" href="/design10.css" />
     <style>
       :root {
         --bg: radial-gradient(circle at top right, #402958, #2a1b3c 60%);
@@ -1909,6 +1907,26 @@
           logoutBtnMobile.addEventListener("click", performLogout);
         }
       });
+
+      // Add any missing function implementations here if needed
+      async function performLogout() {
+        try {
+          const response = await fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            window.location.href = '/login';
+          } else {
+            console.error('Logout failed');
+          }
+        } catch (error) {
+          console.error('Error during logout:', error);
+        }
+      }
     </script>
 
     <script src="/scripts/notifications.js" defer></script>

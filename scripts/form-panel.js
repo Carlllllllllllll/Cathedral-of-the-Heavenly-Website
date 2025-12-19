@@ -873,10 +873,10 @@ whenReady(() => {
                     <i class="fas fa-copy"></i>
                     نسخ
                 </button>
-                ${!isExpired ? `
+                ${form.status !== 'deactivated' ? `
                 <button class="action-btn deactivate-btn" onclick="deactivateForm('${form._id}')">
                     <i class="fas fa-eye-slash"></i>
-                    تعطيل
+                    ${form.status === 'published' ? 'تعطيل' : 'حفظ كمسودة'}
                 </button>
                 ` : ''}
                 ${
