@@ -915,12 +915,12 @@
             return;
           }
 
-          // Filter out pending purchases since we only want processed ones
-          const processedPurchases = data.purchases.filter(
+          // Show all purchases (approved, declined, received)
+          const allPurchases = data.purchases.filter(
             (purchase) => purchase.status !== "pending"
           );
 
-          if (processedPurchases.length === 0) {
+          if (allPurchases.length === 0) {
             list.innerHTML = `
               <div class="empty-state">
                 <i class="fas fa-check-circle"></i>
@@ -931,7 +931,7 @@
             return;
           }
 
-          list.innerHTML = processedPurchases
+          list.innerHTML = allPurchases
             .map((purchase) => {
               const purchasedAt = purchase.purchasedAt
                 ? new Date(purchase.purchasedAt).toLocaleString("ar-EG")
@@ -942,13 +942,13 @@
               
               // Status handling
               const statusClass = 
-                purchase.status === 'approved' ? 'status-approved' : 
-                purchase.status === 'rejected' ? 'status-rejected' : 
+                purchase.status === 'accepted' ? 'status-approved' : 
+                purchase.status === 'declined' ? 'status-rejected' : 
                 purchase.status === 'received' ? 'status-received' : 'status-pending';
                 
               const statusText = 
-                purchase.status === 'approved' ? 'مقبول' : 
-                purchase.status === 'rejected' ? 'مرفوض' : 
+                purchase.status === 'accepted' ? 'مقبول' : 
+                purchase.status === 'declined' ? 'مرفوض' : 
                 purchase.status === 'received' ? 'تم الاستلام' : 'قيد المراجعة';
 
               return `
@@ -967,13 +967,13 @@
                     <div><span class="status-badge ${statusClass}">${statusText}</span></div>
                   </div>
                   
-                  ${purchase.status === 'approved' && purchase.status !== 'received' ? `
+                  ${purchase.status === 'accepted' && !purchase.receivedConfirmed ? `
                     <button onclick="markAsReceived('${purchase._id}')" class="action-btn received-btn">
-                      <i class="fas fa-check-circle"></i> تم الاستلام
+                      <i class="fas fa-check-circle"></i> تأكيد الاستلام
                     </button>
                   ` : ''}
                   
-                  ${purchase.status === 'received' ? `
+                  ${purchase.receivedConfirmed ? `
                     <button class="action-btn received-btn" disabled>
                       <i class="fas fa-check-double"></i> تم الاستلام بنجاح
                     </button>

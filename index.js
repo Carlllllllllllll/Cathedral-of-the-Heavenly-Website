@@ -13064,7 +13064,7 @@ app.post(
         return res.status(404).json({ success: false, message: "الطلب غير موجود" });
       }
 
-      if (purchase.status === "received") {
+      if (purchase.receivedConfirmed) {
         return res.json({ success: true, message: "تم تأكيد الاستلام مسبقاً", purchase });
       }
 
@@ -13087,9 +13087,9 @@ app.post(
         return res.status(400).json({ success: false, message: "يجب الموافقة على الطلب أولاً" });
       }
 
-      purchase.status = "received";
-      purchase.receivedAt = new Date();
-      purchase.receivedBy = req.session.username;
+      purchase.receivedConfirmed = true;
+      purchase.receivedConfirmedAt = new Date();
+      purchase.receivedConfirmedBy = req.session.username;
       await purchase.save();
 
       const adminUser = getSessionUser(req);
