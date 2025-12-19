@@ -885,15 +885,13 @@ whenReady(() => {
                     <i class="fas fa-copy"></i>
                     نسخ
                 </button>
-                <button class="action-btn deactivate-btn" onclick="deactivateForm('${
-                  form._id
-                }')">
+                ${!isExpired ? `
+                <button class="action-btn deactivate-btn" onclick="deactivateForm('${form._id}')">
                     <i class="fas fa-eye-slash"></i>
                     تعطيل
                 </button>
-                <button class="action-btn delete-btn" onclick="if(confirm('هل أنت متأكد من حذف هذا النموذج نهائيًا؟')) { deleteFormFromList('${
-                  form._id
-                }', '${form.link || form._id}') }">
+                ` : ''}
+                <button class="action-btn delete-btn" onclick="deleteFormFromList('${form._id}', '${form.link || form._id}')">
                     <i class="fas fa-trash"></i>
                     حذف
                 </button>
@@ -987,36 +985,54 @@ whenReady(() => {
   };
 
   async function deactivateForm(formId) {
+    const result = await Swal.fire({
+      title: 'تعطيل النموذج',
+      text: 'هل أنت متأكد أنك تريد تعطيل هذا النموذج؟ سيتم تعطيله وتحديد تاريخ انتهائه إلى تاريخ سابق.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، عطل النموذج',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#f39c12',
+      cancelButtonColor: '#666',
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const response = await fetch(`/api/forms/${formId}/deactivate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        },
+        credentials: 'include'
       });
 
-      const result = await response.json();
+      const responseData = await response.json();
       
       if (response.ok) {
-        Swal.fire({
-          title: 'تم!',
-          text: 'تم تعطيل النموذج بنجاح',
+        await Swal.fire({
+          title: 'تم التعطيل',
+          text: responseData.message || 'تم تعطيل النموذج بنجاح. سيتم تحديث الصفحة تلقائيًا.',
           icon: 'success',
-          confirmButtonText: 'حسنًا'
-        }).then(() => {
-          window.location.reload();
+          confirmButtonText: 'حسنًا',
+          confirmButtonColor: '#2ecc71',
+          timer: 2000,
+          timerProgressBar: true,
+          willClose: () => {
+            window.location.reload();
+          }
         });
       } else {
-        throw new Error(result.message || 'فشل تعطيل النموذج');
+        throw new Error(responseData.message || 'فشل تعطيل النموذج');
       }
     } catch (error) {
       console.error('Error deactivating form:', error);
-      Swal.fire({
-        title: 'خطأ!',
-        text: error.message || 'حدث خطأ أثناء تعطيل النموذج',
+      await Swal.fire({
+        title: 'خطأ',
+        text: error.message || 'حدث خطأ أثناء محاولة تعطيل النموذج. يرجى المحاولة مرة أخرى لاحقًا.',
         icon: 'error',
-        confirmButtonText: 'حسنًا'
+        confirmButtonText: 'حسنًا',
+        confirmButtonColor: '#e74c3c'
       });
     }
   }
@@ -1024,10 +1040,10 @@ whenReady(() => {
   async function deleteFormFromList(formId, formLink) {
     const result = await Swal.fire({
       title: "هل أنت متأكد؟",
-      text: "هل أنت متأكد أنك تريد حذف هذا النموذج؟ لا يمكن التراجع عن هذا الإجراء!",
+      text: "هل أنت متأكد أنك تريد حذف هذا النموذج نهائيًا؟ سيتم حذف جميع البيانات المرتبطة به ولا يمكن استرجاعها لاحقًا.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "نعم، احذف",
+      confirmButtonText: "نعم، احذف نهائيًا",
       cancelButtonText: "إلغاء",
       confirmButtonColor: "#e74c3c",
       cancelButtonColor: "#666",
@@ -1037,31 +1053,36 @@ whenReady(() => {
       try {
         const deleteResponse = await fetch(`/api/forms/${formLink}`, {
           method: "DELETE",
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
+        
+        const responseData = await deleteResponse.json();
+        
         if (deleteResponse.ok) {
           Swal.fire({
-            text: "تم حذف النموذج بنجاح.",
+            title: "تم الحذف",
+            text: responseData.message || "تم حذف النموذج نهائيًا بنجاح.",
             icon: "success",
             confirmButtonText: "حسنًا",
             confirmButtonColor: "#ffcc00",
           });
           loadForms();
         } else {
-          Swal.fire({
-            text: "حدث خطأ أثناء حذف النموذج. حاول مرة أخرى.",
-            icon: "error",
-            confirmButtonText: "حسنًا",
-          });
+          throw new Error(responseData.message || "حدث خطأ أثناء حذف النموذج");
         }
       } catch (error) {
+        console.error("Error deleting form:", error);
         Swal.fire({
-          text: "تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
+          title: "خطأ",
+          text: error.message || "حدث خطأ أثناء محاولة حذف النموذج. يرجى المحاولة مرة أخرى لاحقًا.",
           icon: "error",
           confirmButtonText: "حسنًا",
         });
       }
     }
-  };
+  }
 
   async function hydrateUserMenu() {
     try {
