@@ -867,18 +867,6 @@ whenReady(() => {
                     <i class="fas fa-eye"></i>
                     عرض النموذج
                 </a>
-                ${
-                  isExpired
-                    ? `
-                <button class="action-btn reactivate-btn" onclick="reactivateForm('${
-                  form.link || form._id
-                }')">
-                    <i class="fas fa-redo"></i>
-                    إعادة تفعيل
-                </button>
-                `
-                    : ""
-                }
                 <button class="action-btn copy-btn" onclick="copyFormLink('${
                   form.link || form._id
                 }')">
@@ -891,6 +879,18 @@ whenReady(() => {
                     تعطيل
                 </button>
                 ` : ''}
+                ${
+                  isExpired
+                    ? `
+                <button class="action-btn reactivate-btn" onclick="reactivateForm('${
+                  form.link || form._id
+                }')">
+                    <i class="fas fa-redo"></i>
+                    إعادة تفعيل
+                </button>
+                `
+                    : ""
+                }
                 <button class="action-btn delete-btn" onclick="deleteFormFromList('${form._id}', '${form.link || form._id}')">
                     <i class="fas fa-trash"></i>
                     حذف

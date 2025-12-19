@@ -701,6 +701,12 @@
         border: 1px solid rgba(255, 100, 100, 0.3);
       }
 
+      .status-received {
+        background: rgba(52, 152, 219, 0.15);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+      }
+
       .purchase-meta {
         color: var(--muted);
         font-size: 0.9rem;
@@ -1457,26 +1463,63 @@
             return;
           }
 
-          list.innerHTML = data.purchases
-            .map((purchase) => {
-              const status = purchase.status || "pending";
-              const statusClass =
-                status === "accepted"
-                  ? "status-accepted"
-                  : status === "declined"
-                  ? "status-declined"
-                  : "status-pending";
-              const statusText =
-                status === "accepted"
-                  ? "✅ تم القبول"
-                  : status === "declined"
-                  ? "❌ تم الرفض"
-                  : "⏳ قيد المراجعة";
+    async function loadPoints() {
+      try {
+        const response = await fetch("/api/gift-shop/my-points");
+        const data = await response.json();
+        userPoints = data.points || 0;
+        document.getElementById("user-points").textContent = userPoints;
+        const navPoints = document.getElementById("pointsValue");
+        if (navPoints) {
+          navPoints.textContent = userPoints;
+        }
+      } catch (error) {
+        console.error("Error loading points:", error);
+      }
+    }
 
-              const key = purchase.itemId?._id || purchase.itemId;
-              if (key) {
-                if (!userPurchaseCounts[key]) userPurchaseCounts[key] = 0;
-                if (status === "pending" || status === "accepted") {
+    async function loadMyPurchases() {
+      const list = document.getElementById("my-purchases-list");
+      try {
+        list.innerHTML =
+          '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>جاري التحميل...</p></div>';
+
+        const response = await fetch("/api/gift-shop/my-purchases");
+        const data = await response.json();
+
+        userPurchaseCounts = {};
+
+        if (!data.purchases || data.purchases.length === 0) {
+          list.innerHTML =
+            '<div class="empty-state"><i class="fas fa-history"></i><h3>لا توجد طلبات</h3><p>لم تقم بشراء أي هدايا بعد</p></div>';
+          return;
+        }
+
+        list.innerHTML = data.purchases
+          .map((purchase) => {
+            const status = purchase.status || "pending";
+            const statusClass =
+              purchase.receivedConfirmed
+                ? "status-received"
+                : status === "accepted"
+                ? "status-accepted"
+                : status === "declined"
+                ? "status-declined"
+                : "status-pending";
+            const statusText =
+              purchase.receivedConfirmed
+                ? "✅ تم الاستلام"
+                : status === "accepted"
+                ? "✅ تم القبول"
+                : status === "declined"
+                ? "❌ تم الرفض"
+                : "⏳ قيد المراجعة";
+
+            const key = purchase.itemId?._id || purchase.itemId;
+            if (key) {
+              if (!userPurchaseCounts[key]) userPurchaseCounts[key] = 0;
+              if (status === "pending" || status === "accepted") {
+                userPurchaseCounts[key] += 1;
                   userPurchaseCounts[key] += 1;
                 }
               }

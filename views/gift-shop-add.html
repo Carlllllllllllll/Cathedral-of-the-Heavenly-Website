@@ -312,6 +312,24 @@
                                 <i class="fas fa-power-off"></i>
                                 ${item.active ? "تعطيل" : "تفعيل"}
                             </button>
+                            <button onclick="copyItem('${
+                              item._id
+                            }')" class="copy-btn">
+                                <i class="fas fa-copy"></i>
+                                نسخ
+                            </button>
+                            <button onclick="viewLeaderboard('${
+                              item._id
+                            }')" class="leaderboard-btn">
+                                <i class="fas fa-trophy"></i>
+                                لوحة الصدارة
+                            </button>
+                            <button onclick="viewItem('${
+                              item._id
+                            }')" class="view-btn">
+                                <i class="fas fa-eye"></i>
+                                عرض
+                            </button>
                             <button onclick="deleteItem('${
                               item._id
                             }')" class="delete-btn">
@@ -395,6 +413,64 @@
             });
           }
         }
+      }
+
+      async function copyItem(itemId) {
+        try {
+          const response = await fetch(`/api/admin/gift-shop/items/${itemId}`);
+          const item = await response.json();
+          
+          if (response.ok) {
+            const copyData = {
+              name: `${item.name} (نسخة)`,
+              description: item.description,
+              cost: item.cost,
+              stock: item.stock,
+              purchaseLimit: item.purchaseLimit,
+              image: item.image,
+            };
+
+            const createResponse = await fetch("/api/admin/gift-shop/items", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(copyData),
+            });
+            
+            const result = await createResponse.json();
+            
+            if (createResponse.ok) {
+              Swal.fire({
+                title: "تم النسخ!",
+                text: "تم نسخ العنصر بنجاح",
+                icon: "success",
+                confirmButtonText: "حسنًا",
+                confirmButtonColor: "#ffcc00",
+              });
+              loadAdminItems();
+            } else {
+              throw new Error(result.message || "فشل النسخ");
+            }
+          } else {
+            throw new Error("فشل جلب بيانات العنصر");
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "خطأ!",
+            text: error.message || "تعذر نسخ العنصر",
+            icon: "error",
+            confirmButtonText: "حسنًا",
+          });
+        }
+      }
+
+      function viewLeaderboard(itemId) {
+        // Open leaderboard in new tab or modal
+        window.open(`/admin/gift-shop/items/${itemId}/leaderboard`, '_blank');
+      }
+
+      function viewItem(itemId) {
+        // Open item details in new tab or modal
+        window.open(`/admin/gift-shop/items/${itemId}`, '_blank');
       }
 
       function showAddItemModal() {
