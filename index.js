@@ -13379,54 +13379,6 @@ app.post(
               { name: "Admin", value: req.session.username, inline: true },
               {
                 name: "Admin Role",
-                value: adminUser ? adminUser.role.toUpperCase() : "ADMIN",
-                inline: true,
-              },
-              { name: "User", value: purchase.username, inline: true },
-              { name: "Item", value: purchase.itemName, inline: true },
-              {
-                name: "Item ID",
-                value: purchase.itemId.toString(),
-                inline: true,
-              },
-              { name: "Cost", value: `❌ ${purchase.cost} (Refunded)`, inline: true },
-              {
-                name: "Purchase ID",
-                value: purchase._id.toString(),
-                inline: true,
-              },
-              { name: "Previous Status", value: "pending", inline: true },
-              { name: "New Status", value: "declined", inline: true },
-              {
-                name: "Reason",
-                value: reason || "No reason provided",
-                inline: false,
-              },
-              {
-                name: "Time",
-                value: moment().tz("Africa/Cairo").format("YYYY-MM-DD HH:mm:ss"),
-                inline: true,
-              },
-              {
-                name: "Purchased At",
-                value: purchase.purchasedAt.toLocaleString(),
-                inline: true,
-              },
-              {
-                name: "Declined At",
-                value: new Date().toLocaleString(),
-                inline: true,
-              },
-            ],
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      });
-            color: 0xef4444,
-            fields: [
-              { name: "Admin", value: req.session.username, inline: true },
-              {
-                name: "Admin Role",
                 value: declineUser ? declineUser.role.toUpperCase() : "ADMIN",
                 inline: true,
               },
