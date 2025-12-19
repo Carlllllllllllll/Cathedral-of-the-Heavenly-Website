@@ -651,16 +651,149 @@
       <div class="admin-container">
         <h1><i class="fas fa-check-circle"></i> طلبات المراجعة</h1>
 
-        <div id="pending-purchases-list" class="gift-shop-grid">
-          <div class="loading-state">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>جاري التحميل...</p>
+        <div class="tabs">
+          <button class="tab-button active" onclick="showTab('pending-tab')">قيد المراجعة</button>
+          <button class="tab-button" onclick="showTab('processed-tab')">الطلبات المعالجة</button>
+        </div>
+
+        <div id="pending-tab" class="tab-content active">
+          <div id="pending-purchases-list" class="gift-shop-grid">
+            <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>جاري التحميل...</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="processed-tab" class="tab-content">
+          <div id="processed-purchases-list" class="gift-shop-grid">
+            <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>جاري تحميل الطلبات المعالجة...</p>
+            </div>
           </div>
         </div>
       </div>
     </main>
 
+    <style>
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 10px;
+      }
+
+      .tab-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: var(--text);
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .tab-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .tab-button.active {
+        background: var(--accent);
+        color: #000;
+        font-weight: 700;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 8px;
+      }
+
+      .status-pending {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+      }
+
+      .status-approved {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+      }
+
+      .status-rejected {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+      }
+
+      .status-received {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+      }
+
+      .received-btn {
+        background: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.2);
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .received-btn:hover {
+        background: rgba(52, 152, 219, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .received-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+    </style>
+
     <script>
+      function showTab(tabId) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        // Deactivate all tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+          button.classList.remove('active');
+        });
+        
+        // Show the selected tab content
+        document.getElementById(tabId).classList.add('active');
+        
+        // Activate the clicked button
+        event.currentTarget.classList.add('active');
+        
+        // Load processed purchases if needed
+        if (tabId === 'processed-tab') {
+          loadProcessedPurchases();
+        }
+      }
+
       async function loadUserInfo() {
         try {
           const response = await fetch("/api/user-info");
@@ -682,16 +815,129 @@
         }
       }
 
+      async function loadProcessedPurchases() {
+        const list = document.getElementById("processed-purchases-list");
+        if (!list) return;
+
+        list.innerHTML = `
+          <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>جاري تحميل الطلبات المعالجة...</p>
+          </div>
+        `;
+
+        try {
+          const response = await fetch(
+            "/api/admin/gift-shop/purchases?status=processed"
+          );
+          const data = await response.json();
+
+          if (!data.purchases || data.purchases.length === 0) {
+            list.innerHTML =
+              '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>لا توجد طلبات</h3><p>لا توجد طلبات معالجة حالياً</p></div>';
+            return;
+          }
+
+          list.innerHTML = data.purchases
+            .map((purchase) => {
+              const purchasedAt = purchase.purchasedAt
+                ? new Date(purchase.purchasedAt).toLocaleString("ar-EG")
+                : "";
+              const processedAt = purchase.processedAt
+                ? new Date(purchase.processedAt).toLocaleString("ar-EG")
+                : "";
+              const statusClass = purchase.status === 'approved' ? 'status-approved' : 
+                                purchase.status === 'rejected' ? 'status-rejected' : 'status-pending';
+              const statusText = purchase.status === 'approved' ? 'مقبول' : 
+                               purchase.status === 'rejected' ? 'مرفوض' : 'قيد المراجعة';
+              const isReceived = purchase.status === 'received';
+
+              return `
+                <div class="gift-item">
+                  ${purchase.itemId?.image
+                    ? `<img src="${purchase.itemId.image}" alt="${purchase.itemId.name}" loading="lazy">`
+                    : '<div class="no-image"><i class="fas fa-gift"></i></div>'
+                  }
+                  <h3>${purchase.itemName}</h3>
+                  <p class="user-info"><i class="fas fa-user"></i> @${purchase.username}</p>
+                  <div class="cost">${purchase.cost} نقطة</div>
+                  
+                  <div class="purchase-meta">
+                    <div><i class="fas fa-clock"></i> ${purchasedAt}</div>
+                    ${processedAt ? `<div><i class="fas fa-check-circle"></i> ${processedAt}</div>` : ''}
+                    <div><span class="status-badge ${statusClass}">${statusText}</span></div>
+                  </div>
+                  
+                  ${purchase.status === 'approved' && !isReceived ? `
+                    <button onclick="markAsReceived('${purchase._id}')" class="received-btn">
+                      <i class="fas fa-check-circle"></i> تم الاستلام
+                    </button>
+                  ` : ''}
+                  
+                  ${isReceived ? `
+                    <button class="received-btn" disabled>
+                      <i class="fas fa-check-double"></i> تم الاستلام بنجاح
+                    </button>
+                  ` : ''}
+                </div>
+              `;
+            })
+            .join("");
+        } catch (error) {
+          console.error("Error loading processed purchases:", error);
+          list.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-exclamation-circle"></i>
+              <h3>حدث خطأ</h3>
+              <p>تعذر تحميل الطلبات المعالجة. يرجى المحاولة مرة أخرى.</p>
+            </div>
+          `;
+        }
+      }
+
+      async function markAsReceived(purchaseId) {
+        try {
+          const response = await fetch(`/api/admin/gift-shop/purchases/${purchaseId}/received`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok) {
+            Swal.fire({
+              title: 'تم!',
+              text: 'تم تأكيد استلام الهدية بنجاح',
+              icon: 'success',
+              confirmButtonText: 'حسنًا',
+              confirmButtonColor: '#3498db',
+            }).then(() => {
+              loadProcessedPurchases();
+            });
+          } else {
+            throw new Error(result.message || 'فشل تأكيد الاستلام');
+          }
+        } catch (error) {
+          console.error('Error marking as received:', error);
+          Swal.fire({
+            title: 'خطأ!',
+            text: error.message || 'حدث خطأ أثناء تأكيد الاستلام',
+            icon: 'error',
+            confirmButtonText: 'حسنًا',
+          });
+        }
+      }
+
       async function loadPendingPurchases() {
         const list = document.getElementById("pending-purchases-list");
         if (!list) return;
 
         list.innerHTML = `
-                <div class="loading-state">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>جاري التحميل...</p>
-                </div>
-            `;
+          <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>جاري التحميل...</p>
+          </div>
+        `;
 
         try {
           const response = await fetch(
@@ -782,7 +1028,10 @@
                   confirmButtonText: "حسنًا",
                   confirmButtonColor: "#ffcc00",
                 });
-                await loadPendingPurchases();
+                await Promise.all([
+                  loadPendingPurchases(),
+                  loadProcessedPurchases()
+                ]);
               } else {
                 throw new Error(result.message || "فشل قبول الطلب");
               }
@@ -838,7 +1087,10 @@
                   confirmButtonText: "حسنًا",
                   confirmButtonColor: "#ffcc00",
                 });
-                await loadPendingPurchases();
+                await Promise.all([
+                  loadPendingPurchases(),
+                  loadProcessedPurchases()
+                ]);
               } else {
                 throw new Error(result.message || "فشل رفض الطلب");
               }

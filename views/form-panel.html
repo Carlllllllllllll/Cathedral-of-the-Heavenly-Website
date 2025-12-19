@@ -424,6 +424,94 @@
           }
         }
       });
+
+      function confirmDeleteForm(formId) {
+        Swal.fire({
+          title: 'هل أنت متأكد؟',
+          text: 'سيتم حذف النموذج نهائيًا ولن يمكن استرجاعه!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#e74c3c',
+          cancelButtonColor: '#7f8c8d',
+          confirmButtonText: 'نعم، احذف',
+          cancelButtonText: 'إلغاء',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            deleteForm(formId);
+          }
+        });
+      }
+
+      async function deactivateForm(formId) {
+        try {
+          const response = await fetch(`/api/forms/${formId}/deactivate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          const result = await response.json();
+          
+          if (response.ok) {
+            Swal.fire({
+              title: 'تم!',
+              text: 'تم تعطيل النموذج بنجاح',
+              icon: 'success',
+              confirmButtonText: 'حسنًا'
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            throw new Error(result.message || 'فشل تعطيل النموذج');
+          }
+        } catch (error) {
+          console.error('Error deactivating form:', error);
+          Swal.fire({
+            title: 'خطأ!',
+            text: error.message || 'حدث خطأ أثناء تعطيل النموذج',
+            icon: 'error',
+            confirmButtonText: 'حسنًا'
+          });
+        }
+      }
+
+      async function deleteForm(formId) {
+        try {
+          const response = await fetch(`/api/forms/${formId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          const result = await response.json();
+          
+          if (response.ok) {
+            Swal.fire({
+              title: 'تم!',
+              text: 'تم حذف النموذج بنجاح',
+              icon: 'success',
+              confirmButtonText: 'حسنًا'
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            throw new Error(result.message || 'فشل حذف النموذج');
+          }
+        } catch (error) {
+          console.error('Error deleting form:', error);
+          Swal.fire({
+            title: 'خطأ!',
+            text: error.message || 'حدث خطأ أثناء حذف النموذج',
+            icon: 'error',
+            confirmButtonText: 'حسنًا'
+          });
+        }
+      }
     </script>
 
     <style>
@@ -1059,13 +1147,10 @@
       }
 
       .delete-btn {
-        background: linear-gradient(
-          135deg,
-          rgba(231, 76, 60, 0.2),
-          rgba(231, 76, 60, 0.1)
-        );
+        background: rgba(231, 76, 60, 0.1);
         color: #e74c3c;
-        border: 1px solid rgba(231, 76, 60, 0.3);
+        border: 1px solid rgba(231, 76, 60, 0.2);
+        margin-right: 10px;
       }
 
       .delete-btn:hover {

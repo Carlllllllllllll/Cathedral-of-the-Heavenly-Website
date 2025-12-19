@@ -1113,6 +1113,9 @@ const GiftPurchaseSchema = new mongoose.Schema({
   reviewedAt: Date,
   purchasedAt: { type: Date, default: Date.now },
   pointsRefunded: { type: Boolean, default: false },
+  receivedConfirmed: { type: Boolean, default: false },
+  receivedConfirmedAt: Date,
+  receivedConfirmedBy: String,
 });
 
 const GiftPurchase = mongoose.model("GiftPurchase", GiftPurchaseSchema);
@@ -8877,7 +8880,7 @@ app.delete(
             fields: [
               { name: "Admin", value: req.session.username, inline: true },
               { name: "Form Link", value: link, inline: true },
-              { name: "Action", value: "Mark Form as Expired", inline: true },
+              { name: "Action", value: "Delete Form", inline: true },
               { name: "IP", value: req.ip || "unknown", inline: true },
             ],
             timestamp: new Date().toISOString(),
@@ -8903,20 +8906,16 @@ app.delete(
         });
         return res.status(404).json({ message: "النموذج غير موجود" });
       }
-      form.status = "expired";
-      form.updatedBy = req.session.username;
-      form.updatedAt = new Date();
-      if (!form.expiry || form.expiry > new Date()) {
-        form.expiry = new Date();
-      }
-      await form.save();
+
+      await Form.deleteOne({ _id: form._id });
+
       const deleteUser = getSessionUser(req);
       await sendWebhook("FORM", {
-        content: `🕒 **Form Marked Expired**`,
+        content: `🗑️ **Form Deleted**`,
         embeds: [
           {
-            title: "Form Marked Expired",
-            color: 0xe67e22,
+            title: "Form Deleted",
+            color: 0xe74c3c,
             fields: [
               { name: "Admin", value: req.session.username, inline: true },
               {
@@ -8926,8 +8925,6 @@ app.delete(
               },
               { name: "Form Name", value: form.topic, inline: true },
               { name: "Form Link", value: link, inline: true },
-              { name: "Status", value: form.status, inline: true },
-              { name: "Previous Status", value: "published", inline: true },
               {
                 name: "Questions Count",
                 value: form.questions.length.toString(),
@@ -8939,7 +8936,7 @@ app.delete(
                 inline: true,
               },
               {
-                name: "Updated At",
+                name: "Deleted At",
                 value: moment()
                   .tz("Africa/Cairo")
                   .format("YYYY-MM-DD HH:mm:ss"),
@@ -8947,8 +8944,8 @@ app.delete(
               },
               { name: "Form ID", value: form._id.toString(), inline: true },
               {
-                name: "New Expiry",
-                value: form.expiry.toLocaleString(),
+                name: "Created By",
+                value: form.createdBy || "Unknown",
                 inline: true,
               },
             ],
@@ -8956,10 +8953,8 @@ app.delete(
           },
         ],
       });
-      res.json({
-        success: true,
-        message: "تم تحويل حالة النموذج إلى منتهي الصلاحية.",
-      });
+
+      res.json({ success: true, message: "تم حذف النموذج نهائيًا." });
     } catch (error) {
       await sendWebhook("ERROR", {
         embeds: [
@@ -8982,6 +8977,125 @@ app.delete(
         ],
       });
       res.status(500).json({ success: false, message: "تعذر حذف النموذج" });
+    }
+  }
+);
+
+app.post(
+  "/api/forms/:link/deactivate",
+  requireAuth,
+  requireRole(["admin", "leadadmin"]),
+  async (req, res) => {
+    try {
+      const { link } = req.params;
+
+      await sendWebhook("ADMIN", {
+        embeds: [
+          {
+            title: "⏸️ Admin Deactivating Form",
+            color: 0xf1c40f,
+            fields: [
+              { name: "Admin", value: req.session.username, inline: true },
+              { name: "Form Link", value: link, inline: true },
+              { name: "Action", value: "Deactivate Form", inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+
+      const form = await Form.findOne({ link });
+      if (!form) {
+        await sendWebhook("ADMIN", {
+          embeds: [
+            {
+              title: "❌ Deactivate Form Failed - Not Found",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Admin", value: req.session.username, inline: true },
+                { name: "Form Link", value: link, inline: true },
+                { name: "Error", value: "Form not found", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res.status(404).json({ message: "النموذج غير موجود" });
+      }
+
+      const oldDate = new Date("2000-01-01T00:00:00Z");
+      form.status = "expired";
+      form.allowRetake = false;
+      form.expiry = oldDate;
+      form.updatedBy = req.session.username;
+      form.updatedAt = new Date();
+      await form.save();
+
+      const deactivateUser = getSessionUser(req);
+      await sendWebhook("FORM", {
+        content: `⏸️ **Form Deactivated**`,
+        embeds: [
+          {
+            title: "Form Deactivated",
+            color: 0xf1c40f,
+            fields: [
+              { name: "Admin", value: req.session.username, inline: true },
+              {
+                name: "Role",
+                value: deactivateUser
+                  ? deactivateUser.role.toUpperCase()
+                  : "ADMIN",
+                inline: true,
+              },
+              { name: "Form Name", value: form.topic, inline: true },
+              { name: "Form Link", value: link, inline: true },
+              {
+                name: "Expiry Set To",
+                value: oldDate.toLocaleString(),
+                inline: true,
+              },
+              {
+                name: "Questions Count",
+                value: form.questions.length.toString(),
+                inline: true,
+              },
+              {
+                name: "Updated At",
+                value: moment()
+                  .tz("Africa/Cairo")
+                  .format("YYYY-MM-DD HH:mm:ss"),
+                inline: true,
+              },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+
+      res.json({ success: true, message: "تم تعطيل النموذج بنجاح." });
+    } catch (error) {
+      await sendWebhook("ERROR", {
+        embeds: [
+          {
+            title: "❌ Deactivate Form Error",
+            color: 0xe74c3c,
+            fields: [
+              { name: "Admin", value: req.session.username },
+              { name: "Form Link", value: req.params.link },
+              { name: "Error", value: error.message },
+              {
+                name: "Stack Trace",
+                value: error.stack?.substring(0, 500) || "No stack",
+                inline: false,
+              },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      res.status(500).json({ success: false, message: "تعذر تعطيل النموذج" });
     }
   }
 );
@@ -12910,6 +13024,136 @@ app.post(
 databaseBackup.start();
 
 app.post(
+  "/api/admin/gift-shop/purchases/:id/received",
+  requireAuth,
+  requireSpecialRole("gift-approver"),
+  async (req, res) => {
+    try {
+      await sendWebhook("ADMIN", {
+        embeds: [
+          {
+            title: "✅ Admin Marking Gift as Received",
+            color: 0xf59e0b,
+            fields: [
+              { name: "Admin", value: req.session.username, inline: true },
+              { name: "Purchase ID", value: req.params.id, inline: true },
+              { name: "Action", value: "Mark Gift as Received", inline: true },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+
+      const purchase = await GiftPurchase.findById(req.params.id);
+      if (!purchase) {
+        await sendWebhook("ADMIN", {
+          embeds: [
+            {
+              title: "❌ Mark Received Failed - Not Found",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Admin", value: req.session.username, inline: true },
+                { name: "Purchase ID", value: req.params.id, inline: true },
+                { name: "Error", value: "Purchase not found", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res.status(404).json({ success: false, message: "الطلب غير موجود" });
+      }
+
+      if (purchase.status === "received") {
+        return res.json({ success: true, message: "تم تأكيد الاستلام مسبقاً", purchase });
+      }
+
+      if (purchase.status !== "accepted") {
+        await sendWebhook("ADMIN", {
+          embeds: [
+            {
+              title: "❌ Mark Received Failed - Invalid Status",
+              color: 0xe74c3c,
+              fields: [
+                { name: "Admin", value: req.session.username, inline: true },
+                { name: "Purchase ID", value: req.params.id, inline: true },
+                { name: "Current Status", value: purchase.status, inline: true },
+                { name: "Required Status", value: "accepted", inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        });
+        return res.status(400).json({ success: false, message: "يجب الموافقة على الطلب أولاً" });
+      }
+
+      purchase.status = "received";
+      purchase.receivedAt = new Date();
+      purchase.receivedBy = req.session.username;
+      await purchase.save();
+
+      const adminUser = getSessionUser(req);
+      await sendWebhook("GIFT", {
+        content: `🎁 **Gift Marked as Received**`,
+        embeds: [
+          {
+            title: "Gift Received",
+            color: 0x3b82f6,
+            fields: [
+              { name: "Admin", value: req.session.username, inline: true },
+              {
+                name: "Admin Role",
+                value: adminUser ? adminUser.role.toUpperCase() : "ADMIN",
+                inline: true,
+              },
+              { name: "User", value: purchase.username, inline: true },
+              { name: "Item", value: purchase.itemName, inline: true },
+              { name: "Cost", value: `🎁 ${purchase.cost}`, inline: true },
+              { name: "Status", value: "✅ Received", inline: true },
+              {
+                name: "Received At",
+                value: new Date().toLocaleString(),
+                inline: true,
+              },
+              {
+                name: "Time",
+                value: moment().tz("Africa/Cairo").format("YYYY-MM-DD HH:mm:ss"),
+                inline: true,
+              },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+
+      res.json({ success: true, purchase });
+    } catch (error) {
+      await sendWebhook("ERROR", {
+        embeds: [
+          {
+            title: "❌ Mark Gift as Received Error",
+            color: 0xe74c3c,
+            fields: [
+              { name: "Admin", value: req.session.username },
+              { name: "Purchase ID", value: req.params.id },
+              { name: "Error", value: error.message },
+              {
+                name: "Stack Trace",
+                value: error.stack?.substring(0, 500) || "No stack",
+                inline: false,
+              },
+              { name: "IP", value: req.ip || "unknown", inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
+      res.status(500).json({ success: false, message: "تعذر تأكيد استلام الهدية" });
+    }
+  }
+);
+
+app.post(
   "/api/admin/gift-shop/purchases/:id/decline",
   requireAuth,
   requireSpecialRole("gift-approver"),
@@ -13124,11 +13368,60 @@ app.post(
       await purchase.save();
 
       const declineUser = getSessionUser(req);
+      const adminUser = getSessionUser(req);
       await sendWebhook("GIFT", {
         content: `❌ **Gift Purchase Declined**`,
         embeds: [
           {
             title: "Gift Purchase Declined",
+            color: 0xef4444,
+            fields: [
+              { name: "Admin", value: req.session.username, inline: true },
+              {
+                name: "Admin Role",
+                value: adminUser ? adminUser.role.toUpperCase() : "ADMIN",
+                inline: true,
+              },
+              { name: "User", value: purchase.username, inline: true },
+              { name: "Item", value: purchase.itemName, inline: true },
+              {
+                name: "Item ID",
+                value: purchase.itemId.toString(),
+                inline: true,
+              },
+              { name: "Cost", value: `❌ ${purchase.cost} (Refunded)`, inline: true },
+              {
+                name: "Purchase ID",
+                value: purchase._id.toString(),
+                inline: true,
+              },
+              { name: "Previous Status", value: "pending", inline: true },
+              { name: "New Status", value: "declined", inline: true },
+              {
+                name: "Reason",
+                value: reason || "No reason provided",
+                inline: false,
+              },
+              {
+                name: "Time",
+                value: moment().tz("Africa/Cairo").format("YYYY-MM-DD HH:mm:ss"),
+                inline: true,
+              },
+              {
+                name: "Purchased At",
+                value: purchase.purchasedAt.toLocaleString(),
+                inline: true,
+              },
+              {
+                name: "Declined At",
+                value: new Date().toLocaleString(),
+                inline: true,
+              },
+            ],
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      });
             color: 0xef4444,
             fields: [
               { name: "Admin", value: req.session.username, inline: true },

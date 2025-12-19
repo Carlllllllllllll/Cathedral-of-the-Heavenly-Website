@@ -885,9 +885,15 @@ whenReady(() => {
                     <i class="fas fa-copy"></i>
                     نسخ
                 </button>
-                <button class="action-btn delete-btn" onclick="deleteFormFromList('${
+                <button class="action-btn deactivate-btn" onclick="deactivateForm('${
                   form._id
-                }', '${form.link || form._id}')">
+                }')">
+                    <i class="fas fa-eye-slash"></i>
+                    تعطيل
+                </button>
+                <button class="action-btn delete-btn" onclick="if(confirm('هل أنت متأكد من حذف هذا النموذج نهائيًا؟')) { deleteFormFromList('${
+                  form._id
+                }', '${form.link || form._id}') }">
                     <i class="fas fa-trash"></i>
                     حذف
                 </button>
@@ -980,7 +986,42 @@ whenReady(() => {
       });
   };
 
-  window.deleteFormFromList = async function (formId, formLink) {
+  async function deactivateForm(formId) {
+    try {
+      const response = await fetch(`/api/forms/${formId}/deactivate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        Swal.fire({
+          title: 'تم!',
+          text: 'تم تعطيل النموذج بنجاح',
+          icon: 'success',
+          confirmButtonText: 'حسنًا'
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        throw new Error(result.message || 'فشل تعطيل النموذج');
+      }
+    } catch (error) {
+      console.error('Error deactivating form:', error);
+      Swal.fire({
+        title: 'خطأ!',
+        text: error.message || 'حدث خطأ أثناء تعطيل النموذج',
+        icon: 'error',
+        confirmButtonText: 'حسنًا'
+      });
+    }
+  }
+
+  async function deleteFormFromList(formId, formLink) {
     const result = await Swal.fire({
       title: "هل أنت متأكد؟",
       text: "هل أنت متأكد أنك تريد حذف هذا النموذج؟ لا يمكن التراجع عن هذا الإجراء!",
